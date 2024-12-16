@@ -21,7 +21,7 @@ serve(async (req) => {
 
   try {
     const { zipCode, estimatedUse } = await req.json();
-    console.log(`[Request] Processing request for ZIP: ${zipCode}, Usage: ${estimatedUse}`);
+    console.log(`[Edge Function] Processing request for ZIP: ${zipCode}, Usage: ${estimatedUse}`);
 
     if (!zipCode) {
       throw new Error('ZIP code is required');
@@ -37,7 +37,7 @@ serve(async (req) => {
       page_number: 1
     };
 
-    console.log('[API Request] Sending request to Power to Choose API:', JSON.stringify(requestBody, null, 2));
+    console.log('[Edge Function] Request body to Power to Choose API:', JSON.stringify(requestBody, null, 2));
 
     const response = await fetch(`${POWER_TO_CHOOSE_API}/plans`, {
       method: 'POST',
@@ -48,38 +48,36 @@ serve(async (req) => {
       body: JSON.stringify(requestBody),
     });
 
-    console.log('[API Response] Status:', response.status);
-    console.log('[API Response] Status Text:', response.statusText);
-    console.log('[API Response] Headers:', Object.fromEntries(response.headers.entries()));
+    console.log('[Edge Function] Power to Choose API response status:', response.status);
+    console.log('[Edge Function] Power to Choose API response headers:', Object.fromEntries(response.headers.entries()));
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('[API Error] Response:', errorText);
+      console.error('[Edge Function] Power to Choose API error response:', errorText);
       throw new Error(`API Error: ${response.status} ${response.statusText}\n${errorText}`);
     }
 
     // Get the raw response text and log it
     const rawText = await response.text();
-    console.log('[API Response] Raw text:', rawText);
+    console.log('[Edge Function] Power to Choose API raw response:', rawText);
     
     // Try to parse the response as JSON
     let data;
     try {
       data = JSON.parse(rawText);
-      console.log('[API Response] Parsed JSON:', JSON.stringify(data, null, 2));
+      console.log('[Edge Function] Parsed response:', JSON.stringify(data, null, 2));
     } catch (error) {
-      console.error('[Parse Error] Failed to parse response as JSON:', error);
-      console.error('[Parse Error] Raw text that failed to parse:', rawText);
+      console.error('[Edge Function] Failed to parse response as JSON:', error);
+      console.error('[Edge Function] Raw text that failed to parse:', rawText);
       throw new Error('Failed to parse API response as JSON');
     }
 
     // Extract plans from the response
     const apiPlans = Array.isArray(data) ? data : (data.data || []);
-    console.log(`[Processing] Found ${apiPlans.length} plans in response`);
-    console.log('[Processing] Plans:', JSON.stringify(apiPlans, null, 2));
+    console.log(`[Edge Function] Found ${apiPlans.length} plans in response`);
 
     if (!Array.isArray(apiPlans)) {
-      console.error('[Validation Error] Plans is not an array:', apiPlans);
+      console.error('[Edge Function] Plans is not an array:', apiPlans);
       throw new Error('Invalid plans format: expected array');
     }
 
@@ -102,14 +100,14 @@ serve(async (req) => {
       contract_length: plan.term_value || null
     }));
 
-    console.log('[Response] Sending transformed plans:', JSON.stringify(transformedPlans, null, 2));
+    console.log('[Edge Function] Sending transformed plans:', JSON.stringify(transformedPlans, null, 2));
 
     return new Response(JSON.stringify(transformedPlans), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
   } catch (error) {
-    console.error('[Error] Edge function error:', error);
+    console.error('[Edge Function] Error:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
