@@ -1,12 +1,12 @@
-import { serve } from "std/server";
-import { fetchPlans } from "./powerToChooseApi.ts"; // Fixed import path
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { fetchPlans } from "./powerToChooseApi.ts";
 
 serve(async (req) => {
   try {
     const { zipCode, estimatedUse } = await req.json();
     console.log(`[Edge Function] Received request for ZIP: ${zipCode}, Usage: ${estimatedUse}`);
 
-    const plans = await fetchPlans(zipCode, estimatedUse); // Fetch plans from the API
+    const plans = await fetchPlans(zipCode, estimatedUse);
     if (!plans || plans.length === 0) {
       throw new Error("No plans found for the given ZIP code.");
     }

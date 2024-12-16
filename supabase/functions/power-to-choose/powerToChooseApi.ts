@@ -1,4 +1,4 @@
-// This is the implementation of the fetchPlans function that was previously in @/lib/powerToChooseApi
+// This is the implementation of the fetchPlans function
 export async function fetchPlans(zipCode: string, estimatedUse?: string) {
   const baseUrl = "http://www.powertochoose.org/en-us/service/v1";
   
