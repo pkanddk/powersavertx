@@ -23,42 +23,43 @@ export type Plan = z.infer<typeof PlanSchema>;
 
 export const searchPlans = async (zipCode: string, estimatedUse?: string) => {
   try {
-    console.log(`Searching plans for ZIP: ${zipCode}, Usage: ${estimatedUse}`);
+    console.log(`[Frontend] Searching plans for ZIP: ${zipCode}, Usage: ${estimatedUse}`);
     
     // Call the Edge Function
-    const { data: responseData, error } = await supabase.functions.invoke('power-to-choose', {
+    console.log('[Frontend] Calling Edge Function with params:', { zipCode, estimatedUse });
+    const { data: responseData, error: functionError } = await supabase.functions.invoke('power-to-choose', {
       body: { zipCode, estimatedUse },
     });
 
-    console.log('Raw Edge Function response:', responseData);
+    console.log('[Frontend] Edge Function raw response:', responseData);
 
-    if (error) {
-      console.error('Error calling Edge Function:', error);
-      throw error;
+    if (functionError) {
+      console.error('[Frontend] Error calling Edge Function:', functionError);
+      throw functionError;
     }
 
     if (!responseData) {
-      console.error('No data received from Edge Function');
+      console.error('[Frontend] No data received from Edge Function');
       throw new Error('No data received from Edge Function');
     }
 
     // If responseData is an error object, throw it
     if ('error' in responseData) {
-      console.error('Error from Edge Function:', responseData.error);
+      console.error('[Frontend] Error from Edge Function:', responseData.error);
       throw new Error(responseData.error);
     }
 
     // Ensure we have an array to work with
     const plansArray = Array.isArray(responseData) ? responseData : [responseData];
-    console.log('Plans array before validation:', plansArray);
+    console.log('[Frontend] Plans array before validation:', plansArray);
 
     // Parse and validate the plans using Zod
     const validatedPlans = z.array(PlanSchema).parse(plansArray);
-    console.log('Validated plans:', validatedPlans);
+    console.log('[Frontend] Validated plans:', validatedPlans);
 
     return validatedPlans;
   } catch (error) {
-    console.error("Error fetching plans:", error);
+    console.error("[Frontend] Error fetching plans:", error);
     throw error;
   }
 };
