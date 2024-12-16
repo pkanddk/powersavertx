@@ -104,6 +104,8 @@ const mockPlans: Plan[] = [
 
 export const searchPlans = async (zipCode: string, estimatedUse?: string) => {
   try {
+    console.log(`Searching plans for ZIP: ${zipCode}, Usage: ${estimatedUse}`);
+    
     const { data, error } = await supabase.functions.invoke('power-to-choose', {
       body: { zipCode, estimatedUse },
     });
@@ -111,6 +113,11 @@ export const searchPlans = async (zipCode: string, estimatedUse?: string) => {
     if (error) {
       console.error('Error calling Edge Function:', error);
       // Fallback to mock data in case of error
+      return mockPlans;
+    }
+
+    if (!Array.isArray(data)) {
+      console.error('Invalid response format:', data);
       return mockPlans;
     }
 
