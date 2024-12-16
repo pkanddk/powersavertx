@@ -13,10 +13,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { ArrowUpDown } from "lucide-react";
 
 export default function Index() {
   const [search, setSearch] = useState<{ zipCode: string; estimatedUse: string } | null>(null);
   const [comparedPlans, setComparedPlans] = useState<Plan[]>([]);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const { toast } = useToast();
 
   const { data: plans, isLoading } = useQuery({
@@ -55,6 +57,15 @@ export default function Index() {
   const formatPrice = (price: number) => {
     return (price * 100).toFixed(1) + "¢";
   };
+
+  const toggleSort = () => {
+    setSortOrder(current => current === 'asc' ? 'desc' : 'asc');
+  };
+
+  const sortedPlans = plans ? [...plans].sort((a, b) => {
+    const multiplier = sortOrder === 'asc' ? 1 : -1;
+    return (a.price_kwh - b.price_kwh) * multiplier;
+  }) : [];
 
   return (
     <div className="min-h-screen bg-background">
@@ -129,16 +140,29 @@ export default function Index() {
         )}
 
         {plans && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {plans.map((plan: Plan) => (
-              <PlanCard 
-                key={`${plan.company_id}-${plan.plan_name}`} 
-                plan={plan}
-                onCompare={handleCompare}
-                isCompared={comparedPlans.some(p => p.company_id === plan.company_id)}
-              />
-            ))}
-          </div>
+          <>
+            <div className="flex justify-end mb-4">
+              <Button
+                variant="outline"
+                onClick={toggleSort}
+                className="flex items-center gap-2"
+              >
+                Sort by Price
+                <ArrowUpDown className="h-4 w-4" />
+                {sortOrder === 'asc' ? '(Low to High)' : '(High to Low)'}
+              </Button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {sortedPlans.map((plan: Plan) => (
+                <PlanCard 
+                  key={`${plan.company_id}-${plan.plan_name}`} 
+                  plan={plan}
+                  onCompare={handleCompare}
+                  isCompared={comparedPlans.some(p => p.company_id === plan.company_id)}
+                />
+              ))}
+            </div>
+          </>
         )}
       </main>
     </div>
