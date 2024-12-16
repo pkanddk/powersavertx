@@ -64,25 +64,46 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
     const transformedPlans = plans.map(plan => {
       // Extract and parse the price, handling different possible formats
       let price_kwh = 0;
-      if (plan.price_kwh) {
-        price_kwh = parseFloat(plan.price_kwh);
-      } else if (plan.price) {
-        price_kwh = parseFloat(plan.price);
-      } else if (plan.rate500 || plan.rate1000 || plan.rate2000) {
-        // If we have tiered rates, use the 1000 kWh rate as default, or fall back to other tiers
-        price_kwh = parseFloat(plan.rate1000) || parseFloat(plan.rate2000) || parseFloat(plan.rate500) || 0;
+      if (typeof plan.price_kwh === 'number') {
+        price_kwh = plan.price_kwh;
+      } else if (typeof plan.price === 'number') {
+        price_kwh = plan.price;
+      } else if (plan.rate1000) {
+        // Try to parse rate1000 as it's commonly used
+        const rate = parseFloat(plan.rate1000);
+        if (!isNaN(rate)) {
+          price_kwh = rate / 100; // Convert cents to dollars if needed
+        }
+      } else if (plan.rate500) {
+        // Fallback to rate500
+        const rate = parseFloat(plan.rate500);
+        if (!isNaN(rate)) {
+          price_kwh = rate / 100;
+        }
+      } else if (plan.rate2000) {
+        // Fallback to rate2000
+        const rate = parseFloat(plan.rate2000);
+        if (!isNaN(rate)) {
+          price_kwh = rate / 100;
+        }
       }
 
       // Log the price extraction for debugging
       console.log(`[Edge Function] Extracted price for plan ${plan.plan_name}:`, {
-        original: plan.price_kwh || plan.price || plan.rate1000,
+        original: {
+          price_kwh: plan.price_kwh,
+          price: plan.price,
+          rate500: plan.rate500,
+          rate1000: plan.rate1000,
+          rate2000: plan.rate2000
+        },
         parsed: price_kwh
       });
 
       return {
         company_id: String(plan.company_id || ""),
         company_name: String(plan.company_name || ""),
-        company_logo: plan.company_logo_name || null,
+        company_logo: plan.company_logo || null,
         plan_name: String(plan.plan_name || ""),
         plan_type_name: String(plan.plan_type || ""),
         fact_sheet: plan.fact_sheet || null,
