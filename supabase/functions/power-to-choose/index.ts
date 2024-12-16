@@ -1,7 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-const POWER_TO_CHOOSE_API = "http://api.powertochoose.org/api/PowerToChoose";
-
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -21,19 +19,20 @@ serve(async (req) => {
       throw new Error('ZIP code is required');
     }
 
-    // Format the request body according to the exact API requirements
-    const requestBody = {
-      zip_code: zipCode,
-      // Map the frontend usage values to API expected format
-      estimated_use: estimatedUse === "Any Range" ? null : 
-                    estimatedUse === "between 500 and 1,000" ? "500-1000" :
-                    estimatedUse === "between 1,001 and 2,000" ? "1001-2000" :
-                    estimatedUse === "more than 2,000" ? "2001+" : null,
-      renewable: null,
-      plan_type: null
-    };
+    // Construct the URL with query parameters
+    let apiUrl = `http://api.powertochoose.org/api/PowerToChoose/plans?zip_code=${zipCode}`;
+    
+    // Add estimated usage parameter if provided
+    if (estimatedUse && estimatedUse !== "Any Range") {
+      const usageParam = estimatedUse === "between 500 and 1,000" ? "500-1000" :
+                        estimatedUse === "between 1,001 and 2,000" ? "1001-2000" :
+                        estimatedUse === "more than 2,000" ? "2001+" : null;
+      if (usageParam) {
+        apiUrl += `&kwh=${usageParam}`;
+      }
+    }
 
-    console.log('[Edge Function] Formatted request body:', JSON.stringify(requestBody, null, 2));
+    console.log('[Edge Function] Making request to URL:', apiUrl);
 
     // Function to make the API request with retries
     const makeRequest = async (retries = 3, baseDelay = 1000) => {
@@ -41,23 +40,12 @@ serve(async (req) => {
         try {
           console.log(`[Edge Function] Making request attempt ${i + 1} of ${retries}`);
           
-          const response = await fetch(`${POWER_TO_CHOOSE_API}/plans`, {
-            method: 'POST',
+          const response = await fetch(apiUrl, {
+            method: 'GET',
             headers: {
-              'Content-Type': 'application/json',
               'Accept': 'application/json',
-              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-              'Origin': 'http://www.powertochoose.org',
-              'Referer': 'http://www.powertochoose.org/',
-              'X-Requested-With': 'XMLHttpRequest',
-              'Host': 'api.powertochoose.org',
-              'Connection': 'keep-alive',
-              'Cache-Control': 'no-cache',
-              'Pragma': 'no-cache',
-              'Accept-Language': 'en-US,en;q=0.9',
-              'Accept-Encoding': 'gzip, deflate'
-            },
-            body: JSON.stringify(requestBody),
+              'Content-Type': 'application/json'
+            }
           });
 
           console.log(`[Edge Function] Response status: ${response.status}`);
@@ -82,36 +70,14 @@ serve(async (req) => {
             throw new Error('Failed to parse API response as JSON');
           }
 
-          // Check if the response indicates an error or authentication issue
-          if (!response.ok || data.error || data.success === false || data.authenticated === false) {
-            console.error('[Edge Function] API returned error or authentication failed:', data);
-            if (data.authenticated === false) {
-              throw new Error('Authentication failed with Power to Choose API');
-            }
+          // Check if the response indicates an error
+          if (!response.ok || data.error) {
+            console.error('[Edge Function] API returned error:', data);
             throw new Error(data.message || 'API returned an error');
           }
 
-          // Try different response formats
-          let plans = null;
-          if (Array.isArray(data)) {
-            plans = data;
-          } else if (data.data && Array.isArray(data.data)) {
-            plans = data.data;
-          } else if (data.plans && Array.isArray(data.plans)) {
-            plans = data.plans;
-          } else if (data.Results && Array.isArray(data.Results)) {
-            plans = data.Results;
-          }
-
-          if (!plans) {
-            console.error('[Edge Function] No plans array found in response');
-            return [];
-          }
-
-          console.log(`[Edge Function] Found ${plans.length} plans`);
-
           // Transform plans
-          const transformedPlans = plans.map(plan => ({
+          const transformedPlans = data.map(plan => ({
             company_id: String(plan.company_id || ''),
             company_name: String(plan.company_name || ''),
             company_logo: plan.company_logo_name || null,
