@@ -55,8 +55,17 @@ serve(async (req) => {
       throw new Error(`API Error: ${response.status} ${response.statusText}`);
     }
 
-    const apiPlans = await response.json();
+    const data = await response.json();
+    console.log('API Response:', JSON.stringify(data));
+
+    // The API returns an object with a plans array
+    const apiPlans = data.plans || [];
     console.log(`Retrieved ${apiPlans.length} plans from API`);
+
+    if (!Array.isArray(apiPlans)) {
+      console.error('Invalid API response format:', apiPlans);
+      throw new Error('Invalid API response format');
+    }
 
     // Transform and store plans in Supabase
     const transformedPlans = apiPlans.map(plan => ({
@@ -79,7 +88,7 @@ serve(async (req) => {
 
     console.log(`Transformed ${transformedPlans.length} plans`);
 
-    // Delete existing plans for this ZIP code
+    // Delete existing plans for this ZIP code before inserting new ones
     const { error: deleteError } = await supabase
       .from('plans')
       .delete()
