@@ -53,10 +53,18 @@ export const searchPlans = async (zipCode: string, estimatedUse?: string) => {
     const plansArray = Array.isArray(responseData) ? responseData : [responseData];
     console.log('[Frontend] Plans array before validation:', plansArray);
 
-    // Parse and validate the plans using Zod
-    const validatedPlans = z.array(PlanSchema).parse(plansArray);
-    console.log('[Frontend] Validated plans:', validatedPlans);
+    // Parse and validate each plan individually to identify specific validation issues
+    const validatedPlans = plansArray.map((plan, index) => {
+      try {
+        return PlanSchema.parse(plan);
+      } catch (error) {
+        console.error(`[Frontend] Validation error for plan ${index}:`, error);
+        console.error(`[Frontend] Problem plan data:`, plan);
+        throw error;
+      }
+    });
 
+    console.log('[Frontend] Validated plans:', validatedPlans);
     return validatedPlans;
   } catch (error) {
     console.error("[Frontend] Error fetching plans:", error);
