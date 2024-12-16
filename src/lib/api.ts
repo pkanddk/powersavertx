@@ -15,6 +15,9 @@ export const PlanSchema = z.object({
   new_customer: z.boolean().nullable(),
   plan_details: z.string().nullable(),
   price_kwh: z.number(),
+  price_kwh500: z.number(),
+  price_kwh1000: z.number(),
+  price_kwh2000: z.number(),
   base_charge: z.number().nullable(),
   contract_length: z.number().nullable()
 });

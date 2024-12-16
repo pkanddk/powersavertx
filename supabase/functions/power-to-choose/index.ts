@@ -58,7 +58,6 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
     console.log(`[Edge Function] Found ${plans.length} plans`);
 
     const transformedPlans = plans.map(plan => {
-      // Log raw plan data for debugging
       console.log(`[Edge Function] Processing plan: ${plan.plan_name}`);
       console.log(`[Edge Function] Raw rate data:`, {
         price_kwh500: plan.price_kwh500,
@@ -71,37 +70,29 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
         price: plan.price
       });
 
-      // Helper function to parse rate strings and convert from cents to dollars
       const parseRate = (rate: string | number | null | undefined): number => {
         if (!rate) return 0;
-        
-        // Convert to string and remove any non-numeric characters except decimal points
         const cleanRate = String(rate).replace(/[^\d.]/g, '');
         const parsed = parseFloat(cleanRate);
-        
-        // Convert from cents to dollars (divide by 100)
         const result = isNaN(parsed) ? 0 : parsed / 100;
         console.log(`[Edge Function] Parsing rate: ${rate} -> ${cleanRate} -> ${parsed} -> ${result}`);
         return result;
       };
 
-      // Try to get the rate from various possible fields, prioritizing price_kwh1000
-      let price_kwh = 0;
-      if (plan.price_kwh1000) {
-        price_kwh = parseRate(plan.price_kwh1000);
-        console.log(`[Edge Function] Using price_kwh1000: ${plan.price_kwh1000} -> ${price_kwh}`);
-      } else if (plan.rate1000) {
-        price_kwh = parseRate(plan.rate1000);
-        console.log(`[Edge Function] Using rate1000: ${plan.rate1000} -> ${price_kwh}`);
-      } else if (plan.avgprice) {
-        price_kwh = parseRate(plan.avgprice);
-        console.log(`[Edge Function] Using avgprice: ${plan.avgprice} -> ${price_kwh}`);
-      } else if (plan.price) {
-        price_kwh = parseRate(plan.price);
-        console.log(`[Edge Function] Using price: ${plan.price} -> ${price_kwh}`);
-      }
+      // Parse all three rate tiers
+      const price_kwh500 = parseRate(plan.price_kwh500 || plan.rate500);
+      const price_kwh1000 = parseRate(plan.price_kwh1000 || plan.rate1000);
+      const price_kwh2000 = parseRate(plan.price_kwh2000 || plan.rate2000);
 
-      console.log(`[Edge Function] Final price_kwh for plan ${plan.plan_name}: ${price_kwh}`);
+      // Default to 500 kWh rate if no usage specified
+      const price_kwh = price_kwh500;
+
+      console.log(`[Edge Function] Final rates for plan ${plan.plan_name}:`, {
+        price_kwh500,
+        price_kwh1000,
+        price_kwh2000,
+        selected_price: price_kwh
+      });
 
       return {
         company_id: String(plan.company_id || ""),
@@ -116,7 +107,10 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
         minimum_usage: Boolean(plan.minimum_usage),
         new_customer: Boolean(plan.new_customer),
         plan_details: String(plan.special_terms || ""),
-        price_kwh: price_kwh,
+        price_kwh,
+        price_kwh500,
+        price_kwh1000,
+        price_kwh2000,
         base_charge: plan.base_charge ? parseFloat(plan.base_charge) : null,
         contract_length: plan.term_value ? parseInt(plan.term_value) : null
       };

@@ -37,11 +37,18 @@ export function PlanCard({ plan, onCompare, isCompared }: PlanCardProps) {
         </div>
         
         <div className="space-y-4">
-          <div className="flex justify-between items-baseline">
-            <span className="text-3xl font-bold text-primary">
-              {formatPrice(plan.price_kwh)}
-            </span>
-            <span className="text-sm text-muted-foreground">per kWh</span>
+          <div className="space-y-2">
+            <div className="flex justify-between items-baseline">
+              <span className="text-3xl font-bold text-primary">
+                {formatPrice(plan.price_kwh)}
+              </span>
+              <span className="text-sm text-muted-foreground">per kWh</span>
+            </div>
+            <div className="text-sm text-muted-foreground space-y-1">
+              <div>500 kWh: {formatPrice(plan.price_kwh500)}</div>
+              <div>1,000 kWh: {formatPrice(plan.price_kwh1000)}</div>
+              <div>2,000 kWh: {formatPrice(plan.price_kwh2000)}</div>
+            </div>
           </div>
           
           {plan.base_charge && (
