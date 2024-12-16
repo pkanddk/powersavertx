@@ -55,6 +55,12 @@ serve(async (req) => {
 
           console.log(`[Edge Function] Response status: ${response.status}`);
           
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error(`[Edge Function] API Error Response: ${errorText}`);
+            throw new Error(`API returned ${response.status}: ${errorText}`);
+          }
+
           // Get the raw response text first
           const rawText = await response.text();
           console.log('[Edge Function] Raw response:', rawText);
