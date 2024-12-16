@@ -27,8 +27,8 @@ serve(async (req) => {
       estimated_use: estimatedUse || null,
       renewable: null,
       plan_type: null,
-      page_size: 200,  // Increased page size to get more results
-      page_number: 1   // First page
+      page_size: 200,
+      page_number: 1
     };
 
     console.log('Sending request to Power to Choose API:', requestBody);
@@ -50,9 +50,32 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    console.log(`Successfully retrieved ${data.length || 0} plans`);
+    console.log(`Retrieved ${data.length} plans from API`);
+    console.log('First plan example:', data[0]);
 
-    return new Response(JSON.stringify(data), {
+    // Transform the data to include company names and ensure all required fields
+    const transformedData = data.map(plan => ({
+      company_id: plan.company_id,
+      company_name: plan.company_name,
+      company_logo: plan.company_logo_name,
+      plan_name: plan.plan_name,
+      plan_type_name: plan.plan_type,
+      fact_sheet: plan.fact_sheet,
+      go_to_plan: plan.enroll_now,
+      jdp_rating: plan.rating || 0,
+      jdp_rating_year: new Date().getFullYear().toString(),
+      minimum_usage: Boolean(plan.minimum_usage),
+      new_customer: Boolean(plan.new_customer),
+      plan_details: plan.special_terms || '',
+      price_kwh: plan.price_kwh,
+      base_charge: plan.base_charge || null,
+      contract_length: plan.term_value || 0
+    }));
+
+    console.log(`Transformed ${transformedData.length} plans`);
+    console.log('First transformed plan example:', transformedData[0]);
+
+    return new Response(JSON.stringify(transformedData), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 

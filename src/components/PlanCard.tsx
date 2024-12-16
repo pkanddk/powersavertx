@@ -20,13 +20,16 @@ export function PlanCard({ plan, onCompare, isCompared }: PlanCardProps) {
       <CardHeader className="flex-none h-32 flex items-center justify-center p-4 bg-secondary/50">
         <img 
           src={plan.company_logo} 
-          alt={`${plan.plan_name} logo`}
+          alt={`${plan.company_name} logo`}
           className="max-h-full max-w-full object-contain"
         />
       </CardHeader>
       <CardContent className="flex-1 p-6">
         <div className="flex justify-between items-start mb-4">
-          <h3 className="text-xl font-semibold">{plan.plan_name}</h3>
+          <div>
+            <h3 className="text-xl font-semibold">{plan.plan_name}</h3>
+            <p className="text-sm text-muted-foreground">{plan.company_name}</p>
+          </div>
           <div className="flex items-center">
             <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
             <span className="ml-1 text-sm">{plan.jdp_rating}</span>

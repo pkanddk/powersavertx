@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const PlanSchema = z.object({
   company_id: z.string(),
+  company_name: z.string(),
   company_logo: z.string(),
   plan_name: z.string(),
   plan_type_name: z.string(),
@@ -24,6 +25,7 @@ export type Plan = z.infer<typeof PlanSchema>;
 const mockPlans: Plan[] = [
   {
     company_id: "1",
+    company_name: "Energy Co 1",
     company_logo: "https://placehold.co/200x100?text=Energy+Co+1",
     plan_name: "Basic Energy Plan",
     plan_type_name: "Fixed Rate",
@@ -40,6 +42,7 @@ const mockPlans: Plan[] = [
   },
   {
     company_id: "2",
+    company_name: "Energy Co 2",
     company_logo: "https://placehold.co/200x100?text=Energy+Co+2",
     plan_name: "Green Energy Plus",
     plan_type_name: "Variable Rate",
@@ -55,6 +58,7 @@ const mockPlans: Plan[] = [
   },
   {
     company_id: "3",
+    company_name: "Energy Co 3",
     company_logo: "https://placehold.co/200x100?text=Energy+Co+3",
     plan_name: "Premium Power",
     plan_type_name: "Fixed Rate",
@@ -71,6 +75,7 @@ const mockPlans: Plan[] = [
   },
   {
     company_id: "4",
+    company_name: "Energy Co 4",
     company_logo: "https://placehold.co/200x100?text=Energy+Co+4",
     plan_name: "Value Saver",
     plan_type_name: "Fixed Rate",
@@ -87,6 +92,7 @@ const mockPlans: Plan[] = [
   },
   {
     company_id: "5",
+    company_name: "Energy Co 5",
     company_logo: "https://placehold.co/200x100?text=Energy+Co+5",
     plan_name: "Freedom Plan",
     plan_type_name: "Variable Rate",
