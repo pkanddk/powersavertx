@@ -50,9 +50,12 @@ serve(async (req) => {
               'Origin': 'http://www.powertochoose.org',
               'Referer': 'http://www.powertochoose.org/',
               'X-Requested-With': 'XMLHttpRequest',
+              'Host': 'api.powertochoose.org',
               'Connection': 'keep-alive',
               'Cache-Control': 'no-cache',
-              'Pragma': 'no-cache'
+              'Pragma': 'no-cache',
+              'Accept-Language': 'en-US,en;q=0.9',
+              'Accept-Encoding': 'gzip, deflate'
             },
             body: JSON.stringify(requestBody),
           });
