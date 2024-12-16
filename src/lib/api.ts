@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const API_BASE_URL = "https://cors.sh/https://www.powertochoose.org/en-us/service/v1";
+const API_BASE_URL = "https://cors-proxy.org/?url=https://www.powertochoose.org/en-us/service/v1";
 
 export const PlanSchema = z.object({
   company_id: z.string(),
@@ -26,7 +26,7 @@ export const searchPlans = async (zipCode: string, estimatedUse?: string) => {
         "Content-Type": "application/json",
         "Accept": "application/json",
         "Origin": window.location.origin,
-        "x-cors-api-key": "temp_f0e098de2d2f1e7d5f36a623e2b33c9d"
+        "X-Requested-With": "XMLHttpRequest"
       },
       body: JSON.stringify({
         zip_code: zipCode,
