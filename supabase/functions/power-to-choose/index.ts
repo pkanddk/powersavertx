@@ -13,6 +13,9 @@ const supabase = createClient(
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 );
 
+// Add delay function for rate limiting
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -39,23 +42,46 @@ serve(async (req) => {
 
     console.log('[Edge Function] Request body to Power to Choose API:', JSON.stringify(requestBody, null, 2));
 
-    const response = await fetch(`${POWER_TO_CHOOSE_API}/plans`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify(requestBody),
-    });
+    // Function to make the API request with retries
+    const makeRequest = async (retries = 3, delay = 1000) => {
+      for (let i = 0; i < retries; i++) {
+        try {
+          const response = await fetch(`${POWER_TO_CHOOSE_API}/plans`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            body: JSON.stringify(requestBody),
+          });
 
-    console.log('[Edge Function] Power to Choose API response status:', response.status);
-    console.log('[Edge Function] Power to Choose API response headers:', Object.fromEntries(response.headers.entries()));
+          console.log('[Edge Function] Power to Choose API response status:', response.status);
+          
+          if (response.status === 429) {
+            console.log(`[Edge Function] Rate limited, attempt ${i + 1} of ${retries}`);
+            if (i < retries - 1) {
+              await new Promise(resolve => setTimeout(resolve, delay * (i + 1))); // Exponential backoff
+              continue;
+            }
+            throw new Error('Rate limit exceeded. Please try again later.');
+          }
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('[Edge Function] Power to Choose API error response:', errorText);
-      throw new Error(`API Error: ${response.status} ${response.statusText}\n${errorText}`);
-    }
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error('[Edge Function] Power to Choose API error response:', errorText);
+            throw new Error(`API Error: ${response.status} ${response.statusText}\n${errorText}`);
+          }
+
+          return response;
+        } catch (error) {
+          if (i === retries - 1) throw error;
+          await new Promise(resolve => setTimeout(resolve, delay * (i + 1)));
+        }
+      }
+    };
+
+    const response = await makeRequest();
+    if (!response) throw new Error('Failed to get response from API');
 
     // Get the raw response text and log it
     const rawText = await response.text();
@@ -111,7 +137,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
-        status: 500,
+        status: error.message.includes('Rate limit') ? 429 : 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     );
