@@ -1,10 +1,5 @@
 import { z } from "zod";
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
+import { supabase } from "@/integrations/supabase/client";
 
 export const PlanSchema = z.object({
   company_id: z.string(),
