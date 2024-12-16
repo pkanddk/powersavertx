@@ -55,16 +55,21 @@ serve(async (req) => {
       throw new Error(`API Error: ${response.status} ${response.statusText}`);
     }
 
-    const data = await response.json();
-    console.log('API Response structure:', Object.keys(data));
+    const rawData = await response.text();
+    console.log('Raw API Response:', rawData);
+    
+    const data = JSON.parse(rawData);
+    console.log('Parsed API Response:', data);
 
-    // The API returns an object with a plans array
-    const apiPlans = data.data || [];
+    // The API returns the plans directly in the response
+    const apiPlans = Array.isArray(data) ? data : [];
     console.log(`Retrieved ${apiPlans.length} plans from API`);
 
-    if (!Array.isArray(apiPlans)) {
-      console.error('Invalid API response format:', apiPlans);
-      throw new Error('Invalid API response format');
+    if (apiPlans.length === 0) {
+      console.log('No plans found for the given ZIP code');
+      return new Response(JSON.stringify([]), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     // Transform and store plans in Supabase
@@ -111,8 +116,8 @@ serve(async (req) => {
 
     console.log(`Successfully stored ${insertedPlans.length} plans in database`);
 
-    // Return the inserted plans
-    return new Response(JSON.stringify(insertedPlans), {
+    // Return the transformed plans directly
+    return new Response(JSON.stringify(transformedPlans), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
