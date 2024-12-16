@@ -5,9 +5,111 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+async function makeRequest(url: string, method: string, headers: Record<string, string>) {
+  try {
+    console.log("[Edge Function] Making request to:", url);
+    console.log("[Edge Function] Request Method:", method);
+    console.log("[Edge Function] Request Headers:", headers);
+
+    const response = await fetch(url, {
+      method,
+      headers,
+    });
+
+    console.log("[Edge Function] Response Status:", response.status);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("[Edge Function] Error Response:", errorText);
+      throw new Error(`HTTP Error ${response.status}: ${errorText}`);
+    }
+
+    const responseText = await response.text();
+    console.log("[Edge Function] Raw response:", responseText);
+
+    // Try to parse the response as JSON
+    let data;
+    try {
+      data = JSON.parse(responseText);
+      console.log("[Edge Function] Parsed response:", data);
+    } catch (parseError) {
+      console.error("[Edge Function] JSON parse error:", parseError);
+      throw new Error("Failed to parse API response as JSON");
+    }
+
+    // Check if the response indicates an error
+    if (data.error || (data.success === false)) {
+      console.error("[Edge Function] API returned error:", data);
+      throw new Error(data.message || "API returned an error");
+    }
+
+    // Extract plans from the response structure
+    let plans = [];
+    if (Array.isArray(data)) {
+      plans = data;
+    } else if (data.data && Array.isArray(data.data)) {
+      plans = data.data;
+    } else if (data.plans && Array.isArray(data.plans)) {
+      plans = data.plans;
+    } else if (data.Results && Array.isArray(data.Results)) {
+      plans = data.Results;
+    } else {
+      console.error("[Edge Function] Unexpected response structure:", data);
+      throw new Error("Unexpected response structure from API");
+    }
+
+    console.log(`[Edge Function] Found ${plans.length} plans`);
+
+    // Transform plans with proper price handling
+    const transformedPlans = plans.map(plan => {
+      // Extract and parse the price, handling different possible formats
+      let price_kwh = 0;
+      if (plan.price_kwh) {
+        price_kwh = parseFloat(plan.price_kwh);
+      } else if (plan.price) {
+        price_kwh = parseFloat(plan.price);
+      } else if (plan.rate500 || plan.rate1000 || plan.rate2000) {
+        // If we have tiered rates, use the 1000 kWh rate as default, or fall back to other tiers
+        price_kwh = parseFloat(plan.rate1000) || parseFloat(plan.rate2000) || parseFloat(plan.rate500) || 0;
+      }
+
+      // Log the price extraction for debugging
+      console.log(`[Edge Function] Extracted price for plan ${plan.plan_name}:`, {
+        original: plan.price_kwh || plan.price || plan.rate1000,
+        parsed: price_kwh
+      });
+
+      return {
+        company_id: String(plan.company_id || ""),
+        company_name: String(plan.company_name || ""),
+        company_logo: plan.company_logo_name || null,
+        plan_name: String(plan.plan_name || ""),
+        plan_type_name: String(plan.plan_type || ""),
+        fact_sheet: plan.fact_sheet || null,
+        go_to_plan: plan.enroll_now || null,
+        jdp_rating: plan.rating ? parseFloat(plan.rating) : null,
+        jdp_rating_year: new Date().getFullYear().toString(),
+        minimum_usage: Boolean(plan.minimum_usage),
+        new_customer: Boolean(plan.new_customer),
+        plan_details: String(plan.special_terms || ""),
+        price_kwh: price_kwh,
+        base_charge: plan.base_charge ? parseFloat(plan.base_charge) : null,
+        contract_length: plan.term_value ? parseInt(plan.term_value) : null
+      };
+    });
+
+    console.log(`[Edge Function] Successfully transformed ${transformedPlans.length} plans`);
+    return transformedPlans;
+
+  } catch (error) {
+    console.error(`[Edge Function] Request failed:`, error);
+    throw error;
+  }
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
+  if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
@@ -16,7 +118,7 @@ serve(async (req) => {
     console.log(`[Edge Function] Received request with ZIP: ${zipCode}, Usage: ${estimatedUse}`);
 
     if (!zipCode) {
-      throw new Error('ZIP code is required');
+      throw new Error("ZIP code is required");
     }
 
     // Construct the URL with query parameters
@@ -32,125 +134,30 @@ serve(async (req) => {
       }
     }
 
-    console.log('[Edge Function] Making request to URL:', apiUrl);
+    console.log("[Edge Function] Making request to URL:", apiUrl);
 
-    // Function to make the API request with retries
-    const makeRequest = async (retries = 3, baseDelay = 1000) => {
-      for (let i = 0; i < retries; i++) {
-        try {
-          console.log(`[Edge Function] Making request attempt ${i + 1} of ${retries}`);
-          
-          const response = await fetch(apiUrl, {
-            method: 'GET',
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-            }
-          });
-
-          console.log(`[Edge Function] Response status: ${response.status}`);
-          
-          // Get the response text first
-          const responseText = await response.text();
-          console.log('[Edge Function] Raw response:', responseText);
-
-          // If the response is empty
-          if (!responseText) {
-            console.error('[Edge Function] Empty response received');
-            throw new Error('Empty response from API');
-          }
-
-          // Try to parse the response as JSON
-          let data;
-          try {
-            data = JSON.parse(responseText);
-            console.log('[Edge Function] Parsed response:', data);
-          } catch (parseError) {
-            console.error('[Edge Function] JSON parse error:', parseError);
-            throw new Error('Failed to parse API response as JSON');
-          }
-
-          // Check if the response indicates an error
-          if (!response.ok || data.error) {
-            console.error('[Edge Function] API returned error:', data);
-            throw new Error(data.message || 'API returned an error');
-          }
-
-          // Extract plans from the response structure
-          let plans = [];
-          if (Array.isArray(data)) {
-            plans = data;
-          } else if (data.data && Array.isArray(data.data)) {
-            plans = data.data;
-          } else if (data.plans && Array.isArray(data.plans)) {
-            plans = data.plans;
-          } else if (data.Results && Array.isArray(data.Results)) {
-            plans = data.Results;
-          } else {
-            console.error('[Edge Function] Unexpected response structure:', data);
-            throw new Error('Unexpected response structure from API');
-          }
-
-          console.log(`[Edge Function] Found ${plans.length} plans`);
-
-          // Transform plans
-          const transformedPlans = plans.map(plan => ({
-            company_id: String(plan.company_id || ''),
-            company_name: String(plan.company_name || ''),
-            company_logo: plan.company_logo_name || null,
-            plan_name: String(plan.plan_name || ''),
-            plan_type_name: String(plan.plan_type || ''),
-            fact_sheet: plan.fact_sheet || null,
-            go_to_plan: plan.enroll_now || null,
-            jdp_rating: plan.rating ? parseFloat(plan.rating) : null,
-            jdp_rating_year: new Date().getFullYear().toString(),
-            minimum_usage: Boolean(plan.minimum_usage),
-            new_customer: Boolean(plan.new_customer),
-            plan_details: String(plan.special_terms || ''),
-            price_kwh: parseFloat(plan.price_kwh || '0'),
-            base_charge: plan.base_charge ? parseFloat(plan.base_charge) : null,
-            contract_length: plan.term_value ? parseInt(plan.term_value) : null
-          }));
-
-          console.log(`[Edge Function] Successfully transformed ${transformedPlans.length} plans`);
-          return transformedPlans;
-
-        } catch (error) {
-          console.error(`[Edge Function] Request attempt ${i + 1} failed:`, error);
-          
-          // If this is the last retry, throw the error
-          if (i === retries - 1) {
-            throw error;
-          }
-          
-          // Otherwise wait and retry
-          const delay = baseDelay * Math.pow(2, i);
-          console.log(`[Edge Function] Waiting ${delay}ms before retry`);
-          await new Promise(resolve => setTimeout(resolve, delay));
-        }
-      }
-      throw new Error('All retry attempts failed');
-    };
-
-    const plans = await makeRequest();
+    const plans = await makeRequest(apiUrl, "GET", {
+      "Accept": "application/json",
+      "Content-Type": "application/json"
+    });
     
     return new Response(JSON.stringify(plans), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200
     });
 
   } catch (error) {
-    console.error('[Edge Function] Error:', error);
+    console.error("[Edge Function] Error:", error);
     
     return new Response(
       JSON.stringify({
         error: true,
-        message: error.message || 'An unexpected error occurred',
+        message: error.message || "An unexpected error occurred",
         details: error.stack
       }),
       {
         status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
       }
     );
   }
