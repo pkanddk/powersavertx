@@ -1,4 +1,3 @@
-// Follow Deno's deployment guidelines for Supabase Edge Functions
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const POWER_TO_CHOOSE_API = "https://www.powertochoose.org/en-us/service/v1";
@@ -6,7 +5,6 @@ const POWER_TO_CHOOSE_API = "https://www.powertochoose.org/en-us/service/v1";
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
 serve(async (req) => {
@@ -16,10 +14,6 @@ serve(async (req) => {
   }
 
   try {
-    if (req.method !== 'POST') {
-      throw new Error('Method not allowed');
-    }
-
     const { zipCode, estimatedUse } = await req.json();
     console.log(`Processing request for ZIP: ${zipCode}, Usage: ${estimatedUse}`);
 
@@ -30,44 +24,20 @@ serve(async (req) => {
     // Format the request body according to the Power to Choose API requirements
     const requestBody = {
       zip_code: zipCode,
-      // Include other required parameters
-      product_id: "",
-      promo_code: "",
-      sort_by: "",
-      sort_order: "",
-      page_size: 100,
-      page_number: 1,
-      filter_by_contract_length: "",
       filter_by_kwh_usage: estimatedUse || "Any Range",
-      filter_by_price: "",
-      filter_by_renewable: "",
-      filter_by_special_offer: "",
-      filter_by_prepaid: "",
-      filter_by_time_of_use: "",
-      filter_by_spanish: "",
-      filter_by_satisfaction: "",
-      filter_by_jdp_rating: "",
-      filter_by_company: "",
-      filter_by_plan_type: "",
-      filter_by_min_price: "",
-      filter_by_max_price: "",
-      filter_by_min_renewable: "",
-      filter_by_max_renewable: "",
-      filter_by_min_contract_length: "",
-      filter_by_max_contract_length: "",
-      filter_by_min_cancellation_fee: "",
-      filter_by_max_cancellation_fee: "",
-      filter_by_min_satisfaction: "",
-      filter_by_max_satisfaction: "",
-      filter_by_min_jdp_rating: "",
-      filter_by_max_jdp_rating: "",
+      page_size: 100,
+      page_number: 1
     };
 
-    const response = await fetch(`${POWER_TO_CHOOSE_API}/plans`, {
+    console.log('Sending request to Power to Choose API:', requestBody);
+
+    const response = await fetch(`${POWER_TO_CHOOSE_API}/plans/search`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
+        'User-Agent': 'Mozilla/5.0',
+        'Origin': 'https://www.powertochoose.org'
       },
       body: JSON.stringify(requestBody),
     });
