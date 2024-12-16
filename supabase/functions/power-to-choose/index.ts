@@ -26,7 +26,9 @@ serve(async (req) => {
       zip_code: zipCode,
       estimated_use: estimatedUse || null,
       renewable: null,
-      plan_type: null
+      plan_type: null,
+      page_size: 200,  // Increased page size to get more results
+      page_number: 1   // First page
     };
 
     console.log('Sending request to Power to Choose API:', requestBody);
