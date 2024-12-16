@@ -58,17 +58,19 @@ serve(async (req) => {
       throw new Error(`API Error: ${response.status} ${response.statusText}`);
     }
 
-    const rawData = await response.text();
-    console.log('Raw API Response:', rawData);
+    // Get the raw response text first
+    const rawText = await response.text();
+    console.log('Raw API Response:', rawText);
     
     let apiPlans;
     try {
-      const data = JSON.parse(rawData);
-      console.log('Parsed API Response:', data);
+      // Try to parse the raw text
+      const data = JSON.parse(rawText);
+      console.log('Parsed API Response:', JSON.stringify(data, null, 2));
       
       // Check if the response is an array or has a data property
       apiPlans = Array.isArray(data) ? data : (data.data || []);
-      console.log('Extracted plans:', apiPlans);
+      console.log('Extracted plans:', JSON.stringify(apiPlans, null, 2));
     } catch (error) {
       console.error('Error parsing API response:', error);
       throw new Error('Invalid API response format');
