@@ -1,5 +1,5 @@
 import { serve } from "std/server";
-import { fetchPlans } from "@/lib/powerToChooseApi"; // Adjust the import based on your project structure
+import { fetchPlans } from "./powerToChooseApi.ts"; // Fixed import path
 
 serve(async (req) => {
   try {
