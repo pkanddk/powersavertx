@@ -59,13 +59,16 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
 
     const transformedPlans = plans.map(plan => {
       // Log raw plan data for debugging
-      console.log(`[Edge Function] Raw plan data for ${plan.plan_name}:`, {
+      console.log(`[Edge Function] Processing plan: ${plan.plan_name}`);
+      console.log(`[Edge Function] Raw rate data:`, {
         price_kwh500: plan.price_kwh500,
         price_kwh1000: plan.price_kwh1000,
         price_kwh2000: plan.price_kwh2000,
         rate500: plan.rate500,
         rate1000: plan.rate1000,
-        rate2000: plan.rate2000
+        rate2000: plan.rate2000,
+        avgprice: plan.avgprice,
+        price: plan.price
       });
 
       // Helper function to parse rate strings and convert from cents to dollars
@@ -77,22 +80,28 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
         const parsed = parseFloat(cleanRate);
         
         // Convert from cents to dollars (divide by 100)
-        return isNaN(parsed) ? 0 : parsed / 100;
+        const result = isNaN(parsed) ? 0 : parsed / 100;
+        console.log(`[Edge Function] Parsing rate: ${rate} -> ${cleanRate} -> ${parsed} -> ${result}`);
+        return result;
       };
 
       // Try to get the rate from various possible fields, prioritizing price_kwh1000
       let price_kwh = 0;
       if (plan.price_kwh1000) {
         price_kwh = parseRate(plan.price_kwh1000);
+        console.log(`[Edge Function] Using price_kwh1000: ${plan.price_kwh1000} -> ${price_kwh}`);
       } else if (plan.rate1000) {
         price_kwh = parseRate(plan.rate1000);
-      } else if (plan.price_kwh500) {
-        price_kwh = parseRate(plan.price_kwh500);
-      } else if (plan.rate500) {
-        price_kwh = parseRate(plan.rate500);
+        console.log(`[Edge Function] Using rate1000: ${plan.rate1000} -> ${price_kwh}`);
+      } else if (plan.avgprice) {
+        price_kwh = parseRate(plan.avgprice);
+        console.log(`[Edge Function] Using avgprice: ${plan.avgprice} -> ${price_kwh}`);
+      } else if (plan.price) {
+        price_kwh = parseRate(plan.price);
+        console.log(`[Edge Function] Using price: ${plan.price} -> ${price_kwh}`);
       }
 
-      console.log(`[Edge Function] Final price_kwh for plan ${plan.plan_name}:`, price_kwh);
+      console.log(`[Edge Function] Final price_kwh for plan ${plan.plan_name}: ${price_kwh}`);
 
       return {
         company_id: String(plan.company_id || ""),
