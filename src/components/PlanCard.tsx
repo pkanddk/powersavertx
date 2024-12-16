@@ -86,16 +86,20 @@ export function PlanCard({ plan, onCompare, isCompared }: PlanCardProps) {
               {isCompared ? "Remove from Compare" : "Add to Compare"}
             </Button>
           )}
-          <Button asChild className="w-full">
-            <a href={plan.go_to_plan} target="_blank" rel="noopener noreferrer">
-              View Plan
-            </a>
-          </Button>
-          <Button variant="outline" asChild className="w-full">
-            <a href={plan.fact_sheet} target="_blank" rel="noopener noreferrer">
-              Fact Sheet
-            </a>
-          </Button>
+          {plan.go_to_plan && (
+            <Button asChild className="w-full">
+              <a href={plan.go_to_plan} target="_blank" rel="noopener noreferrer">
+                View Plan
+              </a>
+            </Button>
+          )}
+          {plan.fact_sheet && (
+            <Button variant="outline" asChild className="w-full">
+              <a href={plan.fact_sheet} target="_blank" rel="noopener noreferrer">
+                Fact Sheet
+              </a>
+            </Button>
+          )}
         </div>
       </CardFooter>
     </Card>
