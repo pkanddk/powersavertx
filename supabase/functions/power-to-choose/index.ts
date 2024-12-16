@@ -55,25 +55,24 @@ serve(async (req) => {
 
           console.log(`[Edge Function] Response status: ${response.status}`);
           
+          // Get the response text first
+          const responseText = await response.text();
+          console.log('[Edge Function] Raw response:', responseText);
+
+          // If the response is not ok, throw an error with the response text
           if (!response.ok) {
-            const errorText = await response.text();
-            console.error(`[Edge Function] API Error Response: ${errorText}`);
-            throw new Error(`API returned ${response.status}: ${errorText}`);
+            throw new Error(`API returned ${response.status}: ${responseText}`);
           }
 
-          // Get the raw response text first
-          const rawText = await response.text();
-          console.log('[Edge Function] Raw response:', rawText);
-
           // Check if the response is empty
-          if (!rawText) {
+          if (!responseText) {
             throw new Error('Empty response from API');
           }
 
           // Try to parse the response as JSON
           let data;
           try {
-            data = JSON.parse(rawText);
+            data = JSON.parse(responseText);
           } catch (parseError) {
             console.error('[Edge Function] JSON parse error:', parseError);
             throw new Error('Failed to parse API response as JSON');
