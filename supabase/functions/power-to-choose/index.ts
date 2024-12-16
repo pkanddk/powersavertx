@@ -48,6 +48,9 @@ serve(async (req) => {
       body: JSON.stringify(requestBody),
     });
 
+    console.log('API Response Status:', response.status);
+    console.log('API Response Headers:', Object.fromEntries(response.headers.entries()));
+
     if (!response.ok) {
       console.error(`API Error: ${response.status} ${response.statusText}`);
       const errorText = await response.text();
@@ -78,13 +81,6 @@ serve(async (req) => {
 
     console.log(`Retrieved ${apiPlans.length} plans from API`);
 
-    if (apiPlans.length === 0) {
-      console.log('No plans found for the given ZIP code');
-      return new Response(JSON.stringify([]), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
     // Transform plans
     const transformedPlans = apiPlans.map(plan => ({
       company_id: plan.company_id,
@@ -94,42 +90,17 @@ serve(async (req) => {
       plan_type_name: plan.plan_type,
       fact_sheet: plan.fact_sheet,
       go_to_plan: plan.enroll_now,
-      jdp_rating: plan.rating || 0,
+      jdp_rating: plan.rating || null,
       jdp_rating_year: new Date().getFullYear().toString(),
       minimum_usage: Boolean(plan.minimum_usage),
       new_customer: Boolean(plan.new_customer),
       plan_details: plan.special_terms || '',
       price_kwh: plan.price_kwh,
       base_charge: plan.base_charge || null,
-      contract_length: plan.term_value || 0
+      contract_length: plan.term_value || null
     }));
 
     console.log('Transformed plans:', transformedPlans);
-
-    // Delete existing plans for this company before inserting new ones
-    if (transformedPlans.length > 0) {
-      const { error: deleteError } = await supabase
-        .from('plans')
-        .delete()
-        .eq('company_id', transformedPlans[0].company_id);
-
-      if (deleteError) {
-        console.error('Error deleting existing plans:', deleteError);
-      }
-    }
-
-    // Insert transformed plans
-    const { data: insertedPlans, error: insertError } = await supabase
-      .from('plans')
-      .insert(transformedPlans)
-      .select();
-
-    if (insertError) {
-      console.error('Error inserting plans:', insertError);
-      throw new Error('Failed to store plans in database');
-    }
-
-    console.log(`Successfully stored ${insertedPlans?.length || 0} plans in database`);
 
     // Return the transformed plans directly
     return new Response(JSON.stringify(transformedPlans), {
