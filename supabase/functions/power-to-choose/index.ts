@@ -76,8 +76,25 @@ serve(async (req) => {
             throw new Error(data.message || 'API returned an error');
           }
 
+          // Extract plans from the response structure
+          let plans = [];
+          if (Array.isArray(data)) {
+            plans = data;
+          } else if (data.data && Array.isArray(data.data)) {
+            plans = data.data;
+          } else if (data.plans && Array.isArray(data.plans)) {
+            plans = data.plans;
+          } else if (data.Results && Array.isArray(data.Results)) {
+            plans = data.Results;
+          } else {
+            console.error('[Edge Function] Unexpected response structure:', data);
+            throw new Error('Unexpected response structure from API');
+          }
+
+          console.log(`[Edge Function] Found ${plans.length} plans`);
+
           // Transform plans
-          const transformedPlans = data.map(plan => ({
+          const transformedPlans = plans.map(plan => ({
             company_id: String(plan.company_id || ''),
             company_name: String(plan.company_name || ''),
             company_logo: plan.company_logo_name || null,
