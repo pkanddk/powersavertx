@@ -5,6 +5,7 @@ const POWER_TO_CHOOSE_API = "https://www.powertochoose.org/en-us/service/v1";
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
 serve(async (req) => {
@@ -14,28 +15,22 @@ serve(async (req) => {
   }
 
   try {
-    const { zipCode, estimatedUse } = await req.json();
-
-    if (!zipCode) {
-      return new Response(
-        JSON.stringify({ error: "ZIP code is required" }),
-        { 
-          status: 400,
-          headers: {
-            ...corsHeaders,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+    if (req.method !== 'POST') {
+      throw new Error('Method not allowed');
     }
 
-    console.log(`Fetching plans for ZIP: ${zipCode}, Usage: ${estimatedUse}`);
+    const { zipCode, estimatedUse } = await req.json();
+    console.log(`Processing request for ZIP: ${zipCode}, Usage: ${estimatedUse}`);
+
+    if (!zipCode) {
+      throw new Error('ZIP code is required');
+    }
 
     const response = await fetch(`${POWER_TO_CHOOSE_API}/plans`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json",
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
       },
       body: JSON.stringify({
         zip_code: zipCode,
@@ -43,27 +38,30 @@ serve(async (req) => {
       }),
     });
 
-    const data = await response.json();
-    console.log(`Received ${data.length || 0} plans from API`);
+    if (!response.ok) {
+      console.error(`API Error: ${response.status} ${response.statusText}`);
+      throw new Error(`API Error: ${response.status} ${response.statusText}`);
+    }
 
-    return new Response(
-      JSON.stringify(data),
-      { 
-        headers: {
-          ...corsHeaders,
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const data = await response.json();
+    console.log(`Successfully retrieved ${data.length || 0} plans`);
+
+    return new Response(JSON.stringify(data), {
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'application/json',
+      },
+    });
+
   } catch (error) {
-    console.error("Error in power-to-choose function:", error);
+    console.error('Error in power-to-choose function:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
-      { 
+      {
         status: 500,
         headers: {
           ...corsHeaders,
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       }
     );
