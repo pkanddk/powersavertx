@@ -68,8 +68,10 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
       // Helper function to safely parse rate strings
       const parseRate = (rate: string | number | null | undefined): number => {
         if (!rate) return 0;
+        // If it's a string, parse it to float
         const parsed = typeof rate === 'string' ? parseFloat(rate) : rate;
-        return isNaN(parsed) ? 0 : parsed / 100; // Convert cents to dollars
+        // Return 0 if NaN, otherwise return the parsed value (no division by 100)
+        return isNaN(parsed) ? 0 : parsed;
       };
 
       // Log raw rate values for debugging
