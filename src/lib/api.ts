@@ -26,24 +26,37 @@ export const searchPlans = async (zipCode: string, estimatedUse?: string) => {
     console.log(`Searching plans for ZIP: ${zipCode}, Usage: ${estimatedUse}`);
     
     // Call the Edge Function
-    const { data, error } = await supabase.functions.invoke('power-to-choose', {
+    const { data: responseData, error } = await supabase.functions.invoke('power-to-choose', {
       body: { zipCode, estimatedUse },
     });
+
+    console.log('Raw Edge Function response:', responseData);
 
     if (error) {
       console.error('Error calling Edge Function:', error);
       throw error;
     }
 
-    if (!data || !Array.isArray(data)) {
-      console.error('Invalid response format:', data);
-      throw new Error('Invalid response format from Edge Function');
+    if (!responseData) {
+      console.error('No data received from Edge Function');
+      throw new Error('No data received from Edge Function');
     }
 
-    console.log('Received plans from Edge Function:', data);
+    // If responseData is an error object, throw it
+    if ('error' in responseData) {
+      console.error('Error from Edge Function:', responseData.error);
+      throw new Error(responseData.error);
+    }
+
+    // Ensure we have an array to work with
+    const plansArray = Array.isArray(responseData) ? responseData : [responseData];
+    console.log('Plans array before validation:', plansArray);
 
     // Parse and validate the plans using Zod
-    return z.array(PlanSchema).parse(data);
+    const validatedPlans = z.array(PlanSchema).parse(plansArray);
+    console.log('Validated plans:', validatedPlans);
+
+    return validatedPlans;
   } catch (error) {
     console.error("Error fetching plans:", error);
     throw error;

@@ -37,7 +37,7 @@ serve(async (req) => {
       page_number: 1
     };
 
-    console.log('Sending request to Power to Choose API:', requestBody);
+    console.log('Sending request to Power to Choose API:', JSON.stringify(requestBody, null, 2));
 
     const response = await fetch(`${POWER_TO_CHOOSE_API}/plans`, {
       method: 'POST',
@@ -100,7 +100,7 @@ serve(async (req) => {
       contract_length: plan.term_value || null
     }));
 
-    console.log('Transformed plans:', transformedPlans);
+    console.log('Transformed plans:', JSON.stringify(transformedPlans, null, 2));
 
     // Return the transformed plans directly
     return new Response(JSON.stringify(transformedPlans), {
