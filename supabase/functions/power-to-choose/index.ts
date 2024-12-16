@@ -31,35 +31,36 @@ serve(async (req) => {
       page_number: 1
     };
 
-    console.log('[Edge Function] Request body to Power to Choose API:', JSON.stringify(requestBody, null, 2));
+    console.log('[Edge Function] Request body:', JSON.stringify(requestBody, null, 2));
 
     // Function to make the API request with retries
     const makeRequest = async (retries = 3, baseDelay = 1000) => {
       for (let i = 0; i < retries; i++) {
         try {
-          console.log(`[Edge Function] Attempt ${i + 1} of ${retries}`);
+          console.log(`[Edge Function] Making request attempt ${i + 1} of ${retries}`);
           
           const response = await fetch(`${POWER_TO_CHOOSE_API}/plans`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
               'Accept': 'application/json',
-              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-              'Origin': 'http://www.powertochoose.org',
-              'Referer': 'http://www.powertochoose.org/'
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
             },
             body: JSON.stringify(requestBody),
           });
 
-          if (!response.ok) {
-            console.error(`[Edge Function] API response not OK: ${response.status} ${response.statusText}`);
-            throw new Error(`API returned status ${response.status}`);
-          }
-
-          // Get the raw response text and log it
+          console.log(`[Edge Function] Response status: ${response.status}`);
+          
+          // Get the raw response text first
           const rawText = await response.text();
           console.log('[Edge Function] Raw response:', rawText);
 
+          // Check if the response is empty
+          if (!rawText) {
+            throw new Error('Empty response from API');
+          }
+
+          // Try to parse the response as JSON
           let data;
           try {
             data = JSON.parse(rawText);
@@ -69,9 +70,9 @@ serve(async (req) => {
           }
 
           // Check if the response indicates an error
-          if (!data.success && data.message) {
-            console.error('[Edge Function] API returned error:', data.message);
-            throw new Error(data.message);
+          if (data.error || (data.success === false)) {
+            console.error('[Edge Function] API returned error:', data);
+            throw new Error(data.message || 'API returned an error');
           }
 
           // Try different response formats
@@ -87,7 +88,7 @@ serve(async (req) => {
           }
 
           if (!plans) {
-            console.log('[Edge Function] No plans found in response');
+            console.log('[Edge Function] No plans array found in response');
             return [];
           }
 
@@ -114,10 +115,18 @@ serve(async (req) => {
 
           console.log(`[Edge Function] Successfully transformed ${transformedPlans.length} plans`);
           return transformedPlans;
+
         } catch (error) {
           console.error(`[Edge Function] Request attempt ${i + 1} failed:`, error);
-          if (i === retries - 1) throw error;
+          
+          // If this is the last retry, throw the error
+          if (i === retries - 1) {
+            throw error;
+          }
+          
+          // Otherwise wait and retry
           const delay = baseDelay * Math.pow(2, i);
+          console.log(`[Edge Function] Waiting ${delay}ms before retry`);
           await new Promise(resolve => setTimeout(resolve, delay));
         }
       }
@@ -133,16 +142,15 @@ serve(async (req) => {
   } catch (error) {
     console.error('[Edge Function] Error:', error);
     
-    // Return a properly structured error response
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         error: true,
         message: error.message || 'An unexpected error occurred',
         details: error.stack
       }),
-      { 
-        status: error.message.includes('Rate limit') ? 429 : 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }
     );
   }
