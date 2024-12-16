@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const API_BASE_URL = "https://api.powertochoose.org/api/PowerToChoose";
+const API_BASE_URL = "https://www.powertochoose.org/en-us/service/v1";
 
 export const PlanSchema = z.object({
   company_id: z.string(),
@@ -24,6 +24,8 @@ export const searchPlans = async (zipCode: string, estimatedUse?: string) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Origin": window.location.origin
       },
       body: JSON.stringify({
         zip_code: zipCode,
