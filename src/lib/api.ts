@@ -13,7 +13,10 @@ export const PlanSchema = z.object({
   jdp_rating_year: z.string(),
   minimum_usage: z.boolean(),
   new_customer: z.boolean(),
-  plan_details: z.string()
+  plan_details: z.string(),
+  price_kwh: z.number(),
+  base_charge: z.number().optional(),
+  contract_length: z.number()
 });
 
 export type Plan = z.infer<typeof PlanSchema>;
@@ -31,7 +34,10 @@ const mockPlans: Plan[] = [
     jdp_rating_year: "2024",
     minimum_usage: false,
     new_customer: true,
-    plan_details: "12-month fixed rate plan with no hidden fees"
+    plan_details: "12-month fixed rate plan with no hidden fees",
+    price_kwh: 0.089,
+    base_charge: 9.95,
+    contract_length: 12
   },
   {
     company_id: "2",
@@ -44,7 +50,9 @@ const mockPlans: Plan[] = [
     jdp_rating_year: "2024",
     minimum_usage: true,
     new_customer: false,
-    plan_details: "100% renewable energy with monthly rate adjustments"
+    plan_details: "100% renewable energy with monthly rate adjustments",
+    price_kwh: 0.105,
+    contract_length: 1
   },
   {
     company_id: "3",
@@ -57,7 +65,41 @@ const mockPlans: Plan[] = [
     jdp_rating_year: "2024",
     minimum_usage: false,
     new_customer: true,
-    plan_details: "24-month fixed rate with free nights and weekends"
+    plan_details: "24-month fixed rate with free nights and weekends",
+    price_kwh: 0.092,
+    base_charge: 4.95,
+    contract_length: 24
+  },
+  {
+    company_id: "4",
+    company_logo: "https://placehold.co/200x100?text=Energy+Co+4",
+    plan_name: "Value Saver",
+    plan_type_name: "Fixed Rate",
+    fact_sheet: "https://example.com/factsheet4",
+    go_to_plan: "https://example.com/signup4",
+    jdp_rating: 4.3,
+    jdp_rating_year: "2024",
+    minimum_usage: true,
+    new_customer: false,
+    plan_details: "Low rate guaranteed for 6 months",
+    price_kwh: 0.099,
+    base_charge: 7.95,
+    contract_length: 6
+  },
+  {
+    company_id: "5",
+    company_logo: "https://placehold.co/200x100?text=Energy+Co+5",
+    plan_name: "Freedom Plan",
+    plan_type_name: "Variable Rate",
+    fact_sheet: "https://example.com/factsheet5",
+    go_to_plan: "https://example.com/signup5",
+    jdp_rating: 4.1,
+    jdp_rating_year: "2024",
+    minimum_usage: false,
+    new_customer: false,
+    plan_details: "No contract required, cancel anytime",
+    price_kwh: 0.115,
+    contract_length: 0
   }
 ];
 
