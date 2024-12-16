@@ -51,18 +51,9 @@ serve(async (req) => {
             body: JSON.stringify(requestBody),
           });
 
-          console.log('[Edge Function] Response status:', response.status);
-          console.log('[Edge Function] Response headers:', Object.fromEntries(response.headers.entries()));
-          
-          if (response.status === 429) {
-            console.log(`[Edge Function] Rate limited, attempt ${i + 1} of ${retries}`);
-            if (i < retries - 1) {
-              const delay = baseDelay * Math.pow(2, i);
-              console.log(`[Edge Function] Waiting ${delay}ms before retry`);
-              await new Promise(resolve => setTimeout(resolve, delay));
-              continue;
-            }
-            throw new Error('Rate limit exceeded. Please try again later.');
+          if (!response.ok) {
+            console.error(`[Edge Function] API response not OK: ${response.status} ${response.statusText}`);
+            throw new Error(`API returned status ${response.status}`);
           }
 
           // Get the raw response text and log it
@@ -95,10 +86,12 @@ serve(async (req) => {
             plans = data.Results;
           }
 
-          if (!plans || plans.length === 0) {
+          if (!plans) {
             console.log('[Edge Function] No plans found in response');
             return [];
           }
+
+          console.log(`[Edge Function] Found ${plans.length} plans`);
 
           // Transform plans
           const transformedPlans = plans.map(plan => ({
@@ -134,12 +127,19 @@ serve(async (req) => {
     
     return new Response(JSON.stringify(plans), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 200
     });
 
   } catch (error) {
     console.error('[Edge Function] Error:', error);
+    
+    // Return a properly structured error response
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: true,
+        message: error.message || 'An unexpected error occurred',
+        details: error.stack
+      }),
       { 
         status: error.message.includes('Rate limit') ? 429 : 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
