@@ -48,7 +48,8 @@ serve(async (req) => {
               'Accept': 'application/json',
               'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
               'Origin': 'http://www.powertochoose.org',
-              'Referer': 'http://www.powertochoose.org/'
+              'Referer': 'http://www.powertochoose.org/',
+              'X-Requested-With': 'XMLHttpRequest'
             },
             body: JSON.stringify(requestBody),
           });
@@ -59,12 +60,7 @@ serve(async (req) => {
           const responseText = await response.text();
           console.log('[Edge Function] Raw response:', responseText);
 
-          // If the response is not ok, throw an error with the response text
-          if (!response.ok) {
-            throw new Error(`API returned ${response.status}: ${responseText}`);
-          }
-
-          // Check if the response is empty
+          // If the response is empty
           if (!responseText) {
             throw new Error('Empty response from API');
           }
@@ -79,7 +75,7 @@ serve(async (req) => {
           }
 
           // Check if the response indicates an error
-          if (data.error || (data.success === false)) {
+          if (!response.ok || data.error || data.success === false) {
             console.error('[Edge Function] API returned error:', data);
             throw new Error(data.message || 'API returned an error');
           }
@@ -139,6 +135,7 @@ serve(async (req) => {
           await new Promise(resolve => setTimeout(resolve, delay));
         }
       }
+      throw new Error('All retry attempts failed');
     };
 
     const plans = await makeRequest();
