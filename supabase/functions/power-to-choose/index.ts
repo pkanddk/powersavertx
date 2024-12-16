@@ -64,41 +64,37 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
     const transformedPlans = plans.map(plan => {
       // Extract and parse the price, handling different possible formats
       let price_kwh = 0;
-      if (typeof plan.price_kwh === 'number') {
-        price_kwh = plan.price_kwh;
-      } else if (typeof plan.price === 'number') {
-        price_kwh = plan.price;
-      } else if (plan.rate1000) {
-        // Try to parse rate1000 as it's commonly used
-        const rate = parseFloat(plan.rate1000);
-        if (!isNaN(rate)) {
-          price_kwh = rate / 100; // Convert cents to dollars if needed
-        }
+      
+      // Helper function to safely parse rate strings
+      const parseRate = (rate: string | number | null | undefined): number => {
+        if (!rate) return 0;
+        const parsed = typeof rate === 'string' ? parseFloat(rate) : rate;
+        return isNaN(parsed) ? 0 : parsed / 100; // Convert cents to dollars
+      };
+
+      // Log raw rate values for debugging
+      console.log(`[Edge Function] Raw rates for plan ${plan.plan_name}:`, {
+        rate500: plan.rate500,
+        rate1000: plan.rate1000,
+        rate2000: plan.rate2000,
+        price_kwh: plan.price_kwh,
+        price: plan.price
+      });
+
+      // Try different rate fields in order of preference
+      if (plan.rate1000) {
+        price_kwh = parseRate(plan.rate1000);
       } else if (plan.rate500) {
-        // Fallback to rate500
-        const rate = parseFloat(plan.rate500);
-        if (!isNaN(rate)) {
-          price_kwh = rate / 100;
-        }
+        price_kwh = parseRate(plan.rate500);
       } else if (plan.rate2000) {
-        // Fallback to rate2000
-        const rate = parseFloat(plan.rate2000);
-        if (!isNaN(rate)) {
-          price_kwh = rate / 100;
-        }
+        price_kwh = parseRate(plan.rate2000);
+      } else if (plan.price_kwh) {
+        price_kwh = parseRate(plan.price_kwh);
+      } else if (plan.price) {
+        price_kwh = parseRate(plan.price);
       }
 
-      // Log the price extraction for debugging
-      console.log(`[Edge Function] Extracted price for plan ${plan.plan_name}:`, {
-        original: {
-          price_kwh: plan.price_kwh,
-          price: plan.price,
-          rate500: plan.rate500,
-          rate1000: plan.rate1000,
-          rate2000: plan.rate2000
-        },
-        parsed: price_kwh
-      });
+      console.log(`[Edge Function] Final price_kwh for plan ${plan.plan_name}:`, price_kwh);
 
       return {
         company_id: String(plan.company_id || ""),
