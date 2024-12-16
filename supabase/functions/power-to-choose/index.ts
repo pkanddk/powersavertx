@@ -58,11 +58,24 @@ serve(async (req) => {
     const rawData = await response.text();
     console.log('Raw API Response:', rawData);
     
-    const data = JSON.parse(rawData);
-    console.log('Parsed API Response:', data);
+    let apiPlans;
+    try {
+      const data = JSON.parse(rawData);
+      console.log('Parsed API Response:', data);
+      
+      // Check if the response is an array or has a data property
+      apiPlans = Array.isArray(data) ? data : (data.data || []);
+      console.log('Extracted plans:', apiPlans);
+    } catch (error) {
+      console.error('Error parsing API response:', error);
+      throw new Error('Invalid API response format');
+    }
 
-    // The API returns the plans directly in the response
-    const apiPlans = Array.isArray(data) ? data : [];
+    if (!Array.isArray(apiPlans)) {
+      console.error('Invalid plans format:', apiPlans);
+      throw new Error('Invalid plans format');
+    }
+
     console.log(`Retrieved ${apiPlans.length} plans from API`);
 
     if (apiPlans.length === 0) {
@@ -72,7 +85,7 @@ serve(async (req) => {
       });
     }
 
-    // Transform and store plans in Supabase
+    // Transform plans
     const transformedPlans = apiPlans.map(plan => ({
       company_id: plan.company_id,
       company_name: plan.company_name,
@@ -91,19 +104,21 @@ serve(async (req) => {
       contract_length: plan.term_value || 0
     }));
 
-    console.log(`Transformed ${transformedPlans.length} plans`);
+    console.log('Transformed plans:', transformedPlans);
 
-    // Delete existing plans before inserting new ones
-    const { error: deleteError } = await supabase
-      .from('plans')
-      .delete()
-      .eq('company_id', transformedPlans[0]?.company_id);
+    // Delete existing plans for this company before inserting new ones
+    if (transformedPlans.length > 0) {
+      const { error: deleteError } = await supabase
+        .from('plans')
+        .delete()
+        .eq('company_id', transformedPlans[0].company_id);
 
-    if (deleteError) {
-      console.error('Error deleting existing plans:', deleteError);
+      if (deleteError) {
+        console.error('Error deleting existing plans:', deleteError);
+      }
     }
 
-    // Insert new plans
+    // Insert transformed plans
     const { data: insertedPlans, error: insertError } = await supabase
       .from('plans')
       .insert(transformedPlans)
@@ -114,7 +129,7 @@ serve(async (req) => {
       throw new Error('Failed to store plans in database');
     }
 
-    console.log(`Successfully stored ${insertedPlans.length} plans in database`);
+    console.log(`Successfully stored ${insertedPlans?.length || 0} plans in database`);
 
     // Return the transformed plans directly
     return new Response(JSON.stringify(transformedPlans), {
