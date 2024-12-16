@@ -65,27 +65,34 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
       // Extract and parse the price, handling different possible formats
       let price_kwh = 0;
       
-      // Helper function to safely parse rate strings
+      // Helper function to safely parse rate strings and convert to proper format
       const parseRate = (rate: string | number | null | undefined): number => {
         if (!rate) return 0;
-        // If it's a string, parse it to float
-        const parsed = typeof rate === 'string' ? parseFloat(rate) : rate;
-        // Return 0 if NaN, otherwise return the parsed value (no division by 100)
+        
+        // Convert to string and remove any non-numeric characters except decimal points
+        const cleanRate = String(rate).replace(/[^\d.]/g, '');
+        const parsed = parseFloat(cleanRate);
+        
+        // Return 0 if NaN, otherwise return the parsed value
         return isNaN(parsed) ? 0 : parsed;
       };
 
-      // Log raw rate values for debugging
-      console.log(`[Edge Function] Raw rates for plan ${plan.plan_name}:`, {
+      // Log raw values for debugging
+      console.log(`[Edge Function] Raw plan data for ${plan.plan_name}:`, {
+        raw_plan: plan,
         rate500: plan.rate500,
         rate1000: plan.rate1000,
         rate2000: plan.rate2000,
         price_kwh: plan.price_kwh,
-        price: plan.price
+        price: plan.price,
+        avgprice: plan.avgprice
       });
 
       // Try different rate fields in order of preference
       if (plan.rate1000) {
         price_kwh = parseRate(plan.rate1000);
+      } else if (plan.avgprice) {
+        price_kwh = parseRate(plan.avgprice);
       } else if (plan.rate500) {
         price_kwh = parseRate(plan.rate500);
       } else if (plan.rate2000) {
