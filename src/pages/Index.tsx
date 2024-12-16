@@ -9,16 +9,18 @@ export default function Index() {
   const [search, setSearch] = useState<{ zipCode: string; estimatedUse: string } | null>(null);
   const { toast } = useToast();
 
-  const { data: plans, isLoading, error } = useQuery({
+  const { data: plans, isLoading } = useQuery({
     queryKey: ["plans", search?.zipCode, search?.estimatedUse],
     queryFn: () => searchPlans(search!.zipCode, search!.estimatedUse),
     enabled: !!search,
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to fetch energy plans. Please try again.",
-        variant: "destructive",
-      });
+    meta: {
+      onError: () => {
+        toast({
+          title: "Error",
+          description: "Failed to fetch energy plans. Please try again.",
+          variant: "destructive",
+        });
+      },
     },
   });
 
@@ -43,12 +45,6 @@ export default function Index() {
         {isLoading && (
           <div className="text-center py-12">
             <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-primary border-r-transparent" />
-          </div>
-        )}
-
-        {error && (
-          <div className="text-center py-12 text-destructive">
-            An error occurred while fetching plans. Please try again.
           </div>
         )}
 

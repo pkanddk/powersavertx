@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const API_BASE_URL = "http://api.powertochoose.org/api/PowerToChoose";
+const API_BASE_URL = "https://api.powertochoose.org/api/PowerToChoose";
 
 export const PlanSchema = z.object({
   company_id: z.string(),
@@ -19,23 +19,28 @@ export const PlanSchema = z.object({
 export type Plan = z.infer<typeof PlanSchema>;
 
 export const searchPlans = async (zipCode: string, estimatedUse?: string) => {
-  const response = await fetch(`${API_BASE_URL}/plans`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      zip_code: zipCode,
-      estimated_use: estimatedUse || "Any Range",
-    }),
-  });
+  try {
+    const response = await fetch(`${API_BASE_URL}/plans`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        zip_code: zipCode,
+        estimated_use: estimatedUse || "Any Range",
+      }),
+    });
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch plans");
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return z.array(PlanSchema).parse(data);
+  } catch (error) {
+    console.error("Error fetching plans:", error);
+    throw error;
   }
-
-  const data = await response.json();
-  return z.array(PlanSchema).parse(data);
 };
 
 export const getPlanTypes = async () => {
