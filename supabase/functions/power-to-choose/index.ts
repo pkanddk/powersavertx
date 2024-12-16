@@ -98,32 +98,46 @@ serve(async (req) => {
       throw new Error('Failed to parse API response as JSON');
     }
 
-    // Extract plans from the response
-    const apiPlans = Array.isArray(data) ? data : (data.data || []);
-    console.log(`[Edge Function] Found ${apiPlans.length} plans in response`);
-
-    if (!Array.isArray(apiPlans)) {
-      console.error('[Edge Function] Plans is not an array:', apiPlans);
-      throw new Error('Invalid plans format: expected array');
+    // Extract plans from the response - handle both array and object with data property
+    let apiPlans;
+    if (Array.isArray(data)) {
+      apiPlans = data;
+    } else if (data && typeof data === 'object') {
+      // Check various possible response structures
+      if (Array.isArray(data.data)) {
+        apiPlans = data.data;
+      } else if (data.plans && Array.isArray(data.plans)) {
+        apiPlans = data.plans;
+      } else if (data.Results && Array.isArray(data.Results)) {
+        apiPlans = data.Results;
+      } else {
+        console.error('[Edge Function] Unexpected response structure:', data);
+        throw new Error('Invalid response structure from API');
+      }
+    } else {
+      console.error('[Edge Function] Invalid response type:', typeof data);
+      throw new Error('Invalid response type from API');
     }
+
+    console.log(`[Edge Function] Found ${apiPlans.length} plans in response`);
 
     // Transform plans
     const transformedPlans = apiPlans.map(plan => ({
-      company_id: plan.company_id,
-      company_name: plan.company_name,
-      company_logo: plan.company_logo_name,
-      plan_name: plan.plan_name,
-      plan_type_name: plan.plan_type,
-      fact_sheet: plan.fact_sheet,
-      go_to_plan: plan.enroll_now,
-      jdp_rating: plan.rating || null,
+      company_id: plan.company_id?.toString() || '',
+      company_name: plan.company_name || '',
+      company_logo: plan.company_logo_name || null,
+      plan_name: plan.plan_name || '',
+      plan_type_name: plan.plan_type || '',
+      fact_sheet: plan.fact_sheet || null,
+      go_to_plan: plan.enroll_now || null,
+      jdp_rating: plan.rating ? parseFloat(plan.rating) : null,
       jdp_rating_year: new Date().getFullYear().toString(),
       minimum_usage: Boolean(plan.minimum_usage),
       new_customer: Boolean(plan.new_customer),
       plan_details: plan.special_terms || '',
-      price_kwh: plan.price_kwh,
-      base_charge: plan.base_charge || null,
-      contract_length: plan.term_value || null
+      price_kwh: parseFloat(plan.price_kwh) || 0,
+      base_charge: plan.base_charge ? parseFloat(plan.base_charge) : null,
+      contract_length: plan.term_value ? parseInt(plan.term_value) : null
     }));
 
     console.log('[Edge Function] Sending transformed plans:', JSON.stringify(transformedPlans, null, 2));
