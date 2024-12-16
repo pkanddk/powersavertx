@@ -49,7 +49,10 @@ serve(async (req) => {
               'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
               'Origin': 'http://www.powertochoose.org',
               'Referer': 'http://www.powertochoose.org/',
-              'X-Requested-With': 'XMLHttpRequest'
+              'X-Requested-With': 'XMLHttpRequest',
+              'Connection': 'keep-alive',
+              'Cache-Control': 'no-cache',
+              'Pragma': 'no-cache'
             },
             body: JSON.stringify(requestBody),
           });
@@ -62,6 +65,7 @@ serve(async (req) => {
 
           // If the response is empty
           if (!responseText) {
+            console.error('[Edge Function] Empty response received');
             throw new Error('Empty response from API');
           }
 
@@ -69,14 +73,18 @@ serve(async (req) => {
           let data;
           try {
             data = JSON.parse(responseText);
+            console.log('[Edge Function] Parsed response:', data);
           } catch (parseError) {
             console.error('[Edge Function] JSON parse error:', parseError);
             throw new Error('Failed to parse API response as JSON');
           }
 
-          // Check if the response indicates an error
-          if (!response.ok || data.error || data.success === false) {
-            console.error('[Edge Function] API returned error:', data);
+          // Check if the response indicates an error or authentication issue
+          if (!response.ok || data.error || data.success === false || data.authenticated === false) {
+            console.error('[Edge Function] API returned error or authentication failed:', data);
+            if (data.authenticated === false) {
+              throw new Error('Authentication failed with Power to Choose API');
+            }
             throw new Error(data.message || 'API returned an error');
           }
 
@@ -93,7 +101,7 @@ serve(async (req) => {
           }
 
           if (!plans) {
-            console.log('[Edge Function] No plans array found in response');
+            console.error('[Edge Function] No plans array found in response');
             return [];
           }
 
