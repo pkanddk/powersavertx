@@ -27,7 +27,6 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
     const responseText = await response.text();
     console.log("[Edge Function] Raw response:", responseText);
 
-    // Try to parse the response as JSON
     let data;
     try {
       data = JSON.parse(responseText);
@@ -37,13 +36,11 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
       throw new Error("Failed to parse API response as JSON");
     }
 
-    // Check if the response indicates an error
     if (data.error || (data.success === false)) {
       console.error("[Edge Function] API returned error:", data);
       throw new Error(data.message || "API returned an error");
     }
 
-    // Extract plans from the response structure
     let plans = [];
     if (Array.isArray(data)) {
       plans = data;
@@ -60,12 +57,18 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
 
     console.log(`[Edge Function] Found ${plans.length} plans`);
 
-    // Transform plans with proper price handling
     const transformedPlans = plans.map(plan => {
-      // Extract and parse the price, handling different possible formats
-      let price_kwh = 0;
-      
-      // Helper function to safely parse rate strings and convert to proper format
+      // Log raw plan data for debugging
+      console.log(`[Edge Function] Raw plan data for ${plan.plan_name}:`, {
+        price_kwh500: plan.price_kwh500,
+        price_kwh1000: plan.price_kwh1000,
+        price_kwh2000: plan.price_kwh2000,
+        rate500: plan.rate500,
+        rate1000: plan.rate1000,
+        rate2000: plan.rate2000
+      });
+
+      // Helper function to parse rate strings and convert from cents to dollars
       const parseRate = (rate: string | number | null | undefined): number => {
         if (!rate) return 0;
         
@@ -73,34 +76,20 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
         const cleanRate = String(rate).replace(/[^\d.]/g, '');
         const parsed = parseFloat(cleanRate);
         
-        // Return 0 if NaN, otherwise return the parsed value
-        return isNaN(parsed) ? 0 : parsed;
+        // Convert from cents to dollars (divide by 100)
+        return isNaN(parsed) ? 0 : parsed / 100;
       };
 
-      // Log raw values for debugging
-      console.log(`[Edge Function] Raw plan data for ${plan.plan_name}:`, {
-        raw_plan: plan,
-        rate500: plan.rate500,
-        rate1000: plan.rate1000,
-        rate2000: plan.rate2000,
-        price_kwh: plan.price_kwh,
-        price: plan.price,
-        avgprice: plan.avgprice
-      });
-
-      // Try different rate fields in order of preference
-      if (plan.rate1000) {
+      // Try to get the rate from various possible fields, prioritizing price_kwh1000
+      let price_kwh = 0;
+      if (plan.price_kwh1000) {
+        price_kwh = parseRate(plan.price_kwh1000);
+      } else if (plan.rate1000) {
         price_kwh = parseRate(plan.rate1000);
-      } else if (plan.avgprice) {
-        price_kwh = parseRate(plan.avgprice);
+      } else if (plan.price_kwh500) {
+        price_kwh = parseRate(plan.price_kwh500);
       } else if (plan.rate500) {
         price_kwh = parseRate(plan.rate500);
-      } else if (plan.rate2000) {
-        price_kwh = parseRate(plan.rate2000);
-      } else if (plan.price_kwh) {
-        price_kwh = parseRate(plan.price_kwh);
-      } else if (plan.price) {
-        price_kwh = parseRate(plan.price);
       }
 
       console.log(`[Edge Function] Final price_kwh for plan ${plan.plan_name}:`, price_kwh);
@@ -134,7 +123,6 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -147,10 +135,8 @@ serve(async (req) => {
       throw new Error("ZIP code is required");
     }
 
-    // Construct the URL with query parameters
     let apiUrl = `http://api.powertochoose.org/api/PowerToChoose/plans?zip_code=${zipCode}`;
     
-    // Add estimated usage parameter if provided
     if (estimatedUse && estimatedUse !== "Any Range") {
       const usageParam = estimatedUse === "between 500 and 1,000" ? "500-1000" :
                         estimatedUse === "between 1,001 and 2,000" ? "1001-2000" :
