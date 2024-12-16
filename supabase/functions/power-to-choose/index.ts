@@ -1,4 +1,5 @@
-import { serve } from "https://deno.fresh.runtime.dev";
+// Follow Deno's deployment guidelines for Supabase Edge Functions
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const POWER_TO_CHOOSE_API = "https://www.powertochoose.org/en-us/service/v1";
 
