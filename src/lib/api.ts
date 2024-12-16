@@ -1,6 +1,10 @@
 import { z } from "zod";
+import { createClient } from '@supabase/supabase-js';
 
-const API_BASE_URL = "https://cors-proxy.org/?url=https://www.powertochoose.org/en-us/service/v1";
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
+);
 
 export const PlanSchema = z.object({
   company_id: z.string(),
@@ -21,7 +25,7 @@ export const PlanSchema = z.object({
 
 export type Plan = z.infer<typeof PlanSchema>;
 
-// Mock data for development
+// Mock data for development and fallback
 const mockPlans: Plan[] = [
   {
     company_id: "1",
@@ -105,35 +109,21 @@ const mockPlans: Plan[] = [
 
 export const searchPlans = async (zipCode: string, estimatedUse?: string) => {
   try {
-    // For development, return mock data instead of making API call
-    console.log('Searching plans for:', { zipCode, estimatedUse });
-    return mockPlans;
-    
-    /* Real API call code kept for reference
-    const response = await fetch(`${API_BASE_URL}/plans`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-        "Origin": window.location.origin,
-        "X-Requested-With": "XMLHttpRequest"
-      },
-      body: JSON.stringify({
-        zip_code: zipCode,
-        estimated_use: estimatedUse || "Any Range",
-      }),
+    const { data, error } = await supabase.functions.invoke('power-to-choose', {
+      body: { zipCode, estimatedUse },
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    if (error) {
+      console.error('Error calling Edge Function:', error);
+      // Fallback to mock data in case of error
+      return mockPlans;
     }
 
-    const data = await response.json();
     return z.array(PlanSchema).parse(data);
-    */
   } catch (error) {
     console.error("Error fetching plans:", error);
-    throw error;
+    // Fallback to mock data in case of error
+    return mockPlans;
   }
 };
 
