@@ -15,23 +15,25 @@ serve(async (req) => {
 
   try {
     const { zipCode, estimatedUse } = await req.json();
-    console.log(`[Edge Function] Processing request for ZIP: ${zipCode}, Usage: ${estimatedUse}`);
+    console.log(`[Edge Function] Received request with ZIP: ${zipCode}, Usage: ${estimatedUse}`);
 
     if (!zipCode) {
       throw new Error('ZIP code is required');
     }
 
-    // Format the request body according to the Power to Choose API requirements
+    // Format the request body according to the exact API requirements
     const requestBody = {
       zip_code: zipCode,
-      estimated_use: estimatedUse || null,
+      // Map the frontend usage values to API expected format
+      estimated_use: estimatedUse === "Any Range" ? null : 
+                    estimatedUse === "between 500 and 1,000" ? "500-1000" :
+                    estimatedUse === "between 1,001 and 2,000" ? "1001-2000" :
+                    estimatedUse === "more than 2,000" ? "2001+" : null,
       renewable: null,
-      plan_type: null,
-      page_size: 200,
-      page_number: 1
+      plan_type: null
     };
 
-    console.log('[Edge Function] Request body:', JSON.stringify(requestBody, null, 2));
+    console.log('[Edge Function] Formatted request body:', JSON.stringify(requestBody, null, 2));
 
     // Function to make the API request with retries
     const makeRequest = async (retries = 3, baseDelay = 1000) => {
@@ -44,7 +46,9 @@ serve(async (req) => {
             headers: {
               'Content-Type': 'application/json',
               'Accept': 'application/json',
-              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+              'Origin': 'http://www.powertochoose.org',
+              'Referer': 'http://www.powertochoose.org/'
             },
             body: JSON.stringify(requestBody),
           });
