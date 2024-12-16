@@ -56,10 +56,10 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    console.log('API Response:', JSON.stringify(data));
+    console.log('API Response structure:', Object.keys(data));
 
     // The API returns an object with a plans array
-    const apiPlans = data.plans || [];
+    const apiPlans = data.data || [];
     console.log(`Retrieved ${apiPlans.length} plans from API`);
 
     if (!Array.isArray(apiPlans)) {
@@ -88,7 +88,7 @@ serve(async (req) => {
 
     console.log(`Transformed ${transformedPlans.length} plans`);
 
-    // Delete existing plans for this ZIP code before inserting new ones
+    // Delete existing plans before inserting new ones
     const { error: deleteError } = await supabase
       .from('plans')
       .delete()
@@ -111,6 +111,7 @@ serve(async (req) => {
 
     console.log(`Successfully stored ${insertedPlans.length} plans in database`);
 
+    // Return the inserted plans
     return new Response(JSON.stringify(insertedPlans), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
