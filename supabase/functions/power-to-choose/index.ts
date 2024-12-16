@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-const POWER_TO_CHOOSE_API = "https://www.powertochoose.org/en-us/service/v1";
+const POWER_TO_CHOOSE_API = "http://api.powertochoose.org/api/PowerToChoose";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -24,20 +24,18 @@ serve(async (req) => {
     // Format the request body according to the Power to Choose API requirements
     const requestBody = {
       zip_code: zipCode,
-      filter_by_kwh_usage: estimatedUse || "Any Range",
-      page_size: 100,
-      page_number: 1
+      estimated_use: estimatedUse || null,
+      renewable: null,
+      plan_type: null
     };
 
     console.log('Sending request to Power to Choose API:', requestBody);
 
-    const response = await fetch(`${POWER_TO_CHOOSE_API}/plans/search`, {
+    const response = await fetch(`${POWER_TO_CHOOSE_API}/plans`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'User-Agent': 'Mozilla/5.0',
-        'Origin': 'https://www.powertochoose.org'
+        'Accept': 'application/json'
       },
       body: JSON.stringify(requestBody),
     });
