@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const POWER_TO_CHOOSE_API = "http://api.powertochoose.org/api/PowerToChoose";
 
@@ -6,6 +7,11 @@ const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+const supabase = createClient(
+  Deno.env.get('SUPABASE_URL') ?? '',
+  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+);
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -49,12 +55,11 @@ serve(async (req) => {
       throw new Error(`API Error: ${response.status} ${response.statusText}`);
     }
 
-    const data = await response.json();
-    console.log(`Retrieved ${data.length} plans from API`);
-    console.log('First plan example:', data[0]);
+    const apiPlans = await response.json();
+    console.log(`Retrieved ${apiPlans.length} plans from API`);
 
-    // Transform the data to include company names and ensure all required fields
-    const transformedData = data.map(plan => ({
+    // Transform and store plans in Supabase
+    const transformedPlans = apiPlans.map(plan => ({
       company_id: plan.company_id,
       company_name: plan.company_name,
       company_logo: plan.company_logo_name,
@@ -72,10 +77,32 @@ serve(async (req) => {
       contract_length: plan.term_value || 0
     }));
 
-    console.log(`Transformed ${transformedData.length} plans`);
-    console.log('First transformed plan example:', transformedData[0]);
+    console.log(`Transformed ${transformedPlans.length} plans`);
 
-    return new Response(JSON.stringify(transformedData), {
+    // Delete existing plans for this ZIP code
+    const { error: deleteError } = await supabase
+      .from('plans')
+      .delete()
+      .eq('company_id', transformedPlans[0]?.company_id);
+
+    if (deleteError) {
+      console.error('Error deleting existing plans:', deleteError);
+    }
+
+    // Insert new plans
+    const { data: insertedPlans, error: insertError } = await supabase
+      .from('plans')
+      .insert(transformedPlans)
+      .select();
+
+    if (insertError) {
+      console.error('Error inserting plans:', insertError);
+      throw new Error('Failed to store plans in database');
+    }
+
+    console.log(`Successfully stored ${insertedPlans.length} plans in database`);
+
+    return new Response(JSON.stringify(insertedPlans), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 

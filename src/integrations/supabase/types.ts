@@ -9,7 +9,69 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      plans: {
+        Row: {
+          base_charge: number | null
+          company_id: string
+          company_logo: string | null
+          company_name: string
+          contract_length: number | null
+          created_at: string | null
+          fact_sheet: string | null
+          go_to_plan: string | null
+          id: string
+          jdp_rating: number | null
+          jdp_rating_year: string | null
+          minimum_usage: boolean | null
+          new_customer: boolean | null
+          plan_details: string | null
+          plan_name: string
+          plan_type_name: string
+          price_kwh: number
+          updated_at: string | null
+        }
+        Insert: {
+          base_charge?: number | null
+          company_id: string
+          company_logo?: string | null
+          company_name: string
+          contract_length?: number | null
+          created_at?: string | null
+          fact_sheet?: string | null
+          go_to_plan?: string | null
+          id?: string
+          jdp_rating?: number | null
+          jdp_rating_year?: string | null
+          minimum_usage?: boolean | null
+          new_customer?: boolean | null
+          plan_details?: string | null
+          plan_name: string
+          plan_type_name: string
+          price_kwh: number
+          updated_at?: string | null
+        }
+        Update: {
+          base_charge?: number | null
+          company_id?: string
+          company_logo?: string | null
+          company_name?: string
+          contract_length?: number | null
+          created_at?: string | null
+          fact_sheet?: string | null
+          go_to_plan?: string | null
+          id?: string
+          jdp_rating?: number | null
+          jdp_rating_year?: string | null
+          minimum_usage?: boolean | null
+          new_customer?: boolean | null
+          plan_details?: string | null
+          plan_name?: string
+          plan_type_name?: string
+          price_kwh?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
