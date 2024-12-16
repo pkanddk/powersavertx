@@ -1,0 +1,56 @@
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+interface SearchFormProps {
+  onSearch: (zipCode: string, estimatedUse: string) => void;
+  isLoading?: boolean;
+}
+
+const USAGE_OPTIONS = [
+  "Any Range",
+  "between 500 and 1,000",
+  "between 1,001 and 2,000",
+  "more than 2,000"
+];
+
+export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
+  const [zipCode, setZipCode] = useState("");
+  const [estimatedUse, setEstimatedUse] = useState(USAGE_OPTIONS[0]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSearch(zipCode, estimatedUse);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4 md:space-y-0 md:flex md:gap-4 max-w-2xl mx-auto">
+      <Input
+        type="text"
+        placeholder="Enter ZIP Code"
+        value={zipCode}
+        onChange={(e) => setZipCode(e.target.value)}
+        className="md:flex-1"
+        pattern="[0-9]{5}"
+        maxLength={5}
+        required
+      />
+      <Select value={estimatedUse} onValueChange={setEstimatedUse}>
+        <SelectTrigger className="md:w-64">
+          <SelectValue placeholder="Estimated Usage" />
+        </SelectTrigger>
+        <SelectContent>
+          {USAGE_OPTIONS.map((option) => (
+            <SelectItem key={option} value={option}>
+              {option}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <Button type="submit" disabled={isLoading}>
+        {isLoading ? "Searching..." : "Search Plans"}
+      </Button>
+    </form>
+  );
+}
