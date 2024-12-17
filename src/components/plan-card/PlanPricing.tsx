@@ -31,6 +31,7 @@ export function PlanPricing({
       <div className="text-sm font-medium text-gray-700 mb-2">Price per kWh</div>
       <div className="space-y-2">
         {prices.map((item) => {
+          // Compare the estimatedUse directly with the item.id
           const isSelected = estimatedUse === item.id;
           console.log(`Checking ${item.id} against ${estimatedUse}: ${isSelected}`);
           
