@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { SearchForm } from "@/components/SearchForm";
-import { PlanCard } from "@/components/PlanCard";
+import { PlanGrid } from "@/components/PlanGrid";
 import { PlanFilters } from "@/components/PlanFilters";
 import { PlanComparisonTable } from "@/components/PlanComparisonTable";
 import { searchPlans, type Plan } from "@/lib/api";
@@ -152,16 +152,11 @@ export default function Index() {
               onPrepaidChange={setPrepaidFilter}
               onTimeOfUseChange={setTimeOfUseFilter}
             />
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filterAndSortPlans(plans).map((plan: Plan) => (
-                <PlanCard 
-                  key={`${plan.company_id}-${plan.plan_name}`} 
-                  plan={plan}
-                  onCompare={handleCompare}
-                  isCompared={comparedPlans.some(p => p.company_id === plan.company_id)}
-                />
-              ))}
-            </div>
+            <PlanGrid 
+              plans={filterAndSortPlans(plans)}
+              onCompare={handleCompare}
+              comparedPlans={comparedPlans}
+            />
           </>
         )}
       </main>
