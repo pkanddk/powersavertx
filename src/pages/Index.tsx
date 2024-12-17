@@ -60,8 +60,8 @@ export default function Index() {
     if (planType !== 'all') {
       filteredPlans = filteredPlans.filter(plan => 
         planType === 'fixed' 
-          ? plan.plan_type_name === "1"  // Fixed Rate plans have type "1"
-          : plan.plan_type_name === "2"  // Variable Rate plans have type "2"
+          ? plan.plan_type_name === "Fixed Rate"
+          : plan.plan_type_name === "Variable Rate"
       );
     }
 
