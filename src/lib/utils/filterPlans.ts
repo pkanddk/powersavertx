@@ -9,6 +9,7 @@ export function filterPlans(
     timeOfUseFilter,
     companyFilter,
     sortOrder,
+    estimatedUse,
   }: {
     planType: string;
     contractLength: string;
@@ -16,6 +17,7 @@ export function filterPlans(
     timeOfUseFilter: string;
     companyFilter: string;
     sortOrder: string;
+    estimatedUse?: string;
   }
 ) {
   let filteredPlans = [...plans];
@@ -66,13 +68,27 @@ export function filterPlans(
     });
   }
 
+  // Sort plans based on the selected kWh usage
+  const getPriceForUsage = (plan: Plan) => {
+    switch (estimatedUse) {
+      case "500":
+        return plan.price_kwh500;
+      case "1000":
+        return plan.price_kwh1000;
+      case "2000":
+        return plan.price_kwh2000;
+      default:
+        return plan.price_kwh;
+    }
+  };
+
   // Sort plans
   const sortedPlans = filteredPlans.sort((a, b) => {
     switch (sortOrder) {
       case 'price-asc':
-        return a.price_kwh - b.price_kwh;
+        return getPriceForUsage(a) - getPriceForUsage(b);
       case 'price-desc':
-        return b.price_kwh - a.price_kwh;
+        return getPriceForUsage(b) - getPriceForUsage(a);
       case 'length-asc':
         return (a.contract_length || 0) - (b.contract_length || 0);
       case 'length-desc':

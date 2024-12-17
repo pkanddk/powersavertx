@@ -60,6 +60,7 @@ export default function Index() {
     timeOfUseFilter,
     companyFilter,
     sortOrder,
+    estimatedUse: search?.estimatedUse,
   }) : [];
 
   return (
