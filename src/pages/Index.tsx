@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 import { SearchForm } from "@/components/SearchForm";
 import { PlanGrid } from "@/components/PlanGrid";
-import { PlanFilters } from "@/components/PlanFilters";
 import { PlanComparisonTable } from "@/components/PlanComparisonTable";
 import { searchPlans, type Plan } from "@/lib/api";
 import { useToast } from "@/components/ui/use-toast";
@@ -13,13 +12,6 @@ export default function Index() {
   const [searchParams] = useSearchParams();
   const [search, setSearch] = useState<{ zipCode: string; estimatedUse: string } | null>(null);
   const [comparedPlans, setComparedPlans] = useState<Plan[]>([]);
-  const [sortOrder, setSortOrder] = useState<string>('price-asc');
-  const [contractLength, setContractLength] = useState('all');
-  const [planType, setPlanType] = useState('all');
-  const [prepaidFilter, setPrepaidFilter] = useState('all');
-  const [timeOfUseFilter, setTimeOfUseFilter] = useState('all');
-  const [companyFilter, setCompanyFilter] = useState('all');
-  
   const { toast } = useToast();
   const estimatedUse = searchParams.get("estimatedUse") || "any";
 
@@ -57,12 +49,6 @@ export default function Index() {
   };
 
   const filteredPlans = plans ? filterPlans(plans, {
-    planType,
-    contractLength,
-    prepaidFilter,
-    timeOfUseFilter,
-    companyFilter,
-    sortOrder,
     estimatedUse: search?.estimatedUse,
   }) : [];
 
@@ -94,29 +80,12 @@ export default function Index() {
         )}
 
         {plans && (
-          <>
-            <PlanFilters
-              currentSort={sortOrder}
-              currentContractLength={contractLength}
-              currentPlanType={planType}
-              currentPrepaid={prepaidFilter}
-              currentTimeOfUse={timeOfUseFilter}
-              currentCompany={companyFilter}
-              onSortChange={setSortOrder}
-              onContractLengthChange={setContractLength}
-              onPlanTypeChange={setPlanType}
-              onPrepaidChange={setPrepaidFilter}
-              onTimeOfUseChange={setTimeOfUseFilter}
-              onCompanyChange={setCompanyFilter}
-              plans={plans}
-            />
-            <PlanGrid 
-              plans={filteredPlans}
-              onCompare={handleCompare}
-              comparedPlans={comparedPlans}
-              estimatedUse={estimatedUse}
-            />
-          </>
+          <PlanGrid 
+            plans={filteredPlans}
+            onCompare={handleCompare}
+            comparedPlans={comparedPlans}
+            estimatedUse={estimatedUse}
+          />
         )}
       </main>
     </div>
