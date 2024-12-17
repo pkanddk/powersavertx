@@ -22,6 +22,7 @@ export function PlanCard({ plan, onCompare, isCompared }: PlanCardProps) {
           planName={plan.plan_name}
           companyName={plan.company_name}
           rating={plan.jdp_rating}
+          ratingYear={plan.jdp_rating_year}
         />
         
         <div className="space-y-4">
