@@ -69,14 +69,20 @@ export function filterPlans(
   }
 
   // Get the price for the selected kWh usage
-  const getPriceForUsage = (plan: Plan) => {
-    if (estimatedUse === "500") return plan.price_kwh500;
-    if (estimatedUse === "1000") return plan.price_kwh1000;
-    if (estimatedUse === "2000") return plan.price_kwh2000;
-    return plan.price_kwh;
+  const getPriceForUsage = (plan: Plan): number => {
+    switch (estimatedUse) {
+      case "500":
+        return plan.price_kwh500;
+      case "1000":
+        return plan.price_kwh1000;
+      case "2000":
+        return plan.price_kwh2000;
+      default:
+        return plan.price_kwh;
+    }
   };
 
-  // Always sort by price according to the selected kWh usage
+  // Sort plans based on the selected usage price
   return filteredPlans.sort((a, b) => {
     const priceA = getPriceForUsage(a);
     const priceB = getPriceForUsage(b);
