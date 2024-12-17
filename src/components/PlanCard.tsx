@@ -75,7 +75,7 @@ export function PlanCard({ plan, onCompare, isCompared }: PlanCardProps) {
           </p>
         </div>
       </CardContent>
-      <CardFooter className="flex-none p-6 pt-0 space-y-3">
+      <CardFooter className="flex-none p-6 pt-0">
         <div className="w-full space-y-3">
           {onCompare && (
             <Button 
