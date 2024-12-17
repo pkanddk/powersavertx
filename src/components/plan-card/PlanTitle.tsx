@@ -9,8 +9,8 @@ interface PlanTitleProps {
 }
 
 export function PlanTitle({ planName, companyName, rating, ratingYear }: PlanTitleProps) {
-  // A plan has a valid rating if rating is not null/undefined/0 and has a rating year
-  const hasRating = rating && rating > 0 && ratingYear;
+  // A plan has a valid rating if rating is not null/undefined/0 and has a rating year that's not empty
+  const hasValidRating = rating !== null && rating > 0 && ratingYear && ratingYear !== "";
 
   return (
     <div className="flex justify-between items-start mb-4">
@@ -18,7 +18,7 @@ export function PlanTitle({ planName, companyName, rating, ratingYear }: PlanTit
         <h3 className="text-xl font-semibold">{planName}</h3>
         <p className="text-sm text-muted-foreground">{companyName}</p>
       </div>
-      {hasRating ? (
+      {hasValidRating ? (
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>

@@ -30,17 +30,16 @@ export function filterPlans(
   // Apply rating filter
   if (ratingFilter !== 'all') {
     filteredPlans = filteredPlans.filter(plan => {
-      // Ensure we handle null/undefined ratings
-      const rating = plan.jdp_rating ?? 0;
-      const hasRating = rating > 0 && plan.jdp_rating_year;
+      const rating = plan.jdp_rating;
+      const hasValidRating = rating !== null && rating > 0 && plan.jdp_rating_year && plan.jdp_rating_year !== "";
       
       switch (ratingFilter) {
         case 'rated-only':
-          return hasRating;
+          return hasValidRating;
         case '4-plus':
-          return hasRating && rating >= 4;
+          return hasValidRating && rating >= 4;
         case '3-plus':
-          return hasRating && rating >= 3;
+          return hasValidRating && rating >= 3;
         default:
           return true;
       }
@@ -100,11 +99,13 @@ export function filterPlans(
       case 'length-desc':
         return (b.contract_length || 0) - (a.contract_length || 0);
       case 'rating-desc':
-        // Handle null/undefined ratings
-        return ((b.jdp_rating ?? 0) - (a.jdp_rating ?? 0));
+        const ratingA = a.jdp_rating !== null && a.jdp_rating > 0 && a.jdp_rating_year ? a.jdp_rating : 0;
+        const ratingB = b.jdp_rating !== null && b.jdp_rating > 0 && b.jdp_rating_year ? b.jdp_rating : 0;
+        return ratingB - ratingA;
       case 'rating-asc':
-        // Handle null/undefined ratings
-        return ((a.jdp_rating ?? 0) - (b.jdp_rating ?? 0));
+        const ratingAsc1 = a.jdp_rating !== null && a.jdp_rating > 0 && a.jdp_rating_year ? a.jdp_rating : 0;
+        const ratingAsc2 = b.jdp_rating !== null && b.jdp_rating > 0 && b.jdp_rating_year ? b.jdp_rating : 0;
+        return ratingAsc1 - ratingAsc2;
       default:
         return 0;
     }
