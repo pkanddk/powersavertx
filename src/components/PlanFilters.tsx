@@ -48,28 +48,34 @@ export function PlanFilters({
 
   return (
     <div className="flex flex-wrap gap-4 mb-6">
-      <Select value={currentSort} onValueChange={onSortChange}>
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Price: Low to High" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="price-asc">Price: Low to High</SelectItem>
-          <SelectItem value="price-desc">Price: High to Low</SelectItem>
-        </SelectContent>
-      </Select>
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-medium">Sort by Price</label>
+        <Select value={currentSort} onValueChange={onSortChange}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Price: Low to High" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="price-asc">Price: Low to High</SelectItem>
+            <SelectItem value="price-desc">Price: High to Low</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
-      <Select value={currentContractLength} onValueChange={onContractLengthChange}>
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Show All" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="length-asc">Length: Short to Long</SelectItem>
-          <SelectItem value="length-desc">Length: Long to Short</SelectItem>
-          <SelectItem value="0-6">0-6 Months</SelectItem>
-          <SelectItem value="7-12">7-12 Months</SelectItem>
-          <SelectItem value="13+">13+ Months</SelectItem>
-        </SelectContent>
-      </Select>
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-medium">Contract Length</label>
+        <Select value={currentContractLength} onValueChange={onContractLengthChange}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Show All" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="length-asc">Length: Short to Long</SelectItem>
+            <SelectItem value="length-desc">Length: Long to Short</SelectItem>
+            <SelectItem value="0-6">0-6 Months</SelectItem>
+            <SelectItem value="7-12">7-12 Months</SelectItem>
+            <SelectItem value="13+">13+ Months</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
       <Select value={currentPlanType} onValueChange={onPlanTypeChange}>
         <SelectTrigger className="w-[180px]">
