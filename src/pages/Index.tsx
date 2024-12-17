@@ -59,13 +59,13 @@ export default function Index() {
     // Apply plan type filter
     if (planType !== 'all') {
       filteredPlans = filteredPlans.filter(plan => {
-        const planTypeName = plan.plan_type_name?.trim();
+        const planTypeName = (plan.plan_type_name || '').toLowerCase();
         if (planType === 'fixed') {
-          return planTypeName === "Fixed Rate";
+          return planTypeName.includes('fixed');
         } else if (planType === 'variable') {
-          return planTypeName === "Variable Rate";
+          return planTypeName.includes('variable');
         }
-        return true;
+        return false;
       });
     }
 
