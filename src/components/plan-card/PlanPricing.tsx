@@ -18,16 +18,18 @@ export function PlanPricing({
   estimatedUse
 }: PlanPricingProps) {
   
-  const getSelectedPrice = () => {
-    switch(estimatedUse) {
-      case "500": return { usage: "500 kWh", price: priceKwh500 };
-      case "1000": return { usage: "1,000 kWh", price: priceKwh1000 };
-      case "2000": return { usage: "2,000 kWh", price: priceKwh2000 };
-      default: return null;
-    }
-  };
+  const prices = [
+    { usage: "500 kWh", price: priceKwh500, key: "500" },
+    { usage: "1,000 kWh", price: priceKwh1000, key: "1000" },
+    { usage: "2,000 kWh", price: priceKwh2000, key: "2000" }
+  ];
 
-  const selectedPrice = getSelectedPrice();
+  // Sort prices to put selected price first
+  const sortedPrices = [...prices].sort((a, b) => {
+    if (a.key === estimatedUse) return -1;
+    if (b.key === estimatedUse) return 1;
+    return 0;
+  });
 
   const PriceDisplay = ({ usage, price, isSelected }: { usage: string; price: number; isSelected: boolean }) => (
     <div 
@@ -50,21 +52,14 @@ export function PlanPricing({
     <div className="space-y-4">
       <div className="text-sm font-medium text-gray-700 mb-2">Price per kWh</div>
       <div className="space-y-2">
-        <PriceDisplay 
-          usage="500 kWh" 
-          price={priceKwh500} 
-          isSelected={estimatedUse === "500"}
-        />
-        <PriceDisplay 
-          usage="1,000 kWh" 
-          price={priceKwh1000} 
-          isSelected={estimatedUse === "1000"}
-        />
-        <PriceDisplay 
-          usage="2,000 kWh" 
-          price={priceKwh2000} 
-          isSelected={estimatedUse === "2000"}
-        />
+        {sortedPrices.map(({ usage, price, key }) => (
+          <PriceDisplay 
+            key={key}
+            usage={usage} 
+            price={price} 
+            isSelected={estimatedUse === key}
+          />
+        ))}
       </div>
       
       {baseCharge && (
