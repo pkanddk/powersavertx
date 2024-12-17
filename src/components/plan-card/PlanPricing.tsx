@@ -1,3 +1,5 @@
+import { useSearchParams } from "react-router-dom";
+
 interface PlanPricingProps {
   priceKwh: number;
   priceKwh500: number;
@@ -6,29 +8,64 @@ interface PlanPricingProps {
   baseCharge?: number;
 }
 
-export function PlanPricing({ priceKwh, priceKwh500, priceKwh1000, priceKwh2000, baseCharge }: PlanPricingProps) {
+export function PlanPricing({ 
+  priceKwh500, 
+  priceKwh1000, 
+  priceKwh2000, 
+  baseCharge 
+}: PlanPricingProps) {
+  const [searchParams] = useSearchParams();
+  const estimatedUse = searchParams.get("estimatedUse") || "500";
+
   const formatPrice = (price: number) => {
     return (price * 100).toFixed(1) + "¢";
   };
 
+  const getSelectedPrice = () => {
+    switch (estimatedUse) {
+      case "500":
+        return priceKwh500;
+      case "1000":
+        return priceKwh1000;
+      case "2000":
+        return priceKwh2000;
+      default:
+        return priceKwh500;
+    }
+  };
+
   return (
     <div className="space-y-4">
-      <div className="space-y-2">
-        <div className="flex justify-between items-baseline">
-          <span className="text-3xl font-bold text-primary">
-            {formatPrice(priceKwh)}
-          </span>
-          <span className="text-sm text-muted-foreground">per kWh</span>
+      <div className="text-center">
+        <div className="text-4xl font-bold text-primary mb-2">
+          {formatPrice(getSelectedPrice())}
+          <span className="text-sm text-muted-foreground ml-1">per kWh</span>
         </div>
-        <div className="text-sm text-muted-foreground space-y-1">
-          <div>500 kWh: {formatPrice(priceKwh500)}</div>
-          <div>1,000 kWh: {formatPrice(priceKwh1000)}</div>
-          <div>2,000 kWh: {formatPrice(priceKwh2000)}</div>
+      </div>
+      
+      <div className="grid grid-cols-3 gap-2 bg-secondary/20 rounded-lg p-3">
+        <div className={`text-center p-2 rounded ${estimatedUse === "500" ? "bg-primary/20" : ""}`}>
+          <div className="text-sm font-medium">500 kWh</div>
+          <div className={`${estimatedUse === "500" ? "text-primary font-semibold" : "text-muted-foreground"}`}>
+            {formatPrice(priceKwh500)}
+          </div>
+        </div>
+        <div className={`text-center p-2 rounded ${estimatedUse === "1000" ? "bg-primary/20" : ""}`}>
+          <div className="text-sm font-medium">1,000 kWh</div>
+          <div className={`${estimatedUse === "1000" ? "text-primary font-semibold" : "text-muted-foreground"}`}>
+            {formatPrice(priceKwh1000)}
+          </div>
+        </div>
+        <div className={`text-center p-2 rounded ${estimatedUse === "2000" ? "bg-primary/20" : ""}`}>
+          <div className="text-sm font-medium">2,000 kWh</div>
+          <div className={`${estimatedUse === "2000" ? "text-primary font-semibold" : "text-muted-foreground"}`}>
+            {formatPrice(priceKwh2000)}
+          </div>
         </div>
       </div>
       
       {baseCharge && (
-        <div className="text-sm text-muted-foreground">
+        <div className="text-sm text-muted-foreground text-center">
           Base Charge: ${baseCharge}/month
         </div>
       )}
