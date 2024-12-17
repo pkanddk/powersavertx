@@ -1,5 +1,4 @@
 interface PlanPricingProps {
-  priceKwh: number;
   priceKwh500: number;
   priceKwh1000: number;
   priceKwh2000: number;
