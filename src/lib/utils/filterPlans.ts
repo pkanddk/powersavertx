@@ -139,9 +139,9 @@ export function filterPlans(
         const ratingAsc2 = b.jdp_rating !== null && b.jdp_rating > 0 && b.jdp_rating_year && b.jdp_rating_year !== "" ? b.jdp_rating : 0;
         console.log('Sorting ratings asc:', { 
           planA: a.plan_name, 
-          rating: ratingAsc1, 
+          ratingAsc1, 
           planB: b.plan_name, 
-          rating: ratingAsc2 
+          ratingAsc2 
         });
         return ratingAsc1 - ratingAsc2;
       default:
