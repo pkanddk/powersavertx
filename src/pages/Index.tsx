@@ -2,23 +2,19 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { SearchForm } from "@/components/SearchForm";
 import { PlanCard } from "@/components/PlanCard";
+import { PlanFilters } from "@/components/PlanFilters";
 import { searchPlans, type Plan } from "@/lib/api";
 import { useToast } from "@/components/ui/use-toast";
-import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { ArrowUpDown } from "lucide-react";
 
 export default function Index() {
   const [search, setSearch] = useState<{ zipCode: string; estimatedUse: string } | null>(null);
   const [comparedPlans, setComparedPlans] = useState<Plan[]>([]);
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [sortOrder, setSortOrder] = useState<string>('price-asc');
+  const [contractLength, setContractLength] = useState('all');
+  const [planType, setPlanType] = useState('all');
+  const [prepaidFilter, setPrepaidFilter] = useState('all');
+  const [timeOfUseFilter, setTimeOfUseFilter] = useState('all');
+  
   const { toast } = useToast();
 
   const { data: plans, isLoading } = useQuery({
@@ -54,18 +50,65 @@ export default function Index() {
     }
   };
 
-  const formatPrice = (price: number) => {
-    return (price * 100).toFixed(1) + "¢";
-  };
+  const filterAndSortPlans = (plans: Plan[] | undefined) => {
+    if (!plans) return [];
+    
+    let filteredPlans = [...plans];
 
-  const toggleSort = () => {
-    setSortOrder(current => current === 'asc' ? 'desc' : 'asc');
-  };
+    // Apply plan type filter
+    if (planType !== 'all') {
+      filteredPlans = filteredPlans.filter(plan => 
+        planType === 'fixed' 
+          ? plan.plan_type_name.toLowerCase().includes('fixed')
+          : plan.plan_type_name.toLowerCase().includes('variable')
+      );
+    }
 
-  const sortedPlans = plans ? [...plans].sort((a, b) => {
-    const multiplier = sortOrder === 'asc' ? 1 : -1;
-    return (a.price_kwh - b.price_kwh) * multiplier;
-  }) : [];
+    // Apply contract length filter
+    if (contractLength !== 'all') {
+      filteredPlans = filteredPlans.filter(plan => {
+        const length = plan.contract_length || 0;
+        switch (contractLength) {
+          case '0-6': return length >= 0 && length <= 6;
+          case '7-12': return length >= 7 && length <= 12;
+          case '13+': return length >= 13;
+          default: return true;
+        }
+      });
+    }
+
+    // Apply prepaid filter
+    if (prepaidFilter !== 'all') {
+      filteredPlans = filteredPlans.filter(plan => {
+        const isPrepaid = plan.plan_type_name.toLowerCase().includes('prepaid');
+        return prepaidFilter === 'prepaid-only' ? isPrepaid : !isPrepaid;
+      });
+    }
+
+    // Apply time of use filter
+    if (timeOfUseFilter !== 'all') {
+      filteredPlans = filteredPlans.filter(plan => {
+        const isTimeOfUse = plan.plan_type_name.toLowerCase().includes('time of use');
+        return timeOfUseFilter === 'tou-only' ? isTimeOfUse : !isTimeOfUse;
+      });
+    }
+
+    // Apply sorting
+    return filteredPlans.sort((a, b) => {
+      switch (sortOrder) {
+        case 'price-asc':
+          return a.price_kwh - b.price_kwh;
+        case 'price-desc':
+          return b.price_kwh - a.price_kwh;
+        case 'length-asc':
+          return (a.contract_length || 0) - (b.contract_length || 0);
+        case 'length-desc':
+          return (b.contract_length || 0) - (a.contract_length || 0);
+        default:
+          return 0;
+      }
+    });
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -141,19 +184,20 @@ export default function Index() {
 
         {plans && (
           <>
-            <div className="flex justify-end mb-4">
-              <Button
-                variant="outline"
-                onClick={toggleSort}
-                className="flex items-center gap-2"
-              >
-                Sort by Price
-                <ArrowUpDown className="h-4 w-4" />
-                {sortOrder === 'asc' ? '(Low to High)' : '(High to Low)'}
-              </Button>
-            </div>
+            <PlanFilters
+              currentSort={sortOrder}
+              currentContractLength={contractLength}
+              currentPlanType={planType}
+              currentPrepaid={prepaidFilter}
+              currentTimeOfUse={timeOfUseFilter}
+              onSortChange={setSortOrder}
+              onContractLengthChange={setContractLength}
+              onPlanTypeChange={setPlanType}
+              onPrepaidChange={setPrepaidFilter}
+              onTimeOfUseChange={setTimeOfUseFilter}
+            />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {sortedPlans.map((plan: Plan) => (
+              {filterAndSortPlans(plans).map((plan: Plan) => (
                 <PlanCard 
                   key={`${plan.company_id}-${plan.plan_name}`} 
                   plan={plan}
