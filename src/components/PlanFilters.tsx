@@ -42,11 +42,14 @@ export function PlanFilters({
   currentRating,
   plans = [],
 }: PlanFiltersProps) {
-  // Get unique companies from plans
-  const companies = Array.from(new Set(plans.map(plan => ({
-    id: plan.company_id,
-    name: plan.company_name
-  })))).sort((a, b) => a.name.localeCompare(b.name));
+  // Get unique companies from plans, ensuring no duplicates
+  const companies = Array.from(new Set(plans.map(plan => plan.company_id))).map(id => {
+    const plan = plans.find(p => p.company_id === id);
+    return {
+      id: plan?.company_id || '',
+      name: plan?.company_name || ''
+    };
+  }).sort((a, b) => a.name.localeCompare(b.name));
 
   return (
     <div className="flex flex-wrap gap-4 mb-6">
@@ -106,7 +109,7 @@ export function PlanFilters({
         <SelectContent>
           <SelectItem value="all">All Companies</SelectItem>
           {companies.map(company => (
-            <SelectItem key={company.id} value={company.id}>
+            <SelectItem key={`company-${company.id}`} value={company.id}>
               {company.name}
             </SelectItem>
           ))}
