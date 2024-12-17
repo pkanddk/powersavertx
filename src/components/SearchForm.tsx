@@ -21,9 +21,10 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const usageValue = estimatedUse === "500 kWh" ? "500" :
-                      estimatedUse === "1,000 kWh" ? "1000" :
-                      estimatedUse === "2,000 kWh" ? "2000" : "any";
+    // Extract just the number from the usage string
+    const usageValue = estimatedUse === USAGE_OPTIONS[0] ? "any" :
+                      estimatedUse.split(" ")[0].replace(",", "");
+    console.log("[SearchForm] Submitting with usage value:", usageValue);
     onSearch(zipCode, usageValue);
   };
 
