@@ -38,7 +38,6 @@ export function PlanFilters({
   currentCompany,
   plans = [],
 }: PlanFiltersProps) {
-  // Get unique companies from plans, ensuring no duplicates
   const companies = Array.from(new Set(plans.map(plan => plan.company_id))).map(id => {
     const plan = plans.find(p => p.company_id === id);
     return {
@@ -51,13 +50,24 @@ export function PlanFilters({
     <div className="flex flex-wrap gap-4 mb-6">
       <Select value={currentSort} onValueChange={onSortChange}>
         <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Sort by" />
+          <SelectValue placeholder="Sort by Price" />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="price-asc">Price: Low to High</SelectItem>
           <SelectItem value="price-desc">Price: High to Low</SelectItem>
-          <SelectItem value="length-asc">Contract Length: Short to Long</SelectItem>
-          <SelectItem value="length-desc">Contract Length: Long to Short</SelectItem>
+        </SelectContent>
+      </Select>
+
+      <Select value={currentContractLength} onValueChange={onContractLengthChange}>
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder="Sort by Length" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="length-asc">Length: Short to Long</SelectItem>
+          <SelectItem value="length-desc">Length: Long to Short</SelectItem>
+          <SelectItem value="0-6">0-6 Months</SelectItem>
+          <SelectItem value="7-12">7-12 Months</SelectItem>
+          <SelectItem value="13+">13+ Months</SelectItem>
         </SelectContent>
       </Select>
 
@@ -69,18 +79,6 @@ export function PlanFilters({
           <SelectItem value="all">All Plan Types</SelectItem>
           <SelectItem value="fixed">Fixed Rate Only</SelectItem>
           <SelectItem value="variable">Variable Rate Only</SelectItem>
-        </SelectContent>
-      </Select>
-
-      <Select value={currentContractLength} onValueChange={onContractLengthChange}>
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Contract Length" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All Lengths</SelectItem>
-          <SelectItem value="0-6">0-6 Months</SelectItem>
-          <SelectItem value="7-12">7-12 Months</SelectItem>
-          <SelectItem value="13+">13+ Months</SelectItem>
         </SelectContent>
       </Select>
 
