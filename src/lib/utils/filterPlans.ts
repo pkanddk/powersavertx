@@ -68,7 +68,7 @@ export function filterPlans(
     });
   }
 
-  // Sort plans based on the selected kWh usage
+  // Get the appropriate price for the selected usage
   const getPriceForUsage = (plan: Plan) => {
     switch (estimatedUse) {
       case "500":
@@ -82,7 +82,7 @@ export function filterPlans(
     }
   };
 
-  // Sort plans
+  // Sort plans based on the selected usage and sort order
   const sortedPlans = filteredPlans.sort((a, b) => {
     switch (sortOrder) {
       case 'price-asc':
