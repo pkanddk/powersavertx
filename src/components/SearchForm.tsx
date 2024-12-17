@@ -21,9 +21,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Convert the formatted string back to the expected API format
-    const usageValue = estimatedUse === "Any Range" ? "any" :
-                      estimatedUse === "500 kWh" ? "500" :
+    const usageValue = estimatedUse === "500 kWh" ? "500" :
                       estimatedUse === "1,000 kWh" ? "1000" :
                       estimatedUse === "2,000 kWh" ? "2000" : "any";
     onSearch(zipCode, usageValue);

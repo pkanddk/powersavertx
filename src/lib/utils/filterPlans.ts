@@ -68,35 +68,18 @@ export function filterPlans(
     });
   }
 
-  // Get the appropriate price for the selected usage
+  // Get the price for the selected kWh usage
   const getPriceForUsage = (plan: Plan) => {
-    switch (estimatedUse) {
-      case "500":
-        return plan.price_kwh500;
-      case "1000":
-        return plan.price_kwh1000;
-      case "2000":
-        return plan.price_kwh2000;
-      default:
-        return plan.price_kwh;
-    }
+    if (estimatedUse === "500") return plan.price_kwh500;
+    if (estimatedUse === "1000") return plan.price_kwh1000;
+    if (estimatedUse === "2000") return plan.price_kwh2000;
+    return plan.price_kwh;
   };
 
-  // Sort plans based on the selected usage and sort order
-  const sortedPlans = filteredPlans.sort((a, b) => {
-    switch (sortOrder) {
-      case 'price-asc':
-        return getPriceForUsage(a) - getPriceForUsage(b);
-      case 'price-desc':
-        return getPriceForUsage(b) - getPriceForUsage(a);
-      case 'length-asc':
-        return (a.contract_length || 0) - (b.contract_length || 0);
-      case 'length-desc':
-        return (b.contract_length || 0) - (a.contract_length || 0);
-      default:
-        return 0;
-    }
+  // Always sort by price according to the selected kWh usage
+  return filteredPlans.sort((a, b) => {
+    const priceA = getPriceForUsage(a);
+    const priceB = getPriceForUsage(b);
+    return sortOrder === 'price-desc' ? priceB - priceA : priceA - priceB;
   });
-
-  return sortedPlans;
 }
