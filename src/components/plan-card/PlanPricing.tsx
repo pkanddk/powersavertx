@@ -18,19 +18,19 @@ export function PlanPricing({
   estimatedUse
 }: PlanPricingProps) {
   
-  // Create array of all prices
-  const prices = [
+  // Create array of all prices with their usage levels
+  const allPrices = [
     { usage: "500 kWh", price: priceKwh500, key: "500" },
     { usage: "1,000 kWh", price: priceKwh1000, key: "1000" },
     { usage: "2,000 kWh", price: priceKwh2000, key: "2000" }
   ];
 
-  // Sort prices to put selected price first
-  const sortedPrices = prices.sort((a, b) => {
-    if (a.key === estimatedUse) return -1;
-    if (b.key === estimatedUse) return 1;
-    return 0;
-  });
+  // Split prices into selected and non-selected
+  const selectedPrice = allPrices.find(p => p.key === estimatedUse);
+  const otherPrices = allPrices.filter(p => p.key !== estimatedUse);
+  
+  // Combine them with selected first, then others
+  const orderedPrices = selectedPrice ? [selectedPrice, ...otherPrices] : allPrices;
 
   const PriceDisplay = ({ usage, price, isSelected }: { usage: string; price: number; isSelected: boolean }) => (
     <div 
@@ -53,7 +53,7 @@ export function PlanPricing({
     <div className="space-y-4">
       <div className="text-sm font-medium text-gray-700 mb-2">Price per kWh</div>
       <div className="space-y-2">
-        {sortedPrices.map(({ usage, price, key }) => (
+        {orderedPrices.map(({ usage, price, key }) => (
           <PriceDisplay 
             key={key}
             usage={usage}
