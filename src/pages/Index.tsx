@@ -16,6 +16,7 @@ export default function Index() {
   const [prepaidFilter, setPrepaidFilter] = useState('all');
   const [timeOfUseFilter, setTimeOfUseFilter] = useState('all');
   const [companyFilter, setCompanyFilter] = useState('all');
+  const [ratingFilter, setRatingFilter] = useState('all');
   
   const { toast } = useToast();
 
@@ -62,14 +63,30 @@ export default function Index() {
       filteredPlans = filteredPlans.filter(plan => plan.company_id === companyFilter);
     }
 
+    // Apply rating filter
+    if (ratingFilter !== 'all') {
+      filteredPlans = filteredPlans.filter(plan => {
+        const rating = plan.jdp_rating || 0;
+        switch (ratingFilter) {
+          case 'rated-only':
+            return rating > 0;
+          case '4-plus':
+            return rating >= 4;
+          case '3-plus':
+            return rating >= 3;
+          default:
+            return true;
+        }
+      });
+    }
+
     // Apply plan type filter
     if (planType !== 'all') {
       filteredPlans = filteredPlans.filter(plan => {
-        const planTypeName = plan.plan_type_name;
         if (planType === 'fixed') {
-          return planTypeName === "1" || planTypeName === "Fixed Rate";
+          return plan.plan_type_name === "Fixed Rate" || plan.plan_type_name === "1";
         } else if (planType === 'variable') {
-          return planTypeName === "" || planTypeName === "Variable Rate";
+          return plan.plan_type_name === "Variable Rate" || plan.plan_type_name === "";
         }
         return false;
       });
@@ -104,6 +121,7 @@ export default function Index() {
       });
     }
 
+    // Sort plans
     return filteredPlans.sort((a, b) => {
       switch (sortOrder) {
         case 'price-asc':
@@ -114,6 +132,10 @@ export default function Index() {
           return (a.contract_length || 0) - (b.contract_length || 0);
         case 'length-desc':
           return (b.contract_length || 0) - (a.contract_length || 0);
+        case 'rating-desc':
+          return (b.jdp_rating || 0) - (a.jdp_rating || 0);
+        case 'rating-asc':
+          return (a.jdp_rating || 0) - (b.jdp_rating || 0);
         default:
           return 0;
       }
@@ -158,12 +180,14 @@ export default function Index() {
               currentPrepaid={prepaidFilter}
               currentTimeOfUse={timeOfUseFilter}
               currentCompany={companyFilter}
+              currentRating={ratingFilter}
               onSortChange={setSortOrder}
               onContractLengthChange={setContractLength}
               onPlanTypeChange={setPlanType}
               onPrepaidChange={setPrepaidFilter}
               onTimeOfUseChange={setTimeOfUseFilter}
               onCompanyChange={setCompanyFilter}
+              onRatingChange={setRatingFilter}
               plans={plans}
             />
             <PlanGrid 
