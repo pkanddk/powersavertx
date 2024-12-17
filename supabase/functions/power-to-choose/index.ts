@@ -59,15 +59,9 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
 
     const transformedPlans = plans.map(plan => {
       console.log(`[Edge Function] Processing plan: ${plan.plan_name}`);
-      console.log(`[Edge Function] Raw rate data:`, {
-        price_kwh500: plan.price_kwh500,
-        price_kwh1000: plan.price_kwh1000,
-        price_kwh2000: plan.price_kwh2000,
-        rate500: plan.rate500,
-        rate1000: plan.rate1000,
-        rate2000: plan.rate2000,
-        avgprice: plan.avgprice,
-        price: plan.price
+      console.log(`[Edge Function] Plan URLs:`, {
+        fact_sheet: plan.fact_sheet,
+        go_to_plan: plan.enroll_plan_url || plan.go_to_plan || plan.enroll_now
       });
 
       const parseRate = (rate: string | number | null | undefined): number => {
@@ -101,7 +95,7 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
         plan_name: String(plan.plan_name || ""),
         plan_type_name: String(plan.plan_type || ""),
         fact_sheet: plan.fact_sheet || null,
-        go_to_plan: plan.enroll_now || null,
+        go_to_plan: plan.enroll_plan_url || plan.go_to_plan || plan.enroll_now || null,
         jdp_rating: plan.rating ? parseFloat(plan.rating) : null,
         jdp_rating_year: new Date().getFullYear().toString(),
         minimum_usage: Boolean(plan.minimum_usage),
