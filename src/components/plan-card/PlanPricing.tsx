@@ -15,7 +15,7 @@ export function PlanPricing({
   baseCharge 
 }: PlanPricingProps) {
   const [searchParams] = useSearchParams();
-  const estimatedUse = searchParams.get("estimatedUse") || "any";
+  const estimatedUse = searchParams.get("estimatedUse");
   
   console.log("[PlanPricing] Current estimatedUse:", estimatedUse);
 
@@ -24,17 +24,10 @@ export function PlanPricing({
   };
 
   const isHighlighted = (usage: string) => {
-    console.log(`[PlanPricing] Checking highlight for usage: ${usage}, estimatedUse: ${estimatedUse}`);
-    if (estimatedUse === "any") {
-      console.log("[PlanPricing] No highlight - estimatedUse is 'any'");
+    if (!estimatedUse || estimatedUse === "any") {
       return false;
     }
-    // Match the exact string values being passed from SearchForm
-    const shouldHighlight = usage === "500" && estimatedUse === "500" ||
-                          usage === "1000" && estimatedUse === "1000" ||
-                          usage === "2000" && estimatedUse === "2000";
-    console.log(`[PlanPricing] Should highlight ${usage}? ${shouldHighlight}`);
-    return shouldHighlight;
+    return estimatedUse === usage;
   };
 
   return (
