@@ -10,9 +10,9 @@ interface SearchFormProps {
 
 const USAGE_OPTIONS = [
   "Any Range",
-  "between 500 and 1,000",
-  "between 1,001 and 2,000",
-  "more than 2,000"
+  "500 kWh",
+  "1,000 kWh",
+  "2,000 kWh"
 ];
 
 export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
@@ -21,7 +21,12 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSearch(zipCode, estimatedUse);
+    // Convert the formatted string back to the expected API format
+    const usageValue = estimatedUse === "Any Range" ? estimatedUse :
+                      estimatedUse === "500 kWh" ? "500" :
+                      estimatedUse === "1,000 kWh" ? "1000" :
+                      estimatedUse === "2,000 kWh" ? "2000" : estimatedUse;
+    onSearch(zipCode, usageValue);
   };
 
   return (
