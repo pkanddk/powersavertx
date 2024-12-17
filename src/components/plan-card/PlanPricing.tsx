@@ -18,18 +18,32 @@ export function PlanPricing({
   estimatedUse
 }: PlanPricingProps) {
   
-  const prices = [
-    { usage: "500 kWh", price: priceKwh500, key: "500" },
-    { usage: "1,000 kWh", price: priceKwh1000, key: "1000" },
-    { usage: "2,000 kWh", price: priceKwh2000, key: "2000" }
-  ];
+  // Get the selected price based on estimated use
+  const getSelectedPrice = () => {
+    switch(estimatedUse) {
+      case "500": return { usage: "500 kWh", price: priceKwh500 };
+      case "1000": return { usage: "1,000 kWh", price: priceKwh1000 };
+      case "2000": return { usage: "2,000 kWh", price: priceKwh2000 };
+      default: return null;
+    }
+  };
 
-  // Sort prices to put selected price first
-  const sortedPrices = [...prices].sort((a, b) => {
-    if (a.key === estimatedUse) return -1;
-    if (b.key === estimatedUse) return 1;
-    return 0;
-  });
+  const selectedPrice = getSelectedPrice();
+
+  // Get remaining prices that aren't selected
+  const getRemainingPrices = () => {
+    const prices = [];
+    if (estimatedUse !== "500") {
+      prices.push({ usage: "500 kWh", price: priceKwh500 });
+    }
+    if (estimatedUse !== "1000") {
+      prices.push({ usage: "1,000 kWh", price: priceKwh1000 });
+    }
+    if (estimatedUse !== "2000") {
+      prices.push({ usage: "2,000 kWh", price: priceKwh2000 });
+    }
+    return prices;
+  };
 
   const PriceDisplay = ({ usage, price, isSelected }: { usage: string; price: number; isSelected: boolean }) => (
     <div 
@@ -52,12 +66,22 @@ export function PlanPricing({
     <div className="space-y-4">
       <div className="text-sm font-medium text-gray-700 mb-2">Price per kWh</div>
       <div className="space-y-2">
-        {sortedPrices.map(({ usage, price, key }) => (
+        {/* Always show selected price first */}
+        {selectedPrice && (
           <PriceDisplay 
-            key={key}
-            usage={usage} 
-            price={price} 
-            isSelected={estimatedUse === key}
+            usage={selectedPrice.usage}
+            price={selectedPrice.price}
+            isSelected={true}
+          />
+        )}
+        
+        {/* Show remaining prices */}
+        {getRemainingPrices().map((price, index) => (
+          <PriceDisplay 
+            key={index}
+            usage={price.usage}
+            price={price.price}
+            isSelected={false}
           />
         ))}
       </div>
