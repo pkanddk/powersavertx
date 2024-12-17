@@ -20,26 +20,28 @@ export function PlanPricing({
   
   // Create array of all prices with their usage levels
   const allPrices = [
-    { usage: "500 kWh", price: priceKwh500, key: "500" },
-    { usage: "1,000 kWh", price: priceKwh1000, key: "1000" },
-    { usage: "2,000 kWh", price: priceKwh2000, key: "2000" }
+    { usage: "500", display: "500 kWh", price: priceKwh500 },
+    { usage: "1000", display: "1,000 kWh", price: priceKwh1000 },
+    { usage: "2000", display: "2,000 kWh", price: priceKwh2000 }
   ];
 
-  // Split prices into selected and non-selected
-  const selectedPrice = allPrices.find(p => p.key === estimatedUse);
-  const otherPrices = allPrices.filter(p => p.key !== estimatedUse);
+  // Get the selected price based on estimatedUse
+  const selectedPrice = allPrices.find(p => p.usage === estimatedUse);
+  const otherPrices = allPrices.filter(p => p.usage !== estimatedUse);
   
-  // Combine them with selected first, then others
-  const orderedPrices = selectedPrice ? [selectedPrice, ...otherPrices] : allPrices;
+  // Create final array with selected price first, then others
+  const orderedPrices = selectedPrice 
+    ? [selectedPrice, ...otherPrices]
+    : allPrices;
 
-  const PriceDisplay = ({ usage, price, isSelected }: { usage: string; price: number; isSelected: boolean }) => (
+  const PriceDisplay = ({ display, price, isSelected }: { display: string; price: number; isSelected: boolean }) => (
     <div 
       className={`
         flex items-center justify-between p-3 rounded-lg
         ${isSelected ? 'bg-primary/10 border border-primary' : 'hover:bg-gray-50'}
       `}
     >
-      <span className="text-sm text-gray-600">{usage}</span>
+      <span className="text-sm text-gray-600">{display}</span>
       <div className="flex items-baseline">
         <span className={`font-medium ${isSelected ? 'text-primary' : 'text-gray-700'}`}>
           {formatPrice(price)}¢
@@ -53,12 +55,12 @@ export function PlanPricing({
     <div className="space-y-4">
       <div className="text-sm font-medium text-gray-700 mb-2">Price per kWh</div>
       <div className="space-y-2">
-        {orderedPrices.map(({ usage, price, key }) => (
+        {orderedPrices.map((priceInfo) => (
           <PriceDisplay 
-            key={key}
-            usage={usage}
-            price={price}
-            isSelected={key === estimatedUse}
+            key={priceInfo.usage}
+            display={priceInfo.display}
+            price={priceInfo.price}
+            isSelected={priceInfo.usage === estimatedUse}
           />
         ))}
       </div>
