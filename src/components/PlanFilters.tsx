@@ -50,9 +50,9 @@ export function PlanFilters({
     <div className="flex flex-wrap gap-4 mb-6">
       <div className="flex flex-col gap-2">
         <label className="text-sm font-medium">Sort by Price</label>
-        <Select value={currentSort} onValueChange={onSortChange}>
+        <Select value={currentSort || "price-asc"}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Price: Low to High" />
+            <SelectValue defaultValue="price-asc">Price: Low to High</SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="price-asc">Price: Low to High</SelectItem>
@@ -63,9 +63,9 @@ export function PlanFilters({
 
       <div className="flex flex-col gap-2">
         <label className="text-sm font-medium">Contract Length</label>
-        <Select value={currentContractLength} onValueChange={onContractLengthChange}>
+        <Select value={currentContractLength || "all"}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Show All" />
+            <SelectValue defaultValue="all">Show All</SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="length-asc">Length: Short to Long</SelectItem>
@@ -79,9 +79,9 @@ export function PlanFilters({
 
       <div className="flex flex-col gap-2">
         <label className="text-sm font-medium">Plan Type</label>
-        <Select value={currentPlanType} onValueChange={onPlanTypeChange}>
+        <Select value={currentPlanType || "all"}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="All Plan Types" />
+            <SelectValue defaultValue="all">All Plan Types</SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Plan Types</SelectItem>
@@ -93,9 +93,9 @@ export function PlanFilters({
 
       <div className="flex flex-col gap-2">
         <label className="text-sm font-medium">Company</label>
-        <Select value={currentCompany} onValueChange={onCompanyChange}>
+        <Select value={currentCompany || "all"}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="All Companies" />
+            <SelectValue defaultValue="all">All Companies</SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Companies</SelectItem>
@@ -110,9 +110,9 @@ export function PlanFilters({
 
       <div className="flex flex-col gap-2">
         <label className="text-sm font-medium">Prepaid Plans</label>
-        <Select value={currentPrepaid} onValueChange={onPrepaidChange}>
+        <Select value={currentPrepaid || "all"}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Show All" />
+            <SelectValue defaultValue="all">Show All</SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Show All</SelectItem>
@@ -124,9 +124,9 @@ export function PlanFilters({
 
       <div className="flex flex-col gap-2">
         <label className="text-sm font-medium">Time of Use</label>
-        <Select value={currentTimeOfUse} onValueChange={onTimeOfUseChange}>
+        <Select value={currentTimeOfUse || "all"}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Show All" />
+            <SelectValue defaultValue="all">Show All</SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Show All</SelectItem>
