@@ -16,16 +16,22 @@ export function PlanPricing({
 }: PlanPricingProps) {
   const [searchParams] = useSearchParams();
   const estimatedUse = searchParams.get("estimatedUse") || "any";
+  
+  console.log("[PlanPricing] Current estimatedUse:", estimatedUse);
 
   const formatPrice = (price: number) => {
     return (price * 100).toFixed(1) + "¢";
   };
 
   const isHighlighted = (usage: string) => {
+    console.log(`[PlanPricing] Checking highlight for usage: ${usage}, estimatedUse: ${estimatedUse}`);
     if (estimatedUse === "any") {
+      console.log("[PlanPricing] No highlight - estimatedUse is 'any'");
       return false;
     }
-    return estimatedUse === usage;
+    const shouldHighlight = estimatedUse === usage;
+    console.log(`[PlanPricing] Should highlight ${usage}? ${shouldHighlight}`);
+    return shouldHighlight;
   };
 
   return (
