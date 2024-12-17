@@ -15,7 +15,7 @@ export function PlanPricing({
   baseCharge 
 }: PlanPricingProps) {
   const [searchParams] = useSearchParams();
-  const estimatedUse = searchParams.get("estimatedUse") || "500";
+  const estimatedUse = searchParams.get("estimatedUse") || "any";
 
   const formatPrice = (price: number) => {
     return (price * 100).toFixed(1) + "¢";
