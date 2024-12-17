@@ -50,7 +50,7 @@ export function PlanFilters({
     <div className="flex flex-wrap gap-4 mb-6">
       <Select value={currentSort} onValueChange={onSortChange}>
         <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Sort by Price" />
+          <SelectValue placeholder="Price: Low to High" />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="price-asc">Price: Low to High</SelectItem>
@@ -60,7 +60,7 @@ export function PlanFilters({
 
       <Select value={currentContractLength} onValueChange={onContractLengthChange}>
         <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Sort by Length" />
+          <SelectValue placeholder="Show All" />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="length-asc">Length: Short to Long</SelectItem>
