@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useSearchParams } from "react-router-dom";
 import { SearchForm } from "@/components/SearchForm";
 import { PlanGrid } from "@/components/PlanGrid";
 import { PlanFilters } from "@/components/PlanFilters";
@@ -9,6 +10,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { filterPlans } from "@/lib/utils/filterPlans";
 
 export default function Index() {
+  const [searchParams] = useSearchParams();
   const [search, setSearch] = useState<{ zipCode: string; estimatedUse: string } | null>(null);
   const [comparedPlans, setComparedPlans] = useState<Plan[]>([]);
   const [sortOrder, setSortOrder] = useState<string>('price-asc');
@@ -19,6 +21,7 @@ export default function Index() {
   const [companyFilter, setCompanyFilter] = useState('all');
   
   const { toast } = useToast();
+  const estimatedUse = searchParams.get("estimatedUse") || "any";
 
   const { data: plans, isLoading } = useQuery({
     queryKey: ["plans", search?.zipCode, search?.estimatedUse],
@@ -111,6 +114,7 @@ export default function Index() {
               plans={filteredPlans}
               onCompare={handleCompare}
               comparedPlans={comparedPlans}
+              estimatedUse={estimatedUse}
             />
           </>
         )}

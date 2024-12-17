@@ -6,18 +6,17 @@ import { PlanPricing } from "./plan-card/PlanPricing";
 import { PlanBadges } from "./plan-card/PlanBadges";
 import { PlanDetails } from "./plan-card/PlanDetails";
 import { PlanActions } from "./plan-card/PlanActions";
-import { useSearchParams } from "react-router-dom";
 
 interface PlanCardProps {
   plan: Plan;
   onCompare?: (plan: Plan) => void;
   isCompared?: boolean;
+  estimatedUse: string;
 }
 
-export function PlanCard({ plan, onCompare, isCompared }: PlanCardProps) {
-  const [searchParams] = useSearchParams();
+export function PlanCard({ plan, onCompare, isCompared, estimatedUse }: PlanCardProps) {
   console.log("Plan Data:", plan);
-  console.log("Estimated Use:", searchParams.get("estimatedUse"));
+  console.log("Estimated Use:", estimatedUse);
 
   return (
     <Card className="flex flex-col h-full hover:shadow-lg transition-shadow animate-fade-in">
@@ -35,6 +34,7 @@ export function PlanCard({ plan, onCompare, isCompared }: PlanCardProps) {
             priceKwh1000={plan.price_kwh1000}
             priceKwh2000={plan.price_kwh2000}
             baseCharge={plan.base_charge}
+            estimatedUse={estimatedUse}
           />
           
           <PlanBadges 

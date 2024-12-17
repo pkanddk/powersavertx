@@ -1,21 +1,19 @@
-import { useSearchParams } from "react-router-dom";
-
 interface PlanPricingProps {
   priceKwh: number;
   priceKwh500: number;
   priceKwh1000: number;
   priceKwh2000: number;
   baseCharge?: number;
+  estimatedUse: string;
 }
 
 export function PlanPricing({ 
   priceKwh500, 
   priceKwh1000, 
   priceKwh2000, 
-  baseCharge 
+  baseCharge,
+  estimatedUse
 }: PlanPricingProps) {
-  const [searchParams] = useSearchParams();
-  const estimatedUse = searchParams.get("estimatedUse");
   
   console.log("[PlanPricing] Current estimatedUse:", estimatedUse);
 
