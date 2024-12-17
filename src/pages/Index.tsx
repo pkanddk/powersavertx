@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { SearchForm } from "@/components/SearchForm";
 import { PlanCard } from "@/components/PlanCard";
 import { PlanFilters } from "@/components/PlanFilters";
+import { PlanComparisonTable } from "@/components/PlanComparisonTable";
 import { searchPlans, type Plan } from "@/lib/api";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -127,52 +128,7 @@ export default function Index() {
         {comparedPlans.length > 0 && (
           <div className="mb-12 overflow-x-auto">
             <h2 className="text-2xl font-semibold mb-4">Plan Comparison</h2>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Feature</TableHead>
-                  {comparedPlans.map(plan => (
-                    <TableHead key={plan.company_id}>{plan.plan_name}</TableHead>
-                  ))}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow>
-                  <TableCell className="font-medium">Price per kWh</TableCell>
-                  {comparedPlans.map(plan => (
-                    <TableCell key={plan.company_id}>{formatPrice(plan.price_kwh)}</TableCell>
-                  ))}
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">Base Charge</TableCell>
-                  {comparedPlans.map(plan => (
-                    <TableCell key={plan.company_id}>
-                      {plan.base_charge ? `$${plan.base_charge}/month` : 'None'}
-                    </TableCell>
-                  ))}
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">Contract Length</TableCell>
-                  {comparedPlans.map(plan => (
-                    <TableCell key={plan.company_id}>
-                      {plan.contract_length} {plan.contract_length === 1 ? 'month' : 'months'}
-                    </TableCell>
-                  ))}
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">Plan Type</TableCell>
-                  {comparedPlans.map(plan => (
-                    <TableCell key={plan.company_id}>{plan.plan_type_name}</TableCell>
-                  ))}
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">Rating</TableCell>
-                  {comparedPlans.map(plan => (
-                    <TableCell key={plan.company_id}>{plan.jdp_rating}/5</TableCell>
-                  ))}
-                </TableRow>
-              </TableBody>
-            </Table>
+            <PlanComparisonTable plans={comparedPlans} />
           </div>
         )}
 
