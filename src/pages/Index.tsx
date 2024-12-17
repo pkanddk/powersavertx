@@ -6,6 +6,7 @@ import { PlanFilters } from "@/components/PlanFilters";
 import { PlanComparisonTable } from "@/components/PlanComparisonTable";
 import { searchPlans, type Plan } from "@/lib/api";
 import { useToast } from "@/components/ui/use-toast";
+import { filterPlans } from "@/lib/utils/filterPlans";
 
 export default function Index() {
   const [search, setSearch] = useState<{ zipCode: string; estimatedUse: string } | null>(null);
@@ -53,96 +54,15 @@ export default function Index() {
     }
   };
 
-  const filterAndSortPlans = (plans: Plan[] | undefined) => {
-    if (!plans) return [];
-    
-    let filteredPlans = [...plans];
-
-    // Apply company filter
-    if (companyFilter !== 'all') {
-      filteredPlans = filteredPlans.filter(plan => plan.company_id === companyFilter);
-    }
-
-    // Apply rating filter
-    if (ratingFilter !== 'all') {
-      filteredPlans = filteredPlans.filter(plan => {
-        const rating = plan.jdp_rating || 0;
-        switch (ratingFilter) {
-          case 'rated-only':
-            return rating > 0;
-          case '4-plus':
-            return rating >= 4;
-          case '3-plus':
-            return rating >= 3;
-          default:
-            return true;
-        }
-      });
-    }
-
-    // Apply plan type filter
-    if (planType !== 'all') {
-      filteredPlans = filteredPlans.filter(plan => {
-        if (planType === 'fixed') {
-          return plan.plan_type_name === "Fixed Rate" || plan.plan_type_name === "1";
-        } else if (planType === 'variable') {
-          return plan.plan_type_name === "Variable Rate" || plan.plan_type_name === "";
-        }
-        return false;
-      });
-    }
-
-    // Apply contract length filter
-    if (contractLength !== 'all') {
-      filteredPlans = filteredPlans.filter(plan => {
-        const length = plan.contract_length || 0;
-        switch (contractLength) {
-          case '0-6': return length >= 0 && length <= 6;
-          case '7-12': return length >= 7 && length <= 12;
-          case '13+': return length >= 13;
-          default: return true;
-        }
-      });
-    }
-
-    // Apply prepaid filter
-    if (prepaidFilter !== 'all') {
-      filteredPlans = filteredPlans.filter(plan => {
-        const isPrepaid = plan.plan_type_name.toLowerCase().includes('prepaid');
-        return prepaidFilter === 'prepaid-only' ? isPrepaid : !isPrepaid;
-      });
-    }
-
-    // Apply time of use filter
-    if (timeOfUseFilter !== 'all') {
-      filteredPlans = filteredPlans.filter(plan => {
-        const isTimeOfUse = plan.plan_type_name.toLowerCase().includes('time of use');
-        return timeOfUseFilter === 'tou-only' ? isTimeOfUse : !isTimeOfUse;
-      });
-    }
-
-    // Sort plans
-    return filteredPlans.sort((a, b) => {
-      switch (sortOrder) {
-        case 'price-asc':
-          return a.price_kwh - b.price_kwh;
-        case 'price-desc':
-          return b.price_kwh - a.price_kwh;
-        case 'length-asc':
-          return (a.contract_length || 0) - (b.contract_length || 0);
-        case 'length-desc':
-          return (b.contract_length || 0) - (a.contract_length || 0);
-        case 'rating-desc':
-          return (b.jdp_rating || 0) - (a.jdp_rating || 0);
-        case 'rating-asc':
-          return (a.jdp_rating || 0) - (b.jdp_rating || 0);
-        default:
-          return 0;
-      }
-    });
-  };
-
-  const filteredPlans = filterAndSortPlans(plans);
+  const filteredPlans = plans ? filterPlans(plans, {
+    ratingFilter,
+    planType,
+    contractLength,
+    prepaidFilter,
+    timeOfUseFilter,
+    companyFilter,
+    sortOrder,
+  }) : [];
 
   return (
     <div className="min-h-screen bg-background">

@@ -4,11 +4,12 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 interface PlanTitleProps {
   planName: string;
   companyName: string;
-  rating?: number;
-  ratingYear?: string;
+  rating?: number | null;
+  ratingYear?: string | null;
 }
 
 export function PlanTitle({ planName, companyName, rating, ratingYear }: PlanTitleProps) {
+  // A plan has a valid rating if rating is not null/undefined/0 and has a rating year
   const hasRating = rating && rating > 0 && ratingYear;
 
   return (
