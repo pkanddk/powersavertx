@@ -59,11 +59,11 @@ export default function Index() {
     // Apply plan type filter
     if (planType !== 'all') {
       filteredPlans = filteredPlans.filter(plan => {
-        const planTypeName = (plan.plan_type_name || '').toLowerCase();
+        const planTypeName = plan.plan_type_name;
         if (planType === 'fixed') {
-          return planTypeName.includes('fixed');
+          return planTypeName === "1";
         } else if (planType === 'variable') {
-          return planTypeName.includes('variable');
+          return planTypeName === "2";
         }
         return false;
       });
