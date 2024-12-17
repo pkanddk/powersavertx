@@ -39,15 +39,19 @@ export function PlanPricing({
               key={item.id}
               className={`
                 flex items-center justify-between p-3 rounded-lg
-                ${isSelected ? 'bg-primary/10 border border-primary' : 'hover:bg-gray-50'}
+                ${isSelected ? 'bg-primary/10 border border-primary' : 'bg-white'}
               `}
             >
-              <span className="text-sm text-gray-600">{item.kwh}</span>
+              <span className={`text-sm ${isSelected ? 'text-primary font-medium' : 'text-gray-600'}`}>
+                {item.kwh}
+              </span>
               <div className="flex items-baseline gap-1">
                 <span className={`text-lg font-medium ${isSelected ? 'text-primary' : 'text-gray-700'}`}>
                   {formatPrice(item.price)}¢
                 </span>
-                <span className="text-xs text-gray-500">per kWh</span>
+                <span className={`text-xs ${isSelected ? 'text-primary' : 'text-gray-500'}`}>
+                  per kWh
+                </span>
               </div>
             </div>
           );
