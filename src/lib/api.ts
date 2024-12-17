@@ -59,6 +59,8 @@ export const searchPlans = async (zipCode: string, estimatedUse?: string) => {
     // Parse and validate each plan individually to identify specific validation issues
     const validatedPlans = plansArray.map((plan, index) => {
       try {
+        // Log go_to_plan value for debugging
+        console.log(`[Frontend] Plan ${index} go_to_plan:`, plan.go_to_plan);
         return PlanSchema.parse(plan);
       } catch (error) {
         console.error(`[Frontend] Validation error for plan ${index}:`, error);
