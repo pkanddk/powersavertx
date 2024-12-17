@@ -2,7 +2,9 @@ import { Plan } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Star } from "lucide-react";
+import { Star, ChevronDown } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { useState } from "react";
 
 interface PlanCardProps {
   plan: Plan;
@@ -11,6 +13,8 @@ interface PlanCardProps {
 }
 
 export function PlanCard({ plan, onCompare, isCompared }: PlanCardProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  
   const formatPrice = (price: number) => {
     return (price * 100).toFixed(1) + "¢";
   };
@@ -70,9 +74,24 @@ export function PlanCard({ plan, onCompare, isCompared }: PlanCardProps) {
             )}
           </div>
           
-          <p className="text-sm text-muted-foreground line-clamp-2">
-            {plan.plan_details}
-          </p>
+          {plan.plan_details && (
+            <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+              <CollapsibleTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  className="w-full flex items-center justify-center gap-2 hover:bg-secondary/50"
+                >
+                  Plan Details
+                  <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="text-sm text-muted-foreground mt-2 space-y-2 animate-accordion-down">
+                <div className="bg-secondary/20 p-4 rounded-md">
+                  {plan.plan_details}
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+          )}
         </div>
       </CardContent>
       <CardFooter className="flex-none p-6 pt-0">
