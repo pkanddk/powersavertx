@@ -6,6 +6,7 @@ import { PlanPricing } from "./plan-card/PlanPricing";
 import { PlanBadges } from "./plan-card/PlanBadges";
 import { PlanDetails } from "./plan-card/PlanDetails";
 import { PlanActions } from "./plan-card/PlanActions";
+import { useSearchParams } from "react-router-dom";
 
 interface PlanCardProps {
   plan: Plan;
@@ -14,6 +15,10 @@ interface PlanCardProps {
 }
 
 export function PlanCard({ plan, onCompare, isCompared }: PlanCardProps) {
+  const [searchParams] = useSearchParams();
+  console.log("Plan Data:", plan);
+  console.log("Estimated Use:", searchParams.get("estimatedUse"));
+
   return (
     <Card className="flex flex-col h-full hover:shadow-lg transition-shadow animate-fade-in">
       <PlanHeader companyLogo={plan.company_logo} companyName={plan.company_name} />
