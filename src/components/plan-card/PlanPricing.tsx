@@ -22,7 +22,7 @@ export function PlanPricing({
   };
 
   const isHighlighted = (usage: string) => {
-    return estimatedUse === usage || (estimatedUse === "any" && usage === "500");
+    return estimatedUse === usage || estimatedUse === "any";
   };
 
   return (
