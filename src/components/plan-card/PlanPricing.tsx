@@ -21,31 +21,44 @@ export function PlanPricing({
     return (price * 100).toFixed(1) + "¢";
   };
 
-  const isHighlighted = (usage: string) => {
-    if (!estimatedUse || estimatedUse === "any") {
-      return false;
+  const getSelectedPrice = () => {
+    switch(estimatedUse) {
+      case "500": return priceKwh500;
+      case "1000": return priceKwh1000;
+      case "2000": return priceKwh2000;
+      default: return null;
     }
-    return estimatedUse === usage;
   };
+
+  const selectedPrice = getSelectedPrice();
 
   return (
     <div className="space-y-4">
+      {selectedPrice && (
+        <div className="text-center mb-4 p-4 bg-primary/10 rounded-lg">
+          <div className="text-sm font-medium text-primary">Selected Usage: {estimatedUse} kWh</div>
+          <div className="text-3xl font-bold text-primary mt-1">
+            {formatPrice(selectedPrice)}
+          </div>
+        </div>
+      )}
+      
       <div className="grid grid-cols-3 gap-2 bg-secondary/20 rounded-lg p-3">
-        <div className={`text-center p-2 rounded transition-colors ${isHighlighted("500") ? "bg-primary/20" : ""}`}>
-          <div className="text-sm font-medium">500 kWh</div>
-          <div className={`text-lg ${isHighlighted("500") ? "text-primary font-semibold" : "text-muted-foreground"}`}>
+        <div className="text-center p-2">
+          <div className="text-sm font-medium text-muted-foreground">500 kWh</div>
+          <div className="text-sm text-muted-foreground">
             {formatPrice(priceKwh500)}
           </div>
         </div>
-        <div className={`text-center p-2 rounded transition-colors ${isHighlighted("1000") ? "bg-primary/20" : ""}`}>
-          <div className="text-sm font-medium">1,000 kWh</div>
-          <div className={`text-lg ${isHighlighted("1000") ? "text-primary font-semibold" : "text-muted-foreground"}`}>
+        <div className="text-center p-2">
+          <div className="text-sm font-medium text-muted-foreground">1,000 kWh</div>
+          <div className="text-sm text-muted-foreground">
             {formatPrice(priceKwh1000)}
           </div>
         </div>
-        <div className={`text-center p-2 rounded transition-colors ${isHighlighted("2000") ? "bg-primary/20" : ""}`}>
-          <div className="text-sm font-medium">2,000 kWh</div>
-          <div className={`text-lg ${isHighlighted("2000") ? "text-primary font-semibold" : "text-muted-foreground"}`}>
+        <div className="text-center p-2">
+          <div className="text-sm font-medium text-muted-foreground">2,000 kWh</div>
+          <div className="text-sm text-muted-foreground">
             {formatPrice(priceKwh2000)}
           </div>
         </div>
