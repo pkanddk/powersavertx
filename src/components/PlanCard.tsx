@@ -15,9 +15,6 @@ export function PlanCard({ plan, onCompare, isCompared }: PlanCardProps) {
     return (price * 100).toFixed(1) + "¢";
   };
 
-  // Get the URL to view the plan details, preferring go_to_plan but falling back to fact_sheet
-  const viewPlanUrl = plan.go_to_plan || plan.fact_sheet;
-
   return (
     <Card className="flex flex-col h-full hover:shadow-lg transition-shadow animate-fade-in">
       <CardHeader className="flex-none h-32 flex items-center justify-center p-4 bg-secondary/50">
@@ -89,10 +86,17 @@ export function PlanCard({ plan, onCompare, isCompared }: PlanCardProps) {
               {isCompared ? "Remove from Compare" : "Add to Compare"}
             </Button>
           )}
-          {viewPlanUrl && (
+          {plan.go_to_plan && (
             <Button asChild className="w-full">
-              <a href={viewPlanUrl} target="_blank" rel="noopener noreferrer">
-                {plan.go_to_plan ? "View Plan" : "View Fact Sheet"}
+              <a href={plan.go_to_plan} target="_blank" rel="noopener noreferrer">
+                View Plan
+              </a>
+            </Button>
+          )}
+          {plan.fact_sheet && (
+            <Button asChild variant="outline" className="w-full">
+              <a href={plan.fact_sheet} target="_blank" rel="noopener noreferrer">
+                View Fact Sheet
               </a>
             </Button>
           )}
