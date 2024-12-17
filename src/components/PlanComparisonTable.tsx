@@ -53,12 +53,6 @@ export function PlanComparisonTable({ plans }: PlanComparisonTableProps) {
             <TableCell key={plan.company_id}>{plan.plan_type_name}</TableCell>
           ))}
         </TableRow>
-        <TableRow>
-          <TableCell className="font-medium">Rating</TableCell>
-          {plans.map(plan => (
-            <TableCell key={plan.company_id}>{plan.jdp_rating}/5</TableCell>
-          ))}
-        </TableRow>
       </TableBody>
     </Table>
   );

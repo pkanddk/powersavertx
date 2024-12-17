@@ -14,14 +14,12 @@ interface PlanFiltersProps {
   onPrepaidChange: (value: string) => void;
   onTimeOfUseChange: (value: string) => void;
   onCompanyChange: (value: string) => void;
-  onRatingChange: (value: string) => void;
   currentSort: string;
   currentContractLength: string;
   currentPlanType: string;
   currentPrepaid: string;
   currentTimeOfUse: string;
   currentCompany: string;
-  currentRating: string;
   plans?: Plan[];
 }
 
@@ -32,14 +30,12 @@ export function PlanFilters({
   onPrepaidChange,
   onTimeOfUseChange,
   onCompanyChange,
-  onRatingChange,
   currentSort,
   currentContractLength,
   currentPlanType,
   currentPrepaid,
   currentTimeOfUse,
   currentCompany,
-  currentRating,
   plans = [],
 }: PlanFiltersProps) {
   // Get unique companies from plans, ensuring no duplicates
@@ -62,20 +58,6 @@ export function PlanFilters({
           <SelectItem value="price-desc">Price: High to Low</SelectItem>
           <SelectItem value="length-asc">Contract Length: Short to Long</SelectItem>
           <SelectItem value="length-desc">Contract Length: Long to Short</SelectItem>
-          <SelectItem value="rating-desc">Rating: High to Low</SelectItem>
-          <SelectItem value="rating-asc">Rating: Low to High</SelectItem>
-        </SelectContent>
-      </Select>
-
-      <Select value={currentRating} onValueChange={onRatingChange}>
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Rating Filter" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All Ratings</SelectItem>
-          <SelectItem value="rated-only">Rated Plans Only</SelectItem>
-          <SelectItem value="4-plus">4+ Stars</SelectItem>
-          <SelectItem value="3-plus">3+ Stars</SelectItem>
         </SelectContent>
       </Select>
 

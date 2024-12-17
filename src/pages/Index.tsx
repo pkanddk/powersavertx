@@ -17,7 +17,6 @@ export default function Index() {
   const [prepaidFilter, setPrepaidFilter] = useState('all');
   const [timeOfUseFilter, setTimeOfUseFilter] = useState('all');
   const [companyFilter, setCompanyFilter] = useState('all');
-  const [ratingFilter, setRatingFilter] = useState('all');
   
   const { toast } = useToast();
 
@@ -55,7 +54,6 @@ export default function Index() {
   };
 
   const filteredPlans = plans ? filterPlans(plans, {
-    ratingFilter,
     planType,
     contractLength,
     prepaidFilter,
@@ -100,14 +98,12 @@ export default function Index() {
               currentPrepaid={prepaidFilter}
               currentTimeOfUse={timeOfUseFilter}
               currentCompany={companyFilter}
-              currentRating={ratingFilter}
               onSortChange={setSortOrder}
               onContractLengthChange={setContractLength}
               onPlanTypeChange={setPlanType}
               onPrepaidChange={setPrepaidFilter}
               onTimeOfUseChange={setTimeOfUseFilter}
               onCompanyChange={setCompanyFilter}
-              onRatingChange={setRatingFilter}
               plans={plans}
             />
             <PlanGrid 

@@ -9,8 +9,6 @@ export const PlanSchema = z.object({
   plan_type_name: z.string(),
   fact_sheet: z.string().nullable(),
   go_to_plan: z.string().nullable(),
-  jdp_rating: z.number().nullable(),
-  jdp_rating_year: z.string().nullable(),
   minimum_usage: z.boolean().nullable(),
   new_customer: z.boolean().nullable(),
   plan_details: z.string().nullable(),
@@ -59,14 +57,6 @@ export const searchPlans = async (zipCode: string, estimatedUse?: string) => {
     // Parse and validate each plan individually to identify specific validation issues
     const validatedPlans = plansArray.map((plan, index) => {
       try {
-        // Log rating values for debugging
-        console.log(`[Frontend] Plan ${index} rating values:`, {
-          name: plan.plan_name,
-          rating: plan.jdp_rating,
-          ratingYear: plan.jdp_rating_year,
-          ratingType: typeof plan.jdp_rating
-        });
-        
         return PlanSchema.parse(plan);
       } catch (error) {
         console.error(`[Frontend] Validation error for plan ${index}:`, error);
@@ -75,11 +65,7 @@ export const searchPlans = async (zipCode: string, estimatedUse?: string) => {
       }
     });
 
-    console.log('[Frontend] Validated plans:', validatedPlans.map(p => ({
-      name: p.plan_name,
-      rating: p.jdp_rating,
-      ratingYear: p.jdp_rating_year
-    })));
+    console.log('[Frontend] Validated plans:', validatedPlans);
     
     return validatedPlans;
   } catch (error) {

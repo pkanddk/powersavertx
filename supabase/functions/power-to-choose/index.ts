@@ -59,27 +59,6 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
 
     const transformedPlans = plans.map(plan => {
       console.log(`[Edge Function] Processing plan: ${plan.plan_name}`);
-      
-      // Add debug logging for rating values
-      console.log(`[Edge Function] Raw rating values for ${plan.plan_name}:`, {
-        rating: plan.rating,
-        type: typeof plan.rating,
-        year: new Date().getFullYear().toString()
-      });
-
-      // Parse rating value, ensuring it's a number
-      let rating = null;
-      if (plan.rating) {
-        const parsedRating = parseFloat(plan.rating);
-        if (!isNaN(parsedRating) && parsedRating > 0) {
-          rating = parsedRating;
-        }
-      }
-
-      console.log(`[Edge Function] Processed rating for ${plan.plan_name}:`, {
-        parsedRating: rating,
-        year: new Date().getFullYear().toString()
-      });
 
       const parseRate = (rate: string | number | null | undefined): number => {
         if (!rate) return 0;
@@ -105,10 +84,6 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
         selected_price: price_kwh
       });
 
-      // For testing purposes, assign a random rating between 3 and 5
-      // Remove this in production and use actual ratings
-      rating = (Math.random() * 2 + 3).toFixed(1);
-
       return {
         company_id: String(plan.company_id || ""),
         company_name: String(plan.company_name || ""),
@@ -117,8 +92,6 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
         plan_type_name: String(plan.plan_type || ""),
         fact_sheet: plan.fact_sheet || null,
         go_to_plan: plan.enroll_plan_url || plan.go_to_plan || plan.enroll_now || null,
-        jdp_rating: rating,
-        jdp_rating_year: new Date().getFullYear().toString(),
         minimum_usage: Boolean(plan.minimum_usage),
         new_customer: Boolean(plan.new_customer),
         plan_details: String(plan.special_terms || ""),
