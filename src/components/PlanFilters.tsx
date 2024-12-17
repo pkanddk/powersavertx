@@ -5,6 +5,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Plan } from "@/lib/api";
 
 interface PlanFiltersProps {
   onSortChange: (value: string) => void;
@@ -12,11 +13,14 @@ interface PlanFiltersProps {
   onPlanTypeChange: (value: string) => void;
   onPrepaidChange: (value: string) => void;
   onTimeOfUseChange: (value: string) => void;
+  onCompanyChange: (value: string) => void;
   currentSort: string;
   currentContractLength: string;
   currentPlanType: string;
   currentPrepaid: string;
   currentTimeOfUse: string;
+  currentCompany: string;
+  plans?: Plan[];
 }
 
 export function PlanFilters({
@@ -25,12 +29,21 @@ export function PlanFilters({
   onPlanTypeChange,
   onPrepaidChange,
   onTimeOfUseChange,
+  onCompanyChange,
   currentSort,
   currentContractLength,
   currentPlanType,
   currentPrepaid,
   currentTimeOfUse,
+  currentCompany,
+  plans = [],
 }: PlanFiltersProps) {
+  // Get unique companies from plans
+  const companies = Array.from(new Set(plans.map(plan => ({
+    id: plan.company_id,
+    name: plan.company_name
+  })))).sort((a, b) => a.name.localeCompare(b.name));
+
   return (
     <div className="flex flex-wrap gap-4 mb-6">
       <Select value={currentSort} onValueChange={onSortChange}>
@@ -65,6 +78,20 @@ export function PlanFilters({
           <SelectItem value="0-6">0-6 Months</SelectItem>
           <SelectItem value="7-12">7-12 Months</SelectItem>
           <SelectItem value="13+">13+ Months</SelectItem>
+        </SelectContent>
+      </Select>
+
+      <Select value={currentCompany} onValueChange={onCompanyChange}>
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder="Company" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Companies</SelectItem>
+          {companies.map(company => (
+            <SelectItem key={company.id} value={company.id}>
+              {company.name}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
 

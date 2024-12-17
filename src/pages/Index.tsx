@@ -15,6 +15,7 @@ export default function Index() {
   const [planType, setPlanType] = useState('all');
   const [prepaidFilter, setPrepaidFilter] = useState('all');
   const [timeOfUseFilter, setTimeOfUseFilter] = useState('all');
+  const [companyFilter, setCompanyFilter] = useState('all');
   
   const { toast } = useToast();
 
@@ -55,6 +56,11 @@ export default function Index() {
     if (!plans) return [];
     
     let filteredPlans = [...plans];
+
+    // Apply company filter
+    if (companyFilter !== 'all') {
+      filteredPlans = filteredPlans.filter(plan => plan.company_id === companyFilter);
+    }
 
     // Apply plan type filter
     if (planType !== 'all') {
@@ -98,7 +104,6 @@ export default function Index() {
       });
     }
 
-    // Apply sorting
     return filteredPlans.sort((a, b) => {
       switch (sortOrder) {
         case 'price-asc':
@@ -114,6 +119,8 @@ export default function Index() {
       }
     });
   };
+
+  const filteredPlans = filterAndSortPlans(plans);
 
   return (
     <div className="min-h-screen bg-background">
@@ -150,14 +157,17 @@ export default function Index() {
               currentPlanType={planType}
               currentPrepaid={prepaidFilter}
               currentTimeOfUse={timeOfUseFilter}
+              currentCompany={companyFilter}
               onSortChange={setSortOrder}
               onContractLengthChange={setContractLength}
               onPlanTypeChange={setPlanType}
               onPrepaidChange={setPrepaidFilter}
               onTimeOfUseChange={setTimeOfUseFilter}
+              onCompanyChange={setCompanyFilter}
+              plans={plans}
             />
             <PlanGrid 
-              plans={filterAndSortPlans(plans)}
+              plans={filteredPlans}
               onCompare={handleCompare}
               comparedPlans={comparedPlans}
             />
