@@ -59,8 +59,14 @@ export const searchPlans = async (zipCode: string, estimatedUse?: string) => {
     // Parse and validate each plan individually to identify specific validation issues
     const validatedPlans = plansArray.map((plan, index) => {
       try {
-        // Log go_to_plan value for debugging
-        console.log(`[Frontend] Plan ${index} go_to_plan:`, plan.go_to_plan);
+        // Log rating values for debugging
+        console.log(`[Frontend] Plan ${index} rating values:`, {
+          name: plan.plan_name,
+          rating: plan.jdp_rating,
+          ratingYear: plan.jdp_rating_year,
+          ratingType: typeof plan.jdp_rating
+        });
+        
         return PlanSchema.parse(plan);
       } catch (error) {
         console.error(`[Frontend] Validation error for plan ${index}:`, error);
@@ -69,7 +75,12 @@ export const searchPlans = async (zipCode: string, estimatedUse?: string) => {
       }
     });
 
-    console.log('[Frontend] Validated plans:', validatedPlans);
+    console.log('[Frontend] Validated plans:', validatedPlans.map(p => ({
+      name: p.plan_name,
+      rating: p.jdp_rating,
+      ratingYear: p.jdp_rating_year
+    })));
+    
     return validatedPlans;
   } catch (error) {
     console.error("[Frontend] Error fetching plans:", error);

@@ -20,6 +20,12 @@ export function filterPlans(
     sortOrder: string;
   }
 ) {
+  console.log('Initial plans:', plans.map(p => ({
+    name: p.plan_name,
+    rating: p.jdp_rating,
+    ratingYear: p.jdp_rating_year
+  })));
+
   let filteredPlans = [...plans];
 
   // Apply company filter
@@ -29,10 +35,25 @@ export function filterPlans(
 
   // Apply rating filter
   if (ratingFilter !== 'all') {
+    console.log('Applying rating filter:', ratingFilter);
     filteredPlans = filteredPlans.filter(plan => {
       const rating = plan.jdp_rating;
-      const hasValidRating = rating !== null && rating > 0 && plan.jdp_rating_year && plan.jdp_rating_year !== "";
+      const ratingYear = plan.jdp_rating_year;
       
+      console.log('Checking plan:', {
+        name: plan.plan_name,
+        rating,
+        ratingYear,
+        isNull: rating === null,
+        isGreaterThanZero: rating > 0,
+        hasYear: Boolean(ratingYear),
+        yearNotEmpty: ratingYear !== ""
+      });
+
+      const hasValidRating = rating !== null && rating > 0 && ratingYear && ratingYear !== "";
+      
+      console.log('Has valid rating:', hasValidRating);
+
       switch (ratingFilter) {
         case 'rated-only':
           return hasValidRating;
@@ -44,6 +65,11 @@ export function filterPlans(
           return true;
       }
     });
+    console.log('Plans after rating filter:', filteredPlans.map(p => ({
+      name: p.plan_name,
+      rating: p.jdp_rating,
+      ratingYear: p.jdp_rating_year
+    })));
   }
 
   // Apply plan type filter
@@ -88,7 +114,7 @@ export function filterPlans(
   }
 
   // Sort plans
-  return filteredPlans.sort((a, b) => {
+  const sortedPlans = filteredPlans.sort((a, b) => {
     switch (sortOrder) {
       case 'price-asc':
         return a.price_kwh - b.price_kwh;
@@ -99,15 +125,35 @@ export function filterPlans(
       case 'length-desc':
         return (b.contract_length || 0) - (a.contract_length || 0);
       case 'rating-desc':
-        const ratingA = a.jdp_rating !== null && a.jdp_rating > 0 && a.jdp_rating_year ? a.jdp_rating : 0;
-        const ratingB = b.jdp_rating !== null && b.jdp_rating > 0 && b.jdp_rating_year ? b.jdp_rating : 0;
+        const ratingA = a.jdp_rating !== null && a.jdp_rating > 0 && a.jdp_rating_year && a.jdp_rating_year !== "" ? a.jdp_rating : 0;
+        const ratingB = b.jdp_rating !== null && b.jdp_rating > 0 && b.jdp_rating_year && b.jdp_rating_year !== "" ? b.jdp_rating : 0;
+        console.log('Sorting ratings desc:', { 
+          planA: a.plan_name, 
+          ratingA, 
+          planB: b.plan_name, 
+          ratingB 
+        });
         return ratingB - ratingA;
       case 'rating-asc':
-        const ratingAsc1 = a.jdp_rating !== null && a.jdp_rating > 0 && a.jdp_rating_year ? a.jdp_rating : 0;
-        const ratingAsc2 = b.jdp_rating !== null && b.jdp_rating > 0 && b.jdp_rating_year ? b.jdp_rating : 0;
+        const ratingAsc1 = a.jdp_rating !== null && a.jdp_rating > 0 && a.jdp_rating_year && a.jdp_rating_year !== "" ? a.jdp_rating : 0;
+        const ratingAsc2 = b.jdp_rating !== null && b.jdp_rating > 0 && b.jdp_rating_year && b.jdp_rating_year !== "" ? b.jdp_rating : 0;
+        console.log('Sorting ratings asc:', { 
+          planA: a.plan_name, 
+          rating: ratingAsc1, 
+          planB: b.plan_name, 
+          rating: ratingAsc2 
+        });
         return ratingAsc1 - ratingAsc2;
       default:
         return 0;
     }
   });
+
+  console.log('Final filtered and sorted plans:', sortedPlans.map(p => ({
+    name: p.plan_name,
+    rating: p.jdp_rating,
+    ratingYear: p.jdp_rating_year
+  })));
+
+  return sortedPlans;
 }
