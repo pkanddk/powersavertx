@@ -29,7 +29,10 @@ export function PlanPricing({
       console.log("[PlanPricing] No highlight - estimatedUse is 'any'");
       return false;
     }
-    const shouldHighlight = estimatedUse === usage;
+    // Match the exact string values being passed from SearchForm
+    const shouldHighlight = usage === "500" && estimatedUse === "500" ||
+                          usage === "1000" && estimatedUse === "1000" ||
+                          usage === "2000" && estimatedUse === "2000";
     console.log(`[PlanPricing] Should highlight ${usage}? ${shouldHighlight}`);
     return shouldHighlight;
   };
