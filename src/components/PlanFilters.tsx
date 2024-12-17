@@ -77,52 +77,64 @@ export function PlanFilters({
         </Select>
       </div>
 
-      <Select value={currentPlanType} onValueChange={onPlanTypeChange}>
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Plan Type" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All Plan Types</SelectItem>
-          <SelectItem value="fixed">Fixed Rate Only</SelectItem>
-          <SelectItem value="variable">Variable Rate Only</SelectItem>
-        </SelectContent>
-      </Select>
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-medium">Plan Type</label>
+        <Select value={currentPlanType} onValueChange={onPlanTypeChange}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="All Plan Types" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Plan Types</SelectItem>
+            <SelectItem value="fixed">Fixed Rate Only</SelectItem>
+            <SelectItem value="variable">Variable Rate Only</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
-      <Select value={currentCompany} onValueChange={onCompanyChange}>
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Company" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All Companies</SelectItem>
-          {companies.map(company => (
-            <SelectItem key={`company-${company.id}`} value={company.id}>
-              {company.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-medium">Company</label>
+        <Select value={currentCompany} onValueChange={onCompanyChange}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="All Companies" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Companies</SelectItem>
+            {companies.map(company => (
+              <SelectItem key={`company-${company.id}`} value={company.id}>
+                {company.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
-      <Select value={currentPrepaid} onValueChange={onPrepaidChange}>
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Prepaid Plans" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">Show All</SelectItem>
-          <SelectItem value="prepaid-only">Prepaid Only</SelectItem>
-          <SelectItem value="no-prepaid">No Prepaid</SelectItem>
-        </SelectContent>
-      </Select>
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-medium">Prepaid Plans</label>
+        <Select value={currentPrepaid} onValueChange={onPrepaidChange}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Show All" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Show All</SelectItem>
+            <SelectItem value="prepaid-only">Prepaid Only</SelectItem>
+            <SelectItem value="no-prepaid">No Prepaid</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
-      <Select value={currentTimeOfUse} onValueChange={onTimeOfUseChange}>
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Time of Use" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">Show All</SelectItem>
-          <SelectItem value="tou-only">Time of Use Only</SelectItem>
-          <SelectItem value="no-tou">No Time of Use</SelectItem>
-        </SelectContent>
-      </Select>
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-medium">Time of Use</label>
+        <Select value={currentTimeOfUse} onValueChange={onTimeOfUseChange}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Show All" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Show All</SelectItem>
+            <SelectItem value="tou-only">Time of Use Only</SelectItem>
+            <SelectItem value="no-tou">No Time of Use</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
     </div>
   );
 }
