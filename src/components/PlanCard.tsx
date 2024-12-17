@@ -29,7 +29,6 @@ export function PlanCard({ plan, onCompare, isCompared, estimatedUse }: PlanCard
         
         <div className="space-y-4">
           <PlanPricing 
-            priceKwh={plan.price_kwh}
             priceKwh500={plan.price_kwh500}
             priceKwh1000={plan.price_kwh1000}
             priceKwh2000={plan.price_kwh2000}
