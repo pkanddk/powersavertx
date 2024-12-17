@@ -58,11 +58,15 @@ export default function Index() {
 
     // Apply plan type filter
     if (planType !== 'all') {
-      filteredPlans = filteredPlans.filter(plan => 
-        planType === 'fixed' 
-          ? plan.plan_type_name === "Fixed Rate"
-          : plan.plan_type_name === "Variable Rate"
-      );
+      filteredPlans = filteredPlans.filter(plan => {
+        const planTypeName = plan.plan_type_name?.trim();
+        if (planType === 'fixed') {
+          return planTypeName === "Fixed Rate";
+        } else if (planType === 'variable') {
+          return planTypeName === "Variable Rate";
+        }
+        return true;
+      });
     }
 
     // Apply contract length filter
