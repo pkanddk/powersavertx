@@ -18,21 +18,12 @@ export function PlanPricing({
   estimatedUse
 }: PlanPricingProps) {
   
-  // Simplified price array with explicit ordering
-  let prices = [
+  // Simple array of prices in kWh order
+  const prices = [
     { id: "500", kwh: "500 kWh", price: priceKwh500 },
     { id: "1000", kwh: "1,000 kWh", price: priceKwh1000 },
     { id: "2000", kwh: "2,000 kWh", price: priceKwh2000 }
   ];
-
-  // If we have a selected usage, reorder the array
-  if (estimatedUse && estimatedUse !== "any") {
-    // Move the selected price to the front
-    prices = [
-      ...prices.filter(p => p.id === estimatedUse),
-      ...prices.filter(p => p.id !== estimatedUse)
-    ];
-  }
 
   return (
     <div className="space-y-4">
