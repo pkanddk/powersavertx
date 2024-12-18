@@ -20,30 +20,26 @@ export default function Index() {
   const { data: plansData, isLoading } = useQuery({
     queryKey: ["plans", search?.zipCode, search?.estimatedUse],
     queryFn: async () => {
-      if (!search?.zipCode) {
-        const { data: plans, error } = await supabase
-          .from('plans')
-          .select('*');
-
-        if (error) throw error;
-        return {
-          plans,
-          lastUpdated: plans?.[0]?.updated_at
-        };
+      let query = supabase.from('plans').select('*');
+      
+      // If zip code is provided, filter plans by zip code
+      if (search?.zipCode) {
+        query = query.eq('zip_code', search.zipCode);
       }
 
-      // If we have a zip code, use the Power to Choose API endpoint
-      const response = await fetch(`/api/power-to-choose?zipCode=${search.zipCode}&estimatedUse=${search.estimatedUse}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch plans');
+      const { data: plans, error } = await query;
+
+      if (error) {
+        console.error('Error fetching plans:', error);
+        throw error;
       }
-      const plans = await response.json();
+
       return {
-        plans,
-        lastUpdated: new Date().toISOString()
+        plans: plans || [],
+        lastUpdated: plans?.[0]?.updated_at
       };
     },
-    enabled: !!search,
+    enabled: true, // Always enabled since we want to show all plans by default
     meta: {
       onError: () => {
         toast({
