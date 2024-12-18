@@ -26,16 +26,25 @@ export function filterPlans(
 
   // Filter by time of use
   if (timeOfUseFilter && timeOfUseFilter !== "all") {
+    console.log("[filterPlans] Filtering by Time of Use:", timeOfUseFilter);
+    console.log("[filterPlans] Plans before TOU filter:", filteredPlans.length);
+    console.log("[filterPlans] TOU Plans available:", filteredPlans.filter(plan => plan.timeofuse === true).length);
+    
     filteredPlans = filteredPlans.filter(plan => {
+      const isTimeOfUse = Boolean(plan.timeofuse);
+      console.log(`[filterPlans] Plan "${plan.plan_name}" timeofuse:`, isTimeOfUse);
+      
       switch (timeOfUseFilter) {
         case "tou-only":
-          return plan.timeofuse === true;
+          return isTimeOfUse === true;
         case "no-tou":
-          return plan.timeofuse === false;
+          return isTimeOfUse === false;
         default:
           return true;
       }
     });
+
+    console.log("[filterPlans] Plans after TOU filter:", filteredPlans.length);
   }
 
   // Filter by contract length
