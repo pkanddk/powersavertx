@@ -36,12 +36,6 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
       throw new Error("Failed to parse API response as JSON");
     }
 
-    // Handle API-specific error responses
-    if (data.error || (data.success === false)) {
-      console.error("[Edge Function] API returned error:", data);
-      throw new Error(data.message || "API returned an error");
-    }
-
     // Handle empty responses
     if (!data || (Array.isArray(data) && data.length === 0)) {
       console.log("[Edge Function] No plans found in API response");
@@ -54,8 +48,6 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
       plans = data;
     } else if (data.data && Array.isArray(data.data)) {
       plans = data.data;
-    } else if (data.plans && Array.isArray(data.plans)) {
-      plans = data.plans;
     } else if (data.Results && Array.isArray(data.Results)) {
       plans = data.Results;
     } else {
