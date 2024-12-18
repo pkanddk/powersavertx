@@ -37,13 +37,11 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
       throw new Error("Failed to parse API response as JSON");
     }
 
-    // Handle empty responses
     if (!data || (Array.isArray(data) && data.length === 0)) {
       console.log("[Edge Function] No plans found in API response");
       return [];
     }
 
-    // Extract plans from various response structures
     let plans = [];
     if (Array.isArray(data)) {
       plans = data;
@@ -65,23 +63,6 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
         all_fields: plan
       });
     });
-    
-    // Log prepaid-related fields for debugging
-    plans.forEach((plan, index) => {
-      console.log(`[Edge Function] Plan ${index + 1} prepaid fields:`, {
-        plan_name: plan.plan_name,
-        prepaid_plan: plan.prepaid_plan,
-        is_prepaid: plan.is_prepaid,
-        prepaid: plan.prepaid,
-        raw_prepaid_fields: {
-          ...Object.fromEntries(
-            Object.entries(plan).filter(([key]) => 
-              key.toLowerCase().includes('prepaid')
-            )
-          )
-        }
-      });
-    });
 
     const transformedPlans = plans.map(plan => {
       const isPrepaid = Boolean(plan.prepaid_plan || plan.is_prepaid || plan.prepaid || false);
@@ -97,12 +78,29 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
         }
       }
 
-      // Log the timeofuse value from the API
-      console.log(`[Edge Function] Raw timeofuse value for plan "${plan.plan_name}":`, plan.timeofuse);
+      // Determine if plan is time-of-use by checking multiple possible fields and plan details
+      const rawTimeOfUse = plan.timeofuse || plan.time_of_use || plan.tou || false;
+      let isTimeOfUse = Boolean(rawTimeOfUse);
 
-      // Ensure timeofuse is properly converted to boolean
-      const isTimeOfUse = Boolean(plan.timeofuse);
-      console.log(`[Edge Function] Converted timeofuse value for plan "${plan.plan_name}":`, isTimeOfUse);
+      // Also check plan details and name for time-of-use indicators
+      const planDetailsLower = (plan.plan_details || '').toLowerCase();
+      const planNameLower = (plan.plan_name || '').toLowerCase();
+      
+      if (!isTimeOfUse) {
+        isTimeOfUse = planDetailsLower.includes('time of use') || 
+                      planDetailsLower.includes('time-of-use') ||
+                      planDetailsLower.includes('tou') ||
+                      planNameLower.includes('time of use') ||
+                      planNameLower.includes('time-of-use') ||
+                      planNameLower.includes('tou');
+      }
+
+      console.log(`[Edge Function] Plan "${plan.plan_name}" time-of-use check:`, {
+        rawTimeOfUse,
+        planDetailsCheck: planDetailsLower.includes('time of use') || planDetailsLower.includes('time-of-use'),
+        planNameCheck: planNameLower.includes('time of use') || planNameLower.includes('time-of-use'),
+        finalIsTimeOfUse: isTimeOfUse
+      });
 
       return {
         company_id: String(plan.company_id || ""),
@@ -124,7 +122,7 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
         prepaid: isPrepaid,
         zip_code: String(plan.zip_code || ""),
         renewable_percentage: renewablePercentage,
-        timeofuse: isTimeOfUse,  // Use the properly converted boolean value
+        timeofuse: isTimeOfUse,
         jdp_rating: plan.jdp_rating ? parseFloat(plan.jdp_rating) : null,
         jdp_rating_year: plan.jdp_rating_year || null
       };
