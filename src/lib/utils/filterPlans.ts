@@ -47,16 +47,17 @@ export function filterPlans(
 
   // Filter by prepaid status
   if (prepaidFilter && prepaidFilter !== "all") {
+    console.log('Filtering by prepaid status:', prepaidFilter);
+    console.log('Plans before prepaid filter:', filteredPlans.length);
+    
     filteredPlans = filteredPlans.filter(plan => {
-      switch (prepaidFilter) {
-        case "prepaid-only":
-          return plan.prepaid === true;
-        case "no-prepaid":
-          return plan.prepaid === false;
-        default:
-          return true;
-      }
+      const isPrepaid = plan.prepaid === true;
+      const shouldShow = prepaidFilter === "prepaid-only" ? isPrepaid : !isPrepaid;
+      console.log(`Plan ${plan.plan_name} - isPrepaid: ${isPrepaid}, shouldShow: ${shouldShow}`);
+      return shouldShow;
     });
+    
+    console.log('Plans after prepaid filter:', filteredPlans.length);
   }
 
   // Filter by plan type
