@@ -20,26 +20,28 @@ export default function Index() {
   const { data: plansData, isLoading } = useQuery({
     queryKey: ["plans", search?.zipCode],
     queryFn: async () => {
-      console.log("Fetching plans with zip code:", search?.zipCode);
+      console.log("[Index] Starting plan fetch. Search state:", search);
       let query = supabase.from('plans').select('*');
       
       if (search?.zipCode) {
+        console.log("[Index] Filtering by zip code:", search.zipCode);
         query = query.eq('zip_code', search.zipCode);
       }
 
       const { data: plans, error } = await query;
 
       if (error) {
-        console.error('Error fetching plans:', error);
+        console.error('[Index] Error fetching plans:', error);
         throw error;
       }
 
-      console.log("Fetched plans:", plans);
+      console.log("[Index] Fetched plans:", plans?.length || 0, "results");
       return {
         plans: plans || [],
         lastUpdated: plans?.[0]?.updated_at
       };
     },
+    initialData: { plans: [], lastUpdated: null },
     meta: {
       onError: () => {
         toast({
@@ -52,6 +54,7 @@ export default function Index() {
   });
 
   const handleSearch = (zipCode: string, estimatedUse: string) => {
+    console.log("[Index] Search initiated with:", { zipCode, estimatedUse });
     setSearch({ zipCode, estimatedUse });
     setComparedPlans([]);
   };
@@ -105,7 +108,17 @@ export default function Index() {
           </div>
         )}
 
-        {plansData?.plans && (
+        {!isLoading && filteredPlans.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-lg text-muted-foreground">
+              {search?.zipCode 
+                ? "No plans found for this ZIP code. Please try another ZIP code."
+                : "Enter your ZIP code to find available plans in your area."}
+            </p>
+          </div>
+        )}
+
+        {filteredPlans.length > 0 && (
           <PlanGrid 
             plans={filteredPlans}
             onCompare={handleCompare}
