@@ -22,27 +22,18 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
     }
 
     const responseText = await response.text();
-    console.log("[Edge Function] Raw response text:", responseText);
+    console.log("[Edge Function] Raw API Response:", responseText);
 
     let data;
     try {
       data = JSON.parse(responseText);
       
-      // Log raw plan data for debugging time-of-use information
+      // Log complete raw plan data for debugging
       if (Array.isArray(data)) {
         data.forEach((plan, index) => {
-          console.log(`[Edge Function] Raw Plan ${index + 1} Time-of-Use Data:`, {
-            plan_name: plan.plan_name,
-            timeofuse: plan.timeofuse,
-            time_of_use: plan.time_of_use,
-            tou: plan.tou,
-            plan_details: plan.plan_details,
-            raw_timeofuse_fields: {
-              timeofuse: plan.timeofuse,
-              time_of_use: plan.time_of_use,
-              tou: plan.tou,
-              is_tou: plan.is_tou
-            }
+          console.log(`[Edge Function] Complete Raw Plan ${index + 1} Data:`, {
+            ...plan,
+            _raw: plan // Include the complete raw object
           });
         });
       }
@@ -70,14 +61,6 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
     }
 
     console.log(`[Edge Function] Found ${plans.length} plans for ZIP code`);
-    
-    // Log complete raw plan data for debugging
-    plans.forEach((plan, index) => {
-      console.log(`[Edge Function] Raw plan ${index + 1} data:`, {
-        plan_name: plan.plan_name,
-        all_fields: plan
-      });
-    });
 
     const transformedPlans = plans.map(plan => {
       const isPrepaid = Boolean(plan.prepaid_plan || plan.is_prepaid || plan.prepaid || false);
@@ -110,11 +93,13 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
                       planNameLower.includes('tou');
       }
 
-      console.log(`[Edge Function] Plan "${plan.plan_name}" time-of-use check:`, {
-        rawTimeOfUse,
-        planDetailsCheck: planDetailsLower.includes('time of use') || planDetailsLower.includes('time-of-use'),
-        planNameCheck: planNameLower.includes('time of use') || planNameLower.includes('time-of-use'),
-        finalIsTimeOfUse: isTimeOfUse
+      console.log(`[Edge Function] Plan "${plan.plan_name}" complete data:`, {
+        raw_plan: plan,
+        transformed: {
+          timeofuse: isTimeOfUse,
+          renewable_percentage: renewablePercentage,
+          isPrepaid
+        }
       });
 
       return {
