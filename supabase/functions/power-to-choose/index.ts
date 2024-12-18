@@ -9,16 +9,12 @@ const corsHeaders = {
 async function makeRequest(url: string, method: string, headers: Record<string, string>) {
   try {
     console.log("[Edge Function] Making request to:", url);
-    console.log("[Edge Function] Request Method:", method);
-    console.log("[Edge Function] Request Headers:", headers);
-
+    
     const response = await fetch(url, {
       method,
       headers,
     });
 
-    console.log("[Edge Function] Response Status:", response.status);
-    
     if (!response.ok) {
       const errorText = await response.text();
       console.error("[Edge Function] Error Response:", errorText);
@@ -31,7 +27,26 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
     let data;
     try {
       data = JSON.parse(responseText);
-      console.log("[Edge Function] Parsed response data:", JSON.stringify(data, null, 2));
+      
+      // Log raw plan data for debugging time-of-use information
+      if (Array.isArray(data)) {
+        data.forEach((plan, index) => {
+          console.log(`[Edge Function] Raw Plan ${index + 1} Time-of-Use Data:`, {
+            plan_name: plan.plan_name,
+            timeofuse: plan.timeofuse,
+            time_of_use: plan.time_of_use,
+            tou: plan.tou,
+            plan_details: plan.plan_details,
+            raw_timeofuse_fields: {
+              timeofuse: plan.timeofuse,
+              time_of_use: plan.time_of_use,
+              tou: plan.tou,
+              is_tou: plan.is_tou
+            }
+          });
+        });
+      }
+      
     } catch (parseError) {
       console.error("[Edge Function] JSON parse error:", parseError);
       throw new Error("Failed to parse API response as JSON");
