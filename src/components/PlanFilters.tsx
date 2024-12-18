@@ -14,12 +14,16 @@ interface PlanFiltersProps {
   onPrepaidChange: (value: string) => void;
   onTimeOfUseChange: (value: string) => void;
   onCompanyChange: (value: string) => void;
+  onMinUsageChange: (value: string) => void;
+  onRenewableChange: (value: string) => void;
   currentSort: string;
   currentContractLength: string;
   currentPlanType: string;
   currentPrepaid: string;
   currentTimeOfUse: string;
   currentCompany: string;
+  currentMinUsage: string;
+  currentRenewable: string;
   plans?: Plan[];
 }
 
@@ -30,12 +34,16 @@ export function PlanFilters({
   onPrepaidChange,
   onTimeOfUseChange,
   onCompanyChange,
+  onMinUsageChange,
+  onRenewableChange,
   currentSort,
   currentContractLength,
   currentPlanType,
   currentPrepaid,
   currentTimeOfUse,
   currentCompany,
+  currentMinUsage,
+  currentRenewable,
   plans = [],
 }: PlanFiltersProps) {
   const companies = Array.from(new Set(plans.map(plan => plan.company_id))).map(id => {
@@ -65,14 +73,14 @@ export function PlanFilters({
         <label className="text-sm font-medium">Contract Length</label>
         <Select value={currentContractLength || "all"} onValueChange={onContractLengthChange}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue defaultValue="all">Show All</SelectValue>
+            <SelectValue defaultValue="all">All Contract Lengths</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="length-asc">Length: Short to Long</SelectItem>
-            <SelectItem value="length-desc">Length: Long to Short</SelectItem>
+            <SelectItem value="all">All Contract Lengths</SelectItem>
             <SelectItem value="0-6">0-6 Months</SelectItem>
-            <SelectItem value="7-12">7-12 Months</SelectItem>
-            <SelectItem value="13+">13+ Months</SelectItem>
+            <SelectItem value="6-12">6-12 Months</SelectItem>
+            <SelectItem value="12-24">12-24 Months</SelectItem>
+            <SelectItem value="24+">24+ Months</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -112,26 +120,56 @@ export function PlanFilters({
         <label className="text-sm font-medium">Prepaid Plans</label>
         <Select value={currentPrepaid || "all"} onValueChange={onPrepaidChange}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue defaultValue="all">Show All</SelectValue>
+            <SelectValue defaultValue="all">Show All Plans</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Show All</SelectItem>
-            <SelectItem value="prepaid-only">Prepaid Only</SelectItem>
-            <SelectItem value="no-prepaid">No Prepaid</SelectItem>
+            <SelectItem value="all">Show All Plans</SelectItem>
+            <SelectItem value="prepaid-only">Show Only Prepaid Plans</SelectItem>
+            <SelectItem value="no-prepaid">Do Not Show Prepaid Plans</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium">Time of Use</label>
+        <label className="text-sm font-medium">Time of Use Plans</label>
         <Select value={currentTimeOfUse || "all"} onValueChange={onTimeOfUseChange}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue defaultValue="all">Show All</SelectValue>
+            <SelectValue defaultValue="all">Show All Plans</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Show All</SelectItem>
-            <SelectItem value="tou-only">Time of Use Only</SelectItem>
-            <SelectItem value="no-tou">No Time of Use</SelectItem>
+            <SelectItem value="all">Show All Plans</SelectItem>
+            <SelectItem value="tou-only">Show Only Time of Use Plans</SelectItem>
+            <SelectItem value="no-tou">Do Not Show Time of Use Plans</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-medium">Pricing and Billing</label>
+        <Select value={currentMinUsage || "all"} onValueChange={onMinUsageChange}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue defaultValue="all">Show All Plans</SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Show All Plans</SelectItem>
+            <SelectItem value="no-minimum">No Minimum Usage Fee/Credit</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-medium">Renewable Energy</label>
+        <Select value={currentRenewable || "all"} onValueChange={onRenewableChange}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue defaultValue="all">All Renewable Levels</SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Renewable Levels</SelectItem>
+            <SelectItem value="0-25">0-25%</SelectItem>
+            <SelectItem value="25-50">25-50%</SelectItem>
+            <SelectItem value="50-75">50-75%</SelectItem>
+            <SelectItem value="75-99">75-99%</SelectItem>
+            <SelectItem value="100">100%</SelectItem>
           </SelectContent>
         </Select>
       </div>

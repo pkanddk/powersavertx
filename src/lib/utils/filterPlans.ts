@@ -10,6 +10,8 @@ export function filterPlans(
     companyFilter,
     sortOrder,
     estimatedUse,
+    minUsageFilter,
+    renewableFilter,
   }: {
     planType?: string;
     contractLength?: string;
@@ -18,6 +20,8 @@ export function filterPlans(
     companyFilter?: string;
     sortOrder?: string;
     estimatedUse?: string;
+    minUsageFilter?: string;
+    renewableFilter?: string;
   }
 ) {
   let filteredPlans = [...plans];
@@ -29,14 +33,12 @@ export function filterPlans(
       switch (contractLength) {
         case "0-6":
           return length >= 0 && length <= 6;
-        case "7-12":
-          return length >= 7 && length <= 12;
-        case "13+":
-          return length >= 13;
-        case "length-asc":
-          return true; // Handle in sort
-        case "length-desc":
-          return true; // Handle in sort
+        case "6-12":
+          return length > 6 && length <= 12;
+        case "12-24":
+          return length > 12 && length <= 24;
+        case "24+":
+          return length > 24;
         default:
           return true;
       }
@@ -62,6 +64,18 @@ export function filterPlans(
     filteredPlans = filteredPlans.filter(plan => {
       const type = plan.plan_type_name.toLowerCase();
       return type.includes(planType.toLowerCase());
+    });
+  }
+
+  // Filter by minimum usage
+  if (minUsageFilter && minUsageFilter !== "all") {
+    filteredPlans = filteredPlans.filter(plan => {
+      switch (minUsageFilter) {
+        case "no-minimum":
+          return !plan.minimum_usage;
+        default:
+          return true;
+      }
     });
   }
 

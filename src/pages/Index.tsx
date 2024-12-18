@@ -4,6 +4,7 @@ import { useSearchParams } from "react-router-dom";
 import { SearchForm } from "@/components/SearchForm";
 import { PlanGrid } from "@/components/PlanGrid";
 import { PlanComparisonTable } from "@/components/PlanComparisonTable";
+import { PlanFilters } from "@/components/PlanFilters";
 import { type Plan } from "@/lib/api";
 import { useToast } from "@/components/ui/use-toast";
 import { filterPlans } from "@/lib/utils/filterPlans";
@@ -16,6 +17,14 @@ export default function Index() {
   const [searchParams] = useSearchParams();
   const [search, setSearch] = useState<{ zipCode: string; estimatedUse: string } | null>(null);
   const [comparedPlans, setComparedPlans] = useState<Plan[]>([]);
+  const [currentSort, setCurrentSort] = useState("price-asc");
+  const [currentContractLength, setCurrentContractLength] = useState("all");
+  const [currentPlanType, setCurrentPlanType] = useState("all");
+  const [currentPrepaid, setCurrentPrepaid] = useState("all");
+  const [currentTimeOfUse, setCurrentTimeOfUse] = useState("all");
+  const [currentCompany, setCurrentCompany] = useState("all");
+  const [currentMinUsage, setCurrentMinUsage] = useState("all");
+  const [currentRenewable, setCurrentRenewable] = useState("all");
   const { toast } = useToast();
   const estimatedUse = searchParams.get("estimatedUse") || "any";
 
@@ -103,7 +112,15 @@ export default function Index() {
   };
 
   const filteredPlans = plansData?.plans ? filterPlans(plansData.plans, {
+    planType: currentPlanType,
+    contractLength: currentContractLength,
+    prepaidFilter: currentPrepaid,
+    timeOfUseFilter: currentTimeOfUse,
+    companyFilter: currentCompany,
+    sortOrder: currentSort,
     estimatedUse: search?.estimatedUse,
+    minUsageFilter: currentMinUsage,
+    renewableFilter: currentRenewable,
   }) : [];
 
   return (
@@ -124,6 +141,30 @@ export default function Index() {
         <div className="mb-12">
           <SearchForm onSearch={handleSearch} isLoading={isLoading} />
         </div>
+
+        {search?.zipCode && (
+          <div className="mb-8">
+            <PlanFilters
+              onSortChange={setCurrentSort}
+              onContractLengthChange={setCurrentContractLength}
+              onPlanTypeChange={setCurrentPlanType}
+              onPrepaidChange={setCurrentPrepaid}
+              onTimeOfUseChange={setCurrentTimeOfUse}
+              onCompanyChange={setCurrentCompany}
+              onMinUsageChange={setCurrentMinUsage}
+              onRenewableChange={setCurrentRenewable}
+              currentSort={currentSort}
+              currentContractLength={currentContractLength}
+              currentPlanType={currentPlanType}
+              currentPrepaid={currentPrepaid}
+              currentTimeOfUse={currentTimeOfUse}
+              currentCompany={currentCompany}
+              currentMinUsage={currentMinUsage}
+              currentRenewable={currentRenewable}
+              plans={plansData?.plans}
+            />
+          </div>
+        )}
 
         {comparedPlans.length > 0 && (
           <div className="mb-12 overflow-x-auto">
