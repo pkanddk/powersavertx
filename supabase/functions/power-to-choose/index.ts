@@ -57,35 +57,33 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
     }
 
     console.log(`[Edge Function] Found ${plans.length} plans for ZIP code`);
-    if (plans.length > 0) {
-      console.log("[Edge Function] First plan sample:", JSON.stringify(plans[0], null, 2));
-    }
+    
+    // Log prepaid-related fields for debugging
+    plans.forEach((plan, index) => {
+      console.log(`[Edge Function] Plan ${index + 1} prepaid fields:`, {
+        plan_name: plan.plan_name,
+        prepaid_plan: plan.prepaid_plan,
+        is_prepaid: plan.is_prepaid,
+        prepaid: plan.prepaid,
+        raw_prepaid_fields: {
+          ...Object.fromEntries(
+            Object.entries(plan).filter(([key]) => 
+              key.toLowerCase().includes('prepaid')
+            )
+          )
+        }
+      });
+    });
 
     const transformedPlans = plans.map(plan => {
-      console.log(`[Edge Function] Processing plan: ${plan.plan_name}`);
-
-      const parseRate = (rate: string | number | null | undefined): number => {
-        if (!rate) return 0;
-        const cleanRate = String(rate).replace(/[^\d.]/g, '');
-        const parsed = parseFloat(cleanRate);
-        const result = isNaN(parsed) ? 0 : parsed / 100;
-        console.log(`[Edge Function] Parsing rate: ${rate} -> ${cleanRate} -> ${parsed} -> ${result}`);
-        return result;
-      };
-
-      // Parse all three rate tiers
-      const price_kwh500 = parseRate(plan.price_kwh500 || plan.rate500);
-      const price_kwh1000 = parseRate(plan.price_kwh1000 || plan.rate1000);
-      const price_kwh2000 = parseRate(plan.price_kwh2000 || plan.rate2000);
-
-      // Default to 500 kWh rate if no usage specified
-      const price_kwh = price_kwh500;
-
-      console.log(`[Edge Function] Final rates for plan ${plan.plan_name}:`, {
-        price_kwh500,
-        price_kwh1000,
-        price_kwh2000,
-        selected_price: price_kwh
+      const isPrepaid = Boolean(plan.prepaid_plan || plan.is_prepaid || plan.prepaid || false);
+      console.log(`[Edge Function] Transforming plan "${plan.plan_name}":`, {
+        isPrepaid,
+        prepaid_fields: {
+          prepaid_plan: plan.prepaid_plan,
+          is_prepaid: plan.is_prepaid,
+          prepaid: plan.prepaid
+        }
       });
 
       return {
@@ -99,13 +97,13 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
         minimum_usage: Boolean(plan.minimum_usage),
         new_customer: Boolean(plan.new_customer),
         plan_details: String(plan.special_terms || ""),
-        price_kwh,
-        price_kwh500,
-        price_kwh1000,
-        price_kwh2000,
+        price_kwh: parseFloat(plan.price_kwh || plan.rate500 || 0),
+        price_kwh500: parseFloat(plan.price_kwh500 || plan.rate500 || 0),
+        price_kwh1000: parseFloat(plan.price_kwh1000 || plan.rate1000 || 0),
+        price_kwh2000: parseFloat(plan.price_kwh2000 || plan.rate2000 || 0),
         base_charge: plan.base_charge ? parseFloat(plan.base_charge) : null,
         contract_length: plan.term_value ? parseInt(plan.term_value) : null,
-        prepaid: Boolean(plan.prepaid_plan || plan.is_prepaid || plan.prepaid || false),
+        prepaid: isPrepaid,
         zip_code: String(plan.zip_code || "")
       };
     });
@@ -209,3 +207,4 @@ serve(async (req) => {
     );
   }
 });
+
