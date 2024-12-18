@@ -29,6 +29,7 @@ export type Database = {
           plan_type_name: string
           price_kwh: number
           updated_at: string | null
+          zip_code: string
         }
         Insert: {
           base_charge?: number | null
@@ -49,6 +50,7 @@ export type Database = {
           plan_type_name: string
           price_kwh: number
           updated_at?: string | null
+          zip_code: string
         }
         Update: {
           base_charge?: number | null
@@ -69,6 +71,7 @@ export type Database = {
           plan_type_name?: string
           price_kwh?: number
           updated_at?: string | null
+          zip_code?: string
         }
         Relationships: []
       }

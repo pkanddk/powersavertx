@@ -18,11 +18,11 @@ export default function Index() {
   const estimatedUse = searchParams.get("estimatedUse") || "any";
 
   const { data: plansData, isLoading } = useQuery({
-    queryKey: ["plans", search?.zipCode, search?.estimatedUse],
+    queryKey: ["plans", search?.zipCode],
     queryFn: async () => {
+      console.log("Fetching plans with zip code:", search?.zipCode);
       let query = supabase.from('plans').select('*');
       
-      // If zip code is provided, filter plans by zip code
       if (search?.zipCode) {
         query = query.eq('zip_code', search.zipCode);
       }
@@ -34,12 +34,12 @@ export default function Index() {
         throw error;
       }
 
+      console.log("Fetched plans:", plans);
       return {
         plans: plans || [],
         lastUpdated: plans?.[0]?.updated_at
       };
     },
-    enabled: true, // Always enabled since we want to show all plans by default
     meta: {
       onError: () => {
         toast({
