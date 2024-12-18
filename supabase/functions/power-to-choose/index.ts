@@ -93,12 +93,16 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
         if (details.includes('100% clean renewable energy') || details.includes('100% renewable')) {
           renewablePercentage = 100;
         } else if (details.includes('renewable')) {
-          // If renewable is mentioned but not 100%, default to 50%
           renewablePercentage = 50;
         }
       }
 
-      console.log(`[Edge Function] Plan "${plan.plan_name}" renewable percentage:`, renewablePercentage);
+      // Log the timeofuse value from the API
+      console.log(`[Edge Function] Raw timeofuse value for plan "${plan.plan_name}":`, plan.timeofuse);
+
+      // Ensure timeofuse is properly converted to boolean
+      const isTimeOfUse = Boolean(plan.timeofuse);
+      console.log(`[Edge Function] Converted timeofuse value for plan "${plan.plan_name}":`, isTimeOfUse);
 
       return {
         company_id: String(plan.company_id || ""),
@@ -120,7 +124,9 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
         prepaid: isPrepaid,
         zip_code: String(plan.zip_code || ""),
         renewable_percentage: renewablePercentage,
-        timeofuse: Boolean(plan.timeofuse)
+        timeofuse: isTimeOfUse,  // Use the properly converted boolean value
+        jdp_rating: plan.jdp_rating ? parseFloat(plan.jdp_rating) : null,
+        jdp_rating_year: plan.jdp_rating_year || null
       };
     });
 
