@@ -9,6 +9,8 @@ import { useToast } from "@/components/ui/use-toast";
 import { filterPlans } from "@/lib/utils/filterPlans";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 export default function Index() {
   const [searchParams] = useSearchParams();
@@ -17,22 +19,51 @@ export default function Index() {
   const { toast } = useToast();
   const estimatedUse = searchParams.get("estimatedUse") || "any";
 
-  const { data: plansData, isLoading } = useQuery({
+  const { data: plansData, isLoading, error } = useQuery({
     queryKey: ["plans", search?.zipCode],
     queryFn: async () => {
       console.log("[Index] Starting plan fetch. Search state:", search);
-      let query = supabase.from('plans').select('*');
       
-      if (search?.zipCode) {
-        console.log("[Index] Filtering by zip code:", search.zipCode);
-        query = query.eq('zip_code', search.zipCode);
+      if (!search?.zipCode) {
+        return { plans: [], lastUpdated: null };
       }
 
-      const { data: plans, error } = await query;
+      const { data: plans, error } = await supabase
+        .from('plans')
+        .select('*')
+        .eq('zip_code', search.zipCode);
 
       if (error) {
         console.error('[Index] Error fetching plans:', error);
         throw error;
+      }
+
+      // If no plans found in database, try fetching from API
+      if (!plans || plans.length === 0) {
+        console.log('[Index] No plans found in database, fetching from API');
+        const { data: responseData, error: functionError } = await supabase.functions.invoke('power-to-choose', {
+          body: { zipCode: search.zipCode, estimatedUse },
+        });
+
+        if (functionError) {
+          console.error('[Index] Error calling Edge Function:', functionError);
+          throw functionError;
+        }
+
+        if (!responseData) {
+          console.error('[Index] No data received from Edge Function');
+          throw new Error('No plans found for this ZIP code');
+        }
+
+        if ('error' in responseData) {
+          console.error('[Index] Error from Edge Function:', responseData.error);
+          throw new Error(responseData.error);
+        }
+
+        return {
+          plans: Array.isArray(responseData) ? responseData : [],
+          lastUpdated: new Date().toISOString()
+        };
       }
 
       console.log("[Index] Fetched plans:", plans?.length || 0, "results");
@@ -41,12 +72,11 @@ export default function Index() {
         lastUpdated: plans?.[0]?.updated_at
       };
     },
-    initialData: { plans: [], lastUpdated: null },
     meta: {
-      onError: () => {
+      onError: (error: Error) => {
         toast({
           title: "Error",
-          description: "Failed to fetch energy plans. Please try again.",
+          description: error.message || "Failed to fetch energy plans. Please try again.",
           variant: "destructive",
         });
       },
@@ -108,7 +138,16 @@ export default function Index() {
           </div>
         )}
 
-        {!isLoading && filteredPlans.length === 0 && (
+        {error && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              {error instanceof Error ? error.message : "Failed to fetch energy plans. Please try again."}
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {!isLoading && !error && filteredPlans.length === 0 && (
           <div className="text-center py-12">
             <p className="text-lg text-muted-foreground">
               {search?.zipCode 

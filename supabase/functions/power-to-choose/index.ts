@@ -103,7 +103,8 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
         price_kwh1000,
         price_kwh2000,
         base_charge: plan.base_charge ? parseFloat(plan.base_charge) : null,
-        contract_length: plan.term_value ? parseInt(plan.term_value) : null
+        contract_length: plan.term_value ? parseInt(plan.term_value) : null,
+        zip_code: String(plan.zip_code || "")
       };
     });
 
@@ -129,15 +130,15 @@ serve(async (req) => {
       throw new Error("ZIP code is required");
     }
 
+    // Validate ZIP code format
+    if (!/^\d{5}$/.test(zipCode)) {
+      throw new Error("Invalid ZIP code format. Please enter a 5-digit ZIP code.");
+    }
+
     let apiUrl = `http://api.powertochoose.org/api/PowerToChoose/plans?zip_code=${zipCode}`;
     
-    if (estimatedUse && estimatedUse !== "Any Range") {
-      const usageParam = estimatedUse === "between 500 and 1,000" ? "500-1000" :
-                        estimatedUse === "between 1,001 and 2,000" ? "1001-2000" :
-                        estimatedUse === "more than 2,000" ? "2001+" : null;
-      if (usageParam) {
-        apiUrl += `&kwh=${usageParam}`;
-      }
+    if (estimatedUse && estimatedUse !== "any") {
+      apiUrl += `&kWh=${estimatedUse}`;
     }
 
     console.log("[Edge Function] Making request to URL:", apiUrl);
@@ -147,6 +148,16 @@ serve(async (req) => {
       "Content-Type": "application/json"
     });
     
+    if (!plans || plans.length === 0) {
+      return new Response(
+        JSON.stringify({ error: "No plans found for this ZIP code" }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 404
+        }
+      );
+    }
+
     return new Response(JSON.stringify(plans), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200

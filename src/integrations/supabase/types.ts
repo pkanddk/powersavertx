@@ -28,6 +28,9 @@ export type Database = {
           plan_name: string
           plan_type_name: string
           price_kwh: number
+          price_kwh1000: number
+          price_kwh2000: number
+          price_kwh500: number
           updated_at: string | null
           zip_code: string
         }
@@ -49,6 +52,9 @@ export type Database = {
           plan_name: string
           plan_type_name: string
           price_kwh: number
+          price_kwh1000: number
+          price_kwh2000: number
+          price_kwh500: number
           updated_at?: string | null
           zip_code: string
         }
@@ -70,6 +76,9 @@ export type Database = {
           plan_name?: string
           plan_type_name?: string
           price_kwh?: number
+          price_kwh1000?: number
+          price_kwh2000?: number
+          price_kwh500?: number
           updated_at?: string | null
           zip_code?: string
         }
