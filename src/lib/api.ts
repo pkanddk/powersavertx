@@ -21,7 +21,8 @@ export const PlanSchema = z.object({
   jdp_rating: z.number().nullable(),
   jdp_rating_year: z.string().nullable(),
   prepaid: z.boolean().nullable(),
-  renewable_percentage: z.number().nullable()
+  renewable_percentage: z.number().nullable(),
+  timeofuse: z.boolean().nullable()
 });
 
 export type Plan = z.infer<typeof PlanSchema>;

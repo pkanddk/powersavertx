@@ -24,6 +24,20 @@ export function filterPlans(
 ) {
   let filteredPlans = [...plans];
 
+  // Filter by time of use
+  if (timeOfUseFilter && timeOfUseFilter !== "all") {
+    filteredPlans = filteredPlans.filter(plan => {
+      switch (timeOfUseFilter) {
+        case "tou-only":
+          return plan.timeofuse === true;
+        case "no-tou":
+          return plan.timeofuse === false;
+        default:
+          return true;
+      }
+    });
+  }
+
   // Filter by contract length
   if (contractLength && contractLength !== "all") {
     filteredPlans = filteredPlans.filter(plan => {

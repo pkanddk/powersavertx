@@ -33,6 +33,7 @@ export type Database = {
           price_kwh2000: number
           price_kwh500: number
           renewable_percentage: number | null
+          timeofuse: boolean | null
           updated_at: string | null
           zip_code: string
         }
@@ -59,6 +60,7 @@ export type Database = {
           price_kwh2000: number
           price_kwh500: number
           renewable_percentage?: number | null
+          timeofuse?: boolean | null
           updated_at?: string | null
           zip_code: string
         }
@@ -85,6 +87,7 @@ export type Database = {
           price_kwh2000?: number
           price_kwh500?: number
           renewable_percentage?: number | null
+          timeofuse?: boolean | null
           updated_at?: string | null
           zip_code?: string
         }

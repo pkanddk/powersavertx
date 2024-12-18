@@ -119,7 +119,8 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
         contract_length: plan.term_value ? parseInt(plan.term_value) : null,
         prepaid: isPrepaid,
         zip_code: String(plan.zip_code || ""),
-        renewable_percentage: renewablePercentage
+        renewable_percentage: renewablePercentage,
+        timeofuse: Boolean(plan.timeofuse)
       };
     });
 
