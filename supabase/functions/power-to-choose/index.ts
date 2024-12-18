@@ -58,6 +58,14 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
 
     console.log(`[Edge Function] Found ${plans.length} plans for ZIP code`);
     
+    // Log complete raw plan data for debugging
+    plans.forEach((plan, index) => {
+      console.log(`[Edge Function] Raw plan ${index + 1} data:`, {
+        plan_name: plan.plan_name,
+        all_fields: plan
+      });
+    });
+    
     // Log prepaid-related fields for debugging
     plans.forEach((plan, index) => {
       console.log(`[Edge Function] Plan ${index + 1} prepaid fields:`, {
