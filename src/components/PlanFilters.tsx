@@ -50,13 +50,76 @@ export function PlanFilters({
     };
   }).sort((a, b) => a.name.localeCompare(b.name));
 
+  const getSortLabel = (value: string) => {
+    switch (value) {
+      case "price-asc": return "Price: Low to High";
+      case "price-desc": return "Price: High to Low";
+      default: return "Price: Low to High";
+    }
+  };
+
+  const getContractLengthLabel = (value: string) => {
+    switch (value) {
+      case "all": return "All Contract Lengths";
+      case "0-6": return "0-6 Months";
+      case "6-12": return "6-12 Months";
+      case "12-24": return "12-24 Months";
+      case "24+": return "24+ Months";
+      default: return "All Contract Lengths";
+    }
+  };
+
+  const getPlanTypeLabel = (value: string) => {
+    switch (value) {
+      case "all": return "All Plan Types";
+      case "fixed": return "Fixed Rate Only";
+      case "variable": return "Variable Rate Only";
+      default: return "All Plan Types";
+    }
+  };
+
+  const getTimeOfUseLabel = (value: string) => {
+    switch (value) {
+      case "all": return "Show All Plans";
+      case "tou-only": return "Time of Use Plans Only";
+      case "no-tou": return "No Time of Use Plans";
+      default: return "Show All Plans";
+    }
+  };
+
+  const getCompanyLabel = (value: string) => {
+    if (value === "all") return "All Companies";
+    const company = companies.find(c => c.id === value);
+    return company ? company.name : "All Companies";
+  };
+
+  const getMinUsageLabel = (value: string) => {
+    switch (value) {
+      case "all": return "Show All Plans";
+      case "no-minimum": return "No Minimum Usage Fee/Credit";
+      default: return "Show All Plans";
+    }
+  };
+
+  const getRenewableLabel = (value: string) => {
+    switch (value) {
+      case "all": return "All Renewable Levels";
+      case "0-25": return "0-25% Renewable";
+      case "25-50": return "25-50% Renewable";
+      case "50-75": return "50-75% Renewable";
+      case "75-99": return "75-99% Renewable";
+      case "100": return "100% Renewable";
+      default: return "All Renewable Levels";
+    }
+  };
+
   return (
     <div className="flex flex-wrap gap-4 mb-6">
       <div className="flex flex-col gap-2">
         <label className="text-sm font-medium">Sort by Price</label>
-        <Select value={currentSort || "price-asc"} onValueChange={onSortChange}>
+        <Select value={currentSort} onValueChange={onSortChange}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue defaultValue="price-asc">Price: Low to High</SelectValue>
+            <SelectValue>{getSortLabel(currentSort)}</SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="price-asc">Price: Low to High</SelectItem>
@@ -67,9 +130,9 @@ export function PlanFilters({
 
       <div className="flex flex-col gap-2">
         <label className="text-sm font-medium">Contract Length</label>
-        <Select value={currentContractLength || "all"} onValueChange={onContractLengthChange}>
+        <Select value={currentContractLength} onValueChange={onContractLengthChange}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue defaultValue="all">All Contract Lengths</SelectValue>
+            <SelectValue>{getContractLengthLabel(currentContractLength)}</SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Contract Lengths</SelectItem>
@@ -83,9 +146,9 @@ export function PlanFilters({
 
       <div className="flex flex-col gap-2">
         <label className="text-sm font-medium">Plan Type</label>
-        <Select value={currentPlanType || "all"} onValueChange={onPlanTypeChange}>
+        <Select value={currentPlanType} onValueChange={onPlanTypeChange}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue defaultValue="all">All Plan Types</SelectValue>
+            <SelectValue>{getPlanTypeLabel(currentPlanType)}</SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Plan Types</SelectItem>
@@ -96,10 +159,24 @@ export function PlanFilters({
       </div>
 
       <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium">Company</label>
-        <Select value={currentCompany || "all"} onValueChange={onCompanyChange}>
+        <label className="text-sm font-medium">Time of Use Plans</label>
+        <Select value={currentTimeOfUse} onValueChange={onTimeOfUseChange}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue defaultValue="all">All Companies</SelectValue>
+            <SelectValue>{getTimeOfUseLabel(currentTimeOfUse)}</SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Show All Plans</SelectItem>
+            <SelectItem value="tou-only">Time of Use Plans Only</SelectItem>
+            <SelectItem value="no-tou">Do Not Show Time of Use Plans</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-medium">Company</label>
+        <Select value={currentCompany} onValueChange={onCompanyChange}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue>{getCompanyLabel(currentCompany)}</SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Companies</SelectItem>
@@ -113,24 +190,10 @@ export function PlanFilters({
       </div>
 
       <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium">Time of Use Plans</label>
-        <Select value={currentTimeOfUse || "all"} onValueChange={onTimeOfUseChange}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue defaultValue="all">Show All Plans</SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Show All Plans</SelectItem>
-            <SelectItem value="tou-only">Show Only Time of Use Plans</SelectItem>
-            <SelectItem value="no-tou">Do Not Show Time of Use Plans</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="flex flex-col gap-2">
         <label className="text-sm font-medium">Pricing and Billing</label>
-        <Select value={currentMinUsage || "all"} onValueChange={onMinUsageChange}>
+        <Select value={currentMinUsage} onValueChange={onMinUsageChange}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue defaultValue="all">Show All Plans</SelectValue>
+            <SelectValue>{getMinUsageLabel(currentMinUsage)}</SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Show All Plans</SelectItem>
@@ -141,9 +204,9 @@ export function PlanFilters({
 
       <div className="flex flex-col gap-2">
         <label className="text-sm font-medium">Renewable Energy</label>
-        <Select value={currentRenewable || "all"} onValueChange={onRenewableChange}>
+        <Select value={currentRenewable} onValueChange={onRenewableChange}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue defaultValue="all">All Renewable Levels</SelectValue>
+            <SelectValue>{getRenewableLabel(currentRenewable)}</SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Renewable Levels</SelectItem>

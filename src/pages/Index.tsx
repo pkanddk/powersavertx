@@ -114,7 +114,6 @@ export default function Index() {
   const filteredPlans = plansData?.plans ? filterPlans(plansData.plans, {
     planType: currentPlanType,
     contractLength: currentContractLength,
-    prepaidFilter: currentPrepaid,
     timeOfUseFilter: currentTimeOfUse,
     companyFilter: currentCompany,
     sortOrder: currentSort,
