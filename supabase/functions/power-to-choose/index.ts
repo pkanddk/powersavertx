@@ -25,7 +25,7 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
     }
 
     const responseText = await response.text();
-    console.log("[Edge Function] Raw response for ZIP:", responseText);
+    console.log("[Edge Function] Raw response:", responseText);
 
     let data;
     try {
@@ -36,11 +36,13 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
       throw new Error("Failed to parse API response as JSON");
     }
 
-    if (data.error || (data.success === false)) {
-      console.error("[Edge Function] API returned error:", data);
-      throw new Error(data.message || "API returned an error");
+    // Check if the response indicates no plans found
+    if (!data || (Array.isArray(data) && data.length === 0)) {
+      console.log("[Edge Function] No plans found in API response");
+      return [];
     }
 
+    // Handle different response structures
     let plans = [];
     if (Array.isArray(data)) {
       plans = data;
@@ -55,9 +57,9 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
       throw new Error("Unexpected response structure from API");
     }
 
-    console.log(`[Edge Function] Found ${plans.length} plans for ZIP code`);
+    console.log(`[Edge Function] Found ${plans.length} plans`);
     if (plans.length > 0) {
-      console.log("[Edge Function] First plan sample:", plans[0]);
+      console.log("[Edge Function] First plan sample:", JSON.stringify(plans[0], null, 2));
     }
 
     const transformedPlans = plans.map(plan => {
