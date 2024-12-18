@@ -15,12 +15,19 @@ export function PlanBadges({
   newCustomer,
   renewablePercentage 
 }: PlanBadgesProps) {
+  // Only show plan type badge if it's a non-empty string and not just a number
+  const shouldShowPlanType = planType && isNaN(Number(planType)) && planType.trim() !== '';
+  
   return (
     <div className="flex flex-wrap gap-2">
-      <CustomBadge variant="secondary">{planType}</CustomBadge>
-      <CustomBadge variant="outline">
-        {contractLength} {contractLength === 1 ? 'month' : 'months'}
-      </CustomBadge>
+      {shouldShowPlanType && (
+        <CustomBadge variant="secondary">{planType}</CustomBadge>
+      )}
+      {contractLength && (
+        <CustomBadge variant="outline">
+          {contractLength} {contractLength === 1 ? 'month' : 'months'}
+        </CustomBadge>
+      )}
       {minimumUsage && (
         <CustomBadge variant="secondary">Min. Usage Required</CustomBadge>
       )}
