@@ -31,17 +31,15 @@ export function filterPlans(
     console.log("[filterPlans] TOU Plans available:", filteredPlans.filter(plan => plan.timeofuse === true).length);
     
     filteredPlans = filteredPlans.filter(plan => {
-      const isTimeOfUse = Boolean(plan.timeofuse);
+      const isTimeOfUse = plan.timeofuse;
       console.log(`[filterPlans] Plan "${plan.plan_name}" timeofuse:`, isTimeOfUse);
       
-      switch (timeOfUseFilter) {
-        case "tou-only":
-          return isTimeOfUse === true;
-        case "no-tou":
-          return isTimeOfUse === false;
-        default:
-          return true;
+      if (timeOfUseFilter === "tou-only") {
+        return isTimeOfUse === true;
+      } else if (timeOfUseFilter === "no-tou") {
+        return isTimeOfUse === false;
       }
+      return true;
     });
 
     console.log("[filterPlans] Plans after TOU filter:", filteredPlans.length);
