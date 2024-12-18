@@ -8,7 +8,7 @@ const corsHeaders = {
 
 async function makeRequest(url: string, method: string, headers: Record<string, string>) {
   try {
-    console.log("[Edge Function] Making request to:", url);
+    console.log("🔍 [Edge Function] Making request to:", url);
     
     const response = await fetch(url, {
       method,
@@ -17,32 +17,27 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("[Edge Function] Error Response:", errorText);
+      console.error("❌ [Edge Function] Error Response:", errorText);
       throw new Error(`HTTP Error ${response.status}: ${errorText}`);
     }
 
     const responseText = await response.text();
-    console.log("[Edge Function] Raw API Response Text:", responseText);
-
+    
     let data;
     try {
       data = JSON.parse(responseText);
-      console.log("[Edge Function] Complete Raw API Response Data:", JSON.stringify(data, null, 2));
-      
-      if (Array.isArray(data)) {
-        console.log(`[Edge Function] Number of plans received: ${data.length}`);
-        data.forEach((plan, index) => {
-          console.log(`[Edge Function] Raw Plan ${index + 1} Data:`, JSON.stringify(plan, null, 2));
-        });
-      }
+      console.log("\n📦 [Edge Function] RAW API RESPONSE:");
+      console.log("=================================");
+      console.log(JSON.stringify(data, null, 2));
+      console.log("=================================\n");
       
     } catch (parseError) {
-      console.error("[Edge Function] JSON parse error:", parseError);
+      console.error("❌ [Edge Function] JSON parse error:", parseError);
       throw new Error("Failed to parse API response as JSON");
     }
 
     if (!data || (Array.isArray(data) && data.length === 0)) {
-      console.log("[Edge Function] No plans found in API response");
+      console.log("⚠️ [Edge Function] No plans found in API response");
       return [];
     }
 
@@ -54,12 +49,11 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
     } else if (data.Results && Array.isArray(data.Results)) {
       plans = data.Results;
     } else {
-      console.error("[Edge Function] Unexpected response structure:", data);
+      console.error("❌ [Edge Function] Unexpected response structure:", data);
       throw new Error("Unexpected response structure from API");
     }
 
-    console.log(`[Edge Function] Found ${plans.length} plans for ZIP code`);
-    console.log("[Edge Function] Sample of transformed plans:", JSON.stringify(plans.slice(0, 2), null, 2));
+    console.log(`✅ [Edge Function] Found ${plans.length} plans`);
 
     const transformedPlans = plans.map(plan => {
       const isPrepaid = Boolean(plan.prepaid_plan || plan.is_prepaid || plan.prepaid || false);
@@ -88,13 +82,6 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
                       planNameLower.includes('time-of-use') ||
                       planNameLower.includes('tou');
       }
-
-      console.log(`[Edge Function] Processing plan "${plan.plan_name}":`, {
-        raw_plan: plan,
-        timeofuse: isTimeOfUse,
-        renewable_percentage: renewablePercentage,
-        isPrepaid
-      });
 
       return {
         company_id: String(plan.company_id || ""),
@@ -125,7 +112,7 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
     return transformedPlans;
 
   } catch (error) {
-    console.error(`[Edge Function] Request failed:`, error);
+    console.error(`❌ [Edge Function] Request failed:`, error);
     throw error;
   }
 }
@@ -143,13 +130,12 @@ serve(async (req) => {
 
   try {
     const { zipCode, estimatedUse } = await req.json();
-    console.log(`[Edge Function] Received request with ZIP: ${zipCode}, Usage: ${estimatedUse}`);
+    console.log(`🏁 [Edge Function] Starting search for ZIP: ${zipCode}, Usage: ${estimatedUse}`);
 
     if (!zipCode) {
       throw new Error("ZIP code is required");
     }
 
-    // Validate ZIP code format
     if (!/^\d{5}$/.test(zipCode)) {
       throw new Error("Invalid ZIP code format. Please enter a 5-digit ZIP code.");
     }
@@ -159,8 +145,6 @@ serve(async (req) => {
     if (estimatedUse && estimatedUse !== "any") {
       apiUrl += `&kWh=${estimatedUse}`;
     }
-
-    console.log("[Edge Function] Making request to URL:", apiUrl);
 
     const plans = await makeRequest(apiUrl, "GET", {
       "Accept": "application/json",
@@ -184,7 +168,7 @@ serve(async (req) => {
       .eq('zip_code', zipCode);
 
     if (deleteError) {
-      console.error("[Edge Function] Error deleting existing plans:", deleteError);
+      console.error("❌ [Edge Function] Error deleting existing plans:", deleteError);
       throw new Error("Failed to update plans in database");
     }
 
@@ -194,11 +178,11 @@ serve(async (req) => {
       .insert(plans);
 
     if (insertError) {
-      console.error("[Edge Function] Error inserting plans:", insertError);
+      console.error("❌ [Edge Function] Error inserting plans:", insertError);
       throw new Error("Failed to store plans in database");
     }
 
-    console.log(`[Edge Function] Successfully stored ${plans.length} plans in database`);
+    console.log(`✅ [Edge Function] Successfully stored ${plans.length} plans in database`);
 
     return new Response(JSON.stringify(plans), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -206,7 +190,7 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error("[Edge Function] Error:", error);
+    console.error("❌ [Edge Function] Error:", error);
     
     return new Response(
       JSON.stringify({
