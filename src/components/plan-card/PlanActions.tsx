@@ -8,6 +8,9 @@ interface PlanActionsProps {
 }
 
 export function PlanActions({ plan, onCompare, isCompared }: PlanActionsProps) {
+  console.log("PlanActions - plan data:", plan);
+  console.log("PlanActions - go_to_plan URL:", plan.go_to_plan);
+
   return (
     <div className="w-full space-y-3">
       {onCompare && (
