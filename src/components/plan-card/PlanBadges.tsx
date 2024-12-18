@@ -1,4 +1,4 @@
-import { Badge } from "@/components/ui/badge";
+import { CustomBadge } from "@/components/ui/custom-badge";
 
 interface PlanBadgesProps {
   planType: string;
@@ -17,20 +17,20 @@ export function PlanBadges({
 }: PlanBadgesProps) {
   return (
     <div className="flex flex-wrap gap-2">
-      <Badge variant="secondary">{planType}</Badge>
-      <Badge variant="outline">
+      <CustomBadge variant="secondary">{planType}</CustomBadge>
+      <CustomBadge variant="outline">
         {contractLength} {contractLength === 1 ? 'month' : 'months'}
-      </Badge>
+      </CustomBadge>
       {minimumUsage && (
-        <Badge variant="secondary">Min. Usage Required</Badge>
+        <CustomBadge variant="secondary">Min. Usage Required</CustomBadge>
       )}
       {newCustomer && (
-        <Badge variant="secondary">New Customers Only</Badge>
+        <CustomBadge variant="secondary">New Customers Only</CustomBadge>
       )}
       {typeof renewablePercentage === 'number' && (
-        <Badge variant="outline" className="bg-green-50">
+        <CustomBadge variant="outline" className="bg-green-50">
           {renewablePercentage}% Renewable
-        </Badge>
+        </CustomBadge>
       )}
     </div>
   );
