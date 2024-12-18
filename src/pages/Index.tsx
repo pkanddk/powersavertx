@@ -21,13 +21,13 @@ export default function Index() {
     queryKey: ["plans", search?.zipCode, search?.estimatedUse],
     queryFn: async () => {
       const { data: plans, error } = await supabase
-        .from('energy_plans')
+        .from('plans')
         .select('*');
 
       if (error) throw error;
       return {
         plans,
-        lastUpdated: plans?.[0]?.last_updated
+        lastUpdated: plans?.[0]?.updated_at
       };
     },
     enabled: !!search,
