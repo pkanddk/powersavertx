@@ -22,19 +22,17 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
     }
 
     const responseText = await response.text();
-    console.log("[Edge Function] Raw API Response:", responseText);
+    console.log("[Edge Function] Raw API Response Text:", responseText);
 
     let data;
     try {
       data = JSON.parse(responseText);
+      console.log("[Edge Function] Complete Raw API Response Data:", JSON.stringify(data, null, 2));
       
-      // Log complete raw plan data for debugging
       if (Array.isArray(data)) {
+        console.log(`[Edge Function] Number of plans received: ${data.length}`);
         data.forEach((plan, index) => {
-          console.log(`[Edge Function] Complete Raw Plan ${index + 1} Data:`, {
-            ...plan,
-            _raw: plan // Include the complete raw object
-          });
+          console.log(`[Edge Function] Raw Plan ${index + 1} Data:`, JSON.stringify(plan, null, 2));
         });
       }
       
@@ -61,11 +59,11 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
     }
 
     console.log(`[Edge Function] Found ${plans.length} plans for ZIP code`);
+    console.log("[Edge Function] Sample of transformed plans:", JSON.stringify(plans.slice(0, 2), null, 2));
 
     const transformedPlans = plans.map(plan => {
       const isPrepaid = Boolean(plan.prepaid_plan || plan.is_prepaid || plan.prepaid || false);
       
-      // Calculate renewable percentage based on plan details
       let renewablePercentage = 0;
       if (plan.plan_details) {
         const details = plan.plan_details.toLowerCase();
@@ -76,11 +74,9 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
         }
       }
 
-      // Determine if plan is time-of-use by checking multiple possible fields and plan details
       const rawTimeOfUse = plan.timeofuse || plan.time_of_use || plan.tou || false;
       let isTimeOfUse = Boolean(rawTimeOfUse);
 
-      // Also check plan details and name for time-of-use indicators
       const planDetailsLower = (plan.plan_details || '').toLowerCase();
       const planNameLower = (plan.plan_name || '').toLowerCase();
       
@@ -93,13 +89,11 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
                       planNameLower.includes('tou');
       }
 
-      console.log(`[Edge Function] Plan "${plan.plan_name}" complete data:`, {
+      console.log(`[Edge Function] Processing plan "${plan.plan_name}":`, {
         raw_plan: plan,
-        transformed: {
-          timeofuse: isTimeOfUse,
-          renewable_percentage: renewablePercentage,
-          isPrepaid
-        }
+        timeofuse: isTimeOfUse,
+        renewable_percentage: renewablePercentage,
+        isPrepaid
       });
 
       return {
