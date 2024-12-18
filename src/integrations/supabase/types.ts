@@ -27,6 +27,7 @@ export type Database = {
           plan_details: string | null
           plan_name: string
           plan_type_name: string
+          prepaid: boolean | null
           price_kwh: number
           price_kwh1000: number
           price_kwh2000: number
@@ -51,6 +52,7 @@ export type Database = {
           plan_details?: string | null
           plan_name: string
           plan_type_name: string
+          prepaid?: boolean | null
           price_kwh: number
           price_kwh1000: number
           price_kwh2000: number
@@ -75,6 +77,7 @@ export type Database = {
           plan_details?: string | null
           plan_name?: string
           plan_type_name?: string
+          prepaid?: boolean | null
           price_kwh?: number
           price_kwh1000?: number
           price_kwh2000?: number

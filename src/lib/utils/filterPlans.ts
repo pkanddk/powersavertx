@@ -3,6 +3,12 @@ import { Plan } from "@/lib/api";
 export function filterPlans(
   plans: Plan[],
   {
+    planType,
+    contractLength,
+    prepaidFilter,
+    timeOfUseFilter,
+    companyFilter,
+    sortOrder,
     estimatedUse,
   }: {
     planType?: string;
@@ -14,6 +20,56 @@ export function filterPlans(
     estimatedUse?: string;
   }
 ) {
+  let filteredPlans = [...plans];
+
+  // Filter by contract length
+  if (contractLength && contractLength !== "all") {
+    filteredPlans = filteredPlans.filter(plan => {
+      const length = plan.contract_length || 0;
+      switch (contractLength) {
+        case "0-6":
+          return length >= 0 && length <= 6;
+        case "7-12":
+          return length >= 7 && length <= 12;
+        case "13+":
+          return length >= 13;
+        case "length-asc":
+          return true; // Handle in sort
+        case "length-desc":
+          return true; // Handle in sort
+        default:
+          return true;
+      }
+    });
+  }
+
+  // Filter by prepaid status
+  if (prepaidFilter && prepaidFilter !== "all") {
+    filteredPlans = filteredPlans.filter(plan => {
+      switch (prepaidFilter) {
+        case "prepaid-only":
+          return plan.prepaid === true;
+        case "no-prepaid":
+          return plan.prepaid === false;
+        default:
+          return true;
+      }
+    });
+  }
+
+  // Filter by plan type
+  if (planType && planType !== "all") {
+    filteredPlans = filteredPlans.filter(plan => {
+      const type = plan.plan_type_name.toLowerCase();
+      return type.includes(planType.toLowerCase());
+    });
+  }
+
+  // Filter by company
+  if (companyFilter && companyFilter !== "all") {
+    filteredPlans = filteredPlans.filter(plan => plan.company_id === companyFilter);
+  }
+
   // Get the price for the selected kWh usage
   const getPriceForUsage = (plan: Plan): number => {
     switch (estimatedUse) {
@@ -28,10 +84,23 @@ export function filterPlans(
     }
   };
 
-  // Sort plans based solely on price (lowest to highest)
-  return [...plans].sort((a, b) => {
-    const priceA = getPriceForUsage(a);
-    const priceB = getPriceForUsage(b);
-    return priceA - priceB;
-  });
+  // Sort plans
+  if (sortOrder) {
+    filteredPlans.sort((a, b) => {
+      switch (sortOrder) {
+        case "price-asc":
+          return getPriceForUsage(a) - getPriceForUsage(b);
+        case "price-desc":
+          return getPriceForUsage(b) - getPriceForUsage(a);
+        case "length-asc":
+          return (a.contract_length || 0) - (b.contract_length || 0);
+        case "length-desc":
+          return (b.contract_length || 0) - (a.contract_length || 0);
+        default:
+          return 0;
+      }
+    });
+  }
+
+  return filteredPlans;
 }

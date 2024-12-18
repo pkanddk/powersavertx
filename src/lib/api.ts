@@ -19,7 +19,8 @@ export const PlanSchema = z.object({
   base_charge: z.number().nullable(),
   contract_length: z.number().nullable(),
   jdp_rating: z.number().nullable(),
-  jdp_rating_year: z.string().nullable()
+  jdp_rating_year: z.string().nullable(),
+  prepaid: z.boolean().nullable()
 });
 
 export type Plan = z.infer<typeof PlanSchema>;
