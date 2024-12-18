@@ -85,14 +85,20 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
 
     const transformedPlans = plans.map(plan => {
       const isPrepaid = Boolean(plan.prepaid_plan || plan.is_prepaid || plan.prepaid || false);
-      console.log(`[Edge Function] Transforming plan "${plan.plan_name}":`, {
-        isPrepaid,
-        prepaid_fields: {
-          prepaid_plan: plan.prepaid_plan,
-          is_prepaid: plan.is_prepaid,
-          prepaid: plan.prepaid
+      
+      // Calculate renewable percentage based on plan details
+      let renewablePercentage = 0;
+      if (plan.plan_details) {
+        const details = plan.plan_details.toLowerCase();
+        if (details.includes('100% clean renewable energy') || details.includes('100% renewable')) {
+          renewablePercentage = 100;
+        } else if (details.includes('renewable')) {
+          // If renewable is mentioned but not 100%, default to 50%
+          renewablePercentage = 50;
         }
-      });
+      }
+
+      console.log(`[Edge Function] Plan "${plan.plan_name}" renewable percentage:`, renewablePercentage);
 
       return {
         company_id: String(plan.company_id || ""),
@@ -112,7 +118,8 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
         base_charge: plan.base_charge ? parseFloat(plan.base_charge) : null,
         contract_length: plan.term_value ? parseInt(plan.term_value) : null,
         prepaid: isPrepaid,
-        zip_code: String(plan.zip_code || "")
+        zip_code: String(plan.zip_code || ""),
+        renewable_percentage: renewablePercentage
       };
     });
 
@@ -215,4 +222,3 @@ serve(async (req) => {
     );
   }
 });
-

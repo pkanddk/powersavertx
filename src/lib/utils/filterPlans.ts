@@ -63,6 +63,27 @@ export function filterPlans(
     });
   }
 
+  // Filter by renewable percentage
+  if (renewableFilter && renewableFilter !== "all") {
+    filteredPlans = filteredPlans.filter(plan => {
+      const renewablePercentage = plan.renewable_percentage || 0;
+      switch (renewableFilter) {
+        case "0-25":
+          return renewablePercentage >= 0 && renewablePercentage <= 25;
+        case "25-50":
+          return renewablePercentage > 25 && renewablePercentage <= 50;
+        case "50-75":
+          return renewablePercentage > 50 && renewablePercentage <= 75;
+        case "75-99":
+          return renewablePercentage > 75 && renewablePercentage < 100;
+        case "100":
+          return renewablePercentage === 100;
+        default:
+          return true;
+      }
+    });
+  }
+
   // Filter by company
   if (companyFilter && companyFilter !== "all") {
     filteredPlans = filteredPlans.filter(plan => plan.company_id === companyFilter);
