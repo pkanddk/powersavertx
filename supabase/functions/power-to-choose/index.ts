@@ -25,12 +25,12 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
     }
 
     const responseText = await response.text();
-    console.log("[Edge Function] Raw response:", responseText);
+    console.log("[Edge Function] Raw response for ZIP:", responseText);
 
     let data;
     try {
       data = JSON.parse(responseText);
-      console.log("[Edge Function] Parsed response:", data);
+      console.log("[Edge Function] Parsed response data:", JSON.stringify(data, null, 2));
     } catch (parseError) {
       console.error("[Edge Function] JSON parse error:", parseError);
       throw new Error("Failed to parse API response as JSON");
@@ -55,7 +55,8 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
       throw new Error("Unexpected response structure from API");
     }
 
-    console.log(`[Edge Function] Found ${plans.length} plans`);
+    console.log(`[Edge Function] Found ${plans.length} plans for ZIP code`);
+    console.log("[Edge Function] First plan sample:", plans[0]);
 
     const transformedPlans = plans.map(plan => {
       console.log(`[Edge Function] Processing plan: ${plan.plan_name}`);
