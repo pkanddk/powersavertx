@@ -18,7 +18,7 @@ export function PlanBadges({
   return (
     <div className="flex flex-wrap gap-2">
       <Badge variant="secondary">{planType}</Badge>
-      <Badge variant="outline">
+      <Badge variant="outline" className="list-none">
         {contractLength} {contractLength === 1 ? 'month' : 'months'}
       </Badge>
       {minimumUsage && (
