@@ -56,7 +56,9 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
     }
 
     console.log(`[Edge Function] Found ${plans.length} plans for ZIP code`);
-    console.log("[Edge Function] First plan sample:", plans[0]);
+    if (plans.length > 0) {
+      console.log("[Edge Function] First plan sample:", plans[0]);
+    }
 
     const transformedPlans = plans.map(plan => {
       console.log(`[Edge Function] Processing plan: ${plan.plan_name}`);
