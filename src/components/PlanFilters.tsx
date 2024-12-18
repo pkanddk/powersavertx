@@ -11,7 +11,6 @@ interface PlanFiltersProps {
   onSortChange: (value: string) => void;
   onContractLengthChange: (value: string) => void;
   onPlanTypeChange: (value: string) => void;
-  onPrepaidChange: (value: string) => void;
   onTimeOfUseChange: (value: string) => void;
   onCompanyChange: (value: string) => void;
   onMinUsageChange: (value: string) => void;
@@ -19,7 +18,6 @@ interface PlanFiltersProps {
   currentSort: string;
   currentContractLength: string;
   currentPlanType: string;
-  currentPrepaid: string;
   currentTimeOfUse: string;
   currentCompany: string;
   currentMinUsage: string;
@@ -31,7 +29,6 @@ export function PlanFilters({
   onSortChange,
   onContractLengthChange,
   onPlanTypeChange,
-  onPrepaidChange,
   onTimeOfUseChange,
   onCompanyChange,
   onMinUsageChange,
@@ -39,7 +36,6 @@ export function PlanFilters({
   currentSort,
   currentContractLength,
   currentPlanType,
-  currentPrepaid,
   currentTimeOfUse,
   currentCompany,
   currentMinUsage,
@@ -112,20 +108,6 @@ export function PlanFilters({
                 {company.name}
               </SelectItem>
             ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium">Prepaid Plans</label>
-        <Select value={currentPrepaid || "all"} onValueChange={onPrepaidChange}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue defaultValue="all">Show All Plans</SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Show All Plans</SelectItem>
-            <SelectItem value="prepaid-only">Show Only Prepaid Plans</SelectItem>
-            <SelectItem value="no-prepaid">Do Not Show Prepaid Plans</SelectItem>
           </SelectContent>
         </Select>
       </div>

@@ -5,7 +5,6 @@ export function filterPlans(
   {
     planType,
     contractLength,
-    prepaidFilter,
     timeOfUseFilter,
     companyFilter,
     sortOrder,
@@ -15,7 +14,6 @@ export function filterPlans(
   }: {
     planType?: string;
     contractLength?: string;
-    prepaidFilter?: string;
     timeOfUseFilter?: string;
     companyFilter?: string;
     sortOrder?: string;
@@ -43,21 +41,6 @@ export function filterPlans(
           return true;
       }
     });
-  }
-
-  // Filter by prepaid status
-  if (prepaidFilter && prepaidFilter !== "all") {
-    console.log('Filtering by prepaid status:', prepaidFilter);
-    console.log('Plans before prepaid filter:', filteredPlans.length);
-    
-    filteredPlans = filteredPlans.filter(plan => {
-      const isPrepaid = plan.prepaid === true;
-      const shouldShow = prepaidFilter === "prepaid-only" ? isPrepaid : !isPrepaid;
-      console.log(`Plan ${plan.plan_name} - isPrepaid: ${isPrepaid}, shouldShow: ${shouldShow}`);
-      return shouldShow;
-    });
-    
-    console.log('Plans after prepaid filter:', filteredPlans.length);
   }
 
   // Filter by plan type
