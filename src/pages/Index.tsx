@@ -20,14 +20,27 @@ export default function Index() {
   const { data: plansData, isLoading } = useQuery({
     queryKey: ["plans", search?.zipCode, search?.estimatedUse],
     queryFn: async () => {
-      const { data: plans, error } = await supabase
-        .from('plans')
-        .select('*');
+      if (!search?.zipCode) {
+        const { data: plans, error } = await supabase
+          .from('plans')
+          .select('*');
 
-      if (error) throw error;
+        if (error) throw error;
+        return {
+          plans,
+          lastUpdated: plans?.[0]?.updated_at
+        };
+      }
+
+      // If we have a zip code, use the Power to Choose API endpoint
+      const response = await fetch(`/api/power-to-choose?zipCode=${search.zipCode}&estimatedUse=${search.estimatedUse}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch plans');
+      }
+      const plans = await response.json();
       return {
         plans,
-        lastUpdated: plans?.[0]?.updated_at
+        lastUpdated: new Date().toISOString()
       };
     },
     enabled: !!search,
