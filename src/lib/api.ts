@@ -17,7 +17,9 @@ export const PlanSchema = z.object({
   price_kwh1000: z.number(),
   price_kwh2000: z.number(),
   base_charge: z.number().nullable(),
-  contract_length: z.number().nullable()
+  contract_length: z.number().nullable(),
+  jdp_rating: z.number().nullable(),
+  jdp_rating_year: z.string().nullable()
 });
 
 export type Plan = z.infer<typeof PlanSchema>;
