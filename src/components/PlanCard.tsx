@@ -41,6 +41,7 @@ export function PlanCard({ plan, onCompare, isCompared, estimatedUse }: PlanCard
             contractLength={plan.contract_length}
             minimumUsage={plan.minimum_usage}
             newCustomer={plan.new_customer}
+            renewablePercentage={plan.renewable_percentage}
           />
           
           {plan.plan_details && (
