@@ -4,9 +4,11 @@ import { useSearchParams } from "react-router-dom";
 import { SearchForm } from "@/components/SearchForm";
 import { PlanGrid } from "@/components/PlanGrid";
 import { PlanComparisonTable } from "@/components/PlanComparisonTable";
-import { searchPlans, type Plan } from "@/lib/api";
+import { type Plan } from "@/lib/api";
 import { useToast } from "@/components/ui/use-toast";
 import { filterPlans } from "@/lib/utils/filterPlans";
+import { supabase } from "@/integrations/supabase/client";
+import { format } from "date-fns";
 
 export default function Index() {
   const [searchParams] = useSearchParams();
@@ -15,9 +17,19 @@ export default function Index() {
   const { toast } = useToast();
   const estimatedUse = searchParams.get("estimatedUse") || "any";
 
-  const { data: plans, isLoading } = useQuery({
+  const { data: plansData, isLoading } = useQuery({
     queryKey: ["plans", search?.zipCode, search?.estimatedUse],
-    queryFn: () => searchPlans(search!.zipCode, search!.estimatedUse),
+    queryFn: async () => {
+      const { data: plans, error } = await supabase
+        .from('energy_plans')
+        .select('*');
+
+      if (error) throw error;
+      return {
+        plans,
+        lastUpdated: plans?.[0]?.last_updated
+      };
+    },
     enabled: !!search,
     meta: {
       onError: () => {
@@ -48,7 +60,7 @@ export default function Index() {
     }
   };
 
-  const filteredPlans = plans ? filterPlans(plans, {
+  const filteredPlans = plansData?.plans ? filterPlans(plansData.plans, {
     estimatedUse: search?.estimatedUse,
   }) : [];
 
@@ -60,6 +72,11 @@ export default function Index() {
           <p className="text-xl text-muted-foreground">
             Compare energy plans and prices in your area
           </p>
+          {plansData?.lastUpdated && (
+            <p className="text-sm text-muted-foreground mt-2">
+              Last updated: {format(new Date(plansData.lastUpdated), 'PPpp')}
+            </p>
+          )}
         </div>
 
         <div className="mb-12">
@@ -79,7 +96,7 @@ export default function Index() {
           </div>
         )}
 
-        {plans && (
+        {plansData?.plans && (
           <PlanGrid 
             plans={filteredPlans}
             onCompare={handleCompare}
