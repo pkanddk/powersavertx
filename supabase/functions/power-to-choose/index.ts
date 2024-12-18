@@ -105,6 +105,7 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
         price_kwh2000,
         base_charge: plan.base_charge ? parseFloat(plan.base_charge) : null,
         contract_length: plan.term_value ? parseInt(plan.term_value) : null,
+        prepaid: Boolean(plan.prepaid_plan || plan.is_prepaid || plan.prepaid || false),
         zip_code: String(plan.zip_code || "")
       };
     });
