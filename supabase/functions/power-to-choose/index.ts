@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -108,7 +109,6 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
       };
     });
 
-    console.log(`[Edge Function] Successfully transformed ${transformedPlans.length} plans`);
     return transformedPlans;
 
   } catch (error) {
@@ -118,6 +118,12 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
 }
 
 serve(async (req) => {
+  // Initialize Supabase client
+  const supabaseClient = createClient(
+    Deno.env.get('SUPABASE_URL') ?? '',
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+  );
+
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -157,6 +163,29 @@ serve(async (req) => {
         }
       );
     }
+
+    // Delete existing plans for this ZIP code
+    const { error: deleteError } = await supabaseClient
+      .from('plans')
+      .delete()
+      .eq('zip_code', zipCode);
+
+    if (deleteError) {
+      console.error("[Edge Function] Error deleting existing plans:", deleteError);
+      throw new Error("Failed to update plans in database");
+    }
+
+    // Insert new plans
+    const { error: insertError } = await supabaseClient
+      .from('plans')
+      .insert(plans);
+
+    if (insertError) {
+      console.error("[Edge Function] Error inserting plans:", insertError);
+      throw new Error("Failed to store plans in database");
+    }
+
+    console.log(`[Edge Function] Successfully stored ${plans.length} plans in database`);
 
     return new Response(JSON.stringify(plans), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
