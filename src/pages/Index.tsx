@@ -9,9 +9,9 @@ import { type Plan } from "@/lib/api";
 import { useToast } from "@/components/ui/use-toast";
 import { filterPlans } from "@/lib/utils/filterPlans";
 import { supabase } from "@/integrations/supabase/client";
-import { format } from "date-fns";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+import { PageHeader } from "@/components/PageHeader";
+import { ErrorDisplay } from "@/components/ErrorDisplay";
+import { LoadingState, EmptyState } from "@/components/LoadingAndEmptyStates";
 
 export default function Index() {
   const [searchParams] = useSearchParams();
@@ -20,7 +20,6 @@ export default function Index() {
   const [currentSort, setCurrentSort] = useState("price-asc");
   const [currentContractLength, setCurrentContractLength] = useState("all");
   const [currentPlanType, setCurrentPlanType] = useState("all");
-  const [currentPrepaid, setCurrentPrepaid] = useState("all");
   const [currentTimeOfUse, setCurrentTimeOfUse] = useState("all");
   const [currentCompany, setCurrentCompany] = useState("all");
   const [currentMinUsage, setCurrentMinUsage] = useState("all");
@@ -47,7 +46,6 @@ export default function Index() {
         throw error;
       }
 
-      // If no plans found in database, try fetching from API
       if (!plans || plans.length === 0) {
         console.log('[Index] No plans found in database, fetching from API');
         const { data: responseData, error: functionError } = await supabase.functions.invoke('power-to-choose', {
@@ -125,17 +123,7 @@ export default function Index() {
   return (
     <div className="min-h-screen bg-background">
       <main className="container mx-auto px-4 py-8 md:py-12">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">Find the Best Energy Plan</h1>
-          <p className="text-xl text-muted-foreground">
-            Compare energy plans and prices in your area
-          </p>
-          {plansData?.lastUpdated && (
-            <p className="text-sm text-muted-foreground mt-2">
-              Last updated: {format(new Date(plansData.lastUpdated), 'PPpp')}
-            </p>
-          )}
-        </div>
+        <PageHeader lastUpdated={plansData?.lastUpdated} />
 
         <div className="mb-12">
           <SearchForm onSearch={handleSearch} isLoading={isLoading} />
@@ -147,7 +135,6 @@ export default function Index() {
               onSortChange={setCurrentSort}
               onContractLengthChange={setCurrentContractLength}
               onPlanTypeChange={setCurrentPlanType}
-              onPrepaidChange={setCurrentPrepaid}
               onTimeOfUseChange={setCurrentTimeOfUse}
               onCompanyChange={setCurrentCompany}
               onMinUsageChange={setCurrentMinUsage}
@@ -155,7 +142,6 @@ export default function Index() {
               currentSort={currentSort}
               currentContractLength={currentContractLength}
               currentPlanType={currentPlanType}
-              currentPrepaid={currentPrepaid}
               currentTimeOfUse={currentTimeOfUse}
               currentCompany={currentCompany}
               currentMinUsage={currentMinUsage}
@@ -172,29 +158,10 @@ export default function Index() {
           </div>
         )}
 
-        {isLoading && (
-          <div className="text-center py-12">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-primary border-r-transparent" />
-          </div>
-        )}
-
-        {error && (
-          <Alert variant="destructive" className="mb-6">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              {error instanceof Error ? error.message : "Failed to fetch energy plans. Please try again."}
-            </AlertDescription>
-          </Alert>
-        )}
-
+        {isLoading && <LoadingState />}
+        {error && <ErrorDisplay error={error} />}
         {!isLoading && !error && filteredPlans.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-lg text-muted-foreground">
-              {search?.zipCode 
-                ? "No plans found for this ZIP code. Please try another ZIP code."
-                : "Enter your ZIP code to find available plans in your area."}
-            </p>
-          </div>
+          <EmptyState hasSearch={!!search?.zipCode} />
         )}
 
         {filteredPlans.length > 0 && (
