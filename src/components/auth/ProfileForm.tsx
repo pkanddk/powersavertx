@@ -175,8 +175,6 @@ export function ProfileForm() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <BasicProfileSection form={form} />
-              <RenewablePreferenceSection form={form} />
-              <Separator className="my-6" />
               <UniversalAlertSection form={form} />
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? "Updating..." : "Save Changes"}
@@ -187,6 +185,8 @@ export function ProfileForm() {
 
         <TabsContent value="alerts" className="space-y-4">
           <div className="space-y-4">
+            <RenewablePreferenceSection form={form} />
+            <Separator className="my-6" />
             <h3 className="text-lg font-medium">Active Price Alerts</h3>
             <ActiveAlertsSection 
               alerts={priceAlerts} 

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Trash2, Eye, GitCompare } from "lucide-react";
+import { Eye, GitCompare, Trash2 } from "lucide-react";
 import { formatPrice } from "@/lib/utils/formatPrice";
 import { PriceAlert } from "./types";
 import { useQuery } from "@tanstack/react-query";
@@ -60,7 +60,6 @@ export function ActiveAlertsSection({
   });
 
   const handleViewPlan = (planId: string) => {
-    // Navigate to the plan details or trigger a modal
     navigate(`/?plan=${planId}`);
   };
 
