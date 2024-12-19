@@ -21,26 +21,40 @@ export function PlanBadges({
 }: PlanBadgesProps) {
   return (
     <div className="flex flex-wrap gap-2">
-      <Badge variant="secondary" className="list-none before:content-none">
-        {planType}
-      </Badge>
-      <Badge variant="outline" className="bg-white list-none before:content-none">
-        {contractLength} {contractLength === 1 ? 'month' : 'months'}
-      </Badge>
+      <div>
+        <Badge variant="secondary">
+          {planType}
+        </Badge>
+      </div>
+      <div>
+        <Badge variant="outline" className="bg-white">
+          {contractLength} {contractLength === 1 ? 'month' : 'months'}
+        </Badge>
+      </div>
       {minimumUsage && (
-        <Badge variant="secondary">Min. Usage Required</Badge>
+        <div>
+          <Badge variant="secondary">Min. Usage Required</Badge>
+        </div>
       )}
       {newCustomer && (
-        <Badge variant="secondary">New Customers Only</Badge>
+        <div>
+          <Badge variant="secondary">New Customers Only</Badge>
+        </div>
       )}
       {prepaid && (
-        <Badge variant="secondary">Prepaid Plan</Badge>
+        <div>
+          <Badge variant="secondary">Prepaid Plan</Badge>
+        </div>
       )}
       {timeOfUse && (
-        <Badge variant="secondary">Time of Use</Badge>
+        <div>
+          <Badge variant="secondary">Time of Use</Badge>
+        </div>
       )}
       {renewablePercentage !== undefined && renewablePercentage > 0 && (
-        <Badge variant="secondary">{renewablePercentage}% Renewable</Badge>
+        <div>
+          <Badge variant="secondary">{renewablePercentage}% Renewable</Badge>
+        </div>
       )}
     </div>
   );
