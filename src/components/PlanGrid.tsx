@@ -11,17 +11,35 @@ interface PlanGridProps {
 }
 
 export function PlanGrid({ plans, onCompare, comparedPlans, estimatedUse }: PlanGridProps) {
+  console.log('PlanGrid - Received plans:', plans);
+  console.log('PlanGrid - Estimated Use:', estimatedUse);
+
   const getPriceForUsage = (plan: Plan) => {
+    let price;
     switch (estimatedUse) {
       case "500":
-        return plan.price_kwh500;
+        price = plan.price_kwh500;
+        break;
       case "1000":
-        return plan.price_kwh1000;
+        price = plan.price_kwh1000;
+        break;
       case "2000":
-        return plan.price_kwh2000;
+        price = plan.price_kwh2000;
+        break;
       default:
-        return plan.price_kwh;
+        price = plan.price_kwh;
     }
+    console.log(`Price for plan ${plan.plan_name}:`, {
+      estimatedUse,
+      price,
+      raw: {
+        price_kwh: plan.price_kwh,
+        price_kwh500: plan.price_kwh500,
+        price_kwh1000: plan.price_kwh1000,
+        price_kwh2000: plan.price_kwh2000
+      }
+    });
+    return price;
   };
 
   // Sanitize plan type name to remove unwanted numbers
