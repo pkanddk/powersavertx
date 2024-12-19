@@ -35,7 +35,8 @@ Deno.serve(async (req) => {
         ),
         energy_plans:plan_id (
           company_id,
-          plan_name
+          plan_name,
+          company_name
         )
       `)
       .eq('active', true)
@@ -86,11 +87,82 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         from: 'Power Saver TX <alerts@powersavertx.com>',
         to: [user.email],
-        subject: 'Test Price Alert',
+        subject: 'Test Price Alert 💡',
         html: `
-          <h2>This is a test price alert</h2>
-          <p>Your price alert for ${alerts.energy_plans.plan_name} is working.</p>
-          <p>You will be notified when the price drops below ${alerts.price_threshold}¢/kWh for ${alerts.kwh_usage}kWh usage.</p>
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <style>
+                body { 
+                  font-family: Arial, sans-serif;
+                  line-height: 1.6;
+                  color: #333;
+                  max-width: 600px;
+                  margin: 0 auto;
+                  padding: 20px;
+                }
+                .header {
+                  background-color: #D6BCFA;
+                  padding: 20px;
+                  border-radius: 8px;
+                  margin-bottom: 20px;
+                  text-align: center;
+                }
+                .plan-card {
+                  border: 1px solid #e2e8f0;
+                  border-radius: 8px;
+                  padding: 16px;
+                  margin-bottom: 16px;
+                  background-color: #fff;
+                }
+                .company-name {
+                  font-size: 18px;
+                  font-weight: bold;
+                  color: #2d3748;
+                }
+                .plan-name {
+                  color: #4a5568;
+                  margin: 8px 0;
+                }
+                .price {
+                  font-size: 16px;
+                  color: #2d3748;
+                  margin: 8px 0;
+                }
+                .info {
+                  background-color: #f7fafc;
+                  border: 1px solid #e2e8f0;
+                  border-radius: 8px;
+                  padding: 16px;
+                  margin-top: 20px;
+                }
+              </style>
+            </head>
+            <body>
+              <div class="header">
+                <h2>🎯 Test Price Alert</h2>
+                <p>Your price alerts are working!</p>
+              </div>
+              
+              <div class="plan-card">
+                <div class="company-name">${alerts.energy_plans.company_name}</div>
+                <div class="plan-name">${alerts.energy_plans.plan_name}</div>
+                <div class="price">
+                  Alert set for: ${alerts.price_threshold}¢/kWh
+                  <br>
+                  Usage level: ${alerts.kwh_usage} kWh
+                </div>
+              </div>
+              
+              <div class="info">
+                <p>✅ Your price alerts are properly configured</p>
+                <p>You will receive notifications when prices match your criteria.</p>
+                <p style="color: #666; font-size: 14px;">
+                  Price alerts automatically expire after 30 days. You can manage your alerts in your profile settings.
+                </p>
+              </div>
+            </body>
+          </html>
         `,
       }),
     });
