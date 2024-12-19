@@ -14,7 +14,6 @@ interface PlanGridProps {
 export function PlanGrid({ plans, onCompare, comparedPlans, estimatedUse }: PlanGridProps) {
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  // Adjust plans per page to be divisible by 3 (our grid columns)
   const plansPerPage = 24;
 
   const indexOfLastPlan = currentPage * plansPerPage;
@@ -38,7 +37,7 @@ export function PlanGrid({ plans, onCompare, comparedPlans, estimatedUse }: Plan
       </div>
 
       {totalPages > 1 && (
-        <div className="flex justify-center gap-2 mt-6">
+        <div className="flex justify-center items-center gap-8 mt-6">
           <Button
             variant="outline"
             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
@@ -46,7 +45,7 @@ export function PlanGrid({ plans, onCompare, comparedPlans, estimatedUse }: Plan
           >
             Previous
           </Button>
-          <span className="py-2 px-4">
+          <span className="text-sm">
             Page {currentPage} of {totalPages}
           </span>
           <Button
@@ -59,7 +58,6 @@ export function PlanGrid({ plans, onCompare, comparedPlans, estimatedUse }: Plan
         </div>
       )}
 
-      {/* Plan Details Drawer */}
       {selectedPlan && (
         <PlanDetails
           plan={selectedPlan}
