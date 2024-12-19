@@ -52,9 +52,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
       />
       <Select 
         value={estimatedUse} 
-        onValueChange={(value) => {
-          setEstimatedUse(value);
-        }}
+        onValueChange={setEstimatedUse}
       >
         <SelectTrigger className="md:w-64">
           <SelectValue placeholder="Estimated Usage" />
