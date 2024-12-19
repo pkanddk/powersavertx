@@ -28,9 +28,17 @@ export function PlanFeatures({ plan }: PlanFeaturesProps) {
         </div>
       )}
 
-      {plan.cancellation_fee && (
+      {plan.renewable_percentage > 0 && (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span>Cancellation Fee: ${plan.cancellation_fee}</span>
+          <Check className="h-4 w-4 text-primary" />
+          <span>{plan.renewable_percentage}% Renewable</span>
+        </div>
+      )}
+
+      {plan.prepaid && (
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Check className="h-4 w-4 text-primary" />
+          <span>Prepaid Plan</span>
         </div>
       )}
     </div>
