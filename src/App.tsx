@@ -5,6 +5,7 @@ import Alerts from "./pages/Alerts";
 import { useState } from "react";
 import { Plan } from "./lib/api";
 import { Toaster } from "./components/ui/toaster";
+import { AuthSidebar } from "./components/auth/AuthSidebar";
 
 function App() {
   const [comparedPlans, setComparedPlans] = useState<Plan[]>([]);
@@ -31,6 +32,7 @@ function App() {
 
   return (
     <Router>
+      <AuthSidebar />
       <Routes>
         <Route
           path="/"
