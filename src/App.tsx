@@ -32,6 +32,7 @@ function App() {
               <Index 
                 comparedPlans={comparedPlans} 
                 onCompare={handleCompare} 
+                estimatedUse="1000"
               />
             } 
           />

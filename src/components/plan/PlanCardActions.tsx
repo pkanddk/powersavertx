@@ -15,6 +15,13 @@ export function PlanCardActions({
   isCompared, 
   onShowDetails 
 }: PlanCardActionsProps) {
+  const handleCompare = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('Compare button clicked for plan:', plan.plan_name);
+    onCompare(plan);
+  };
+
   return (
     <div className="space-y-3">
       <div className="grid grid-cols-2 gap-3">
@@ -45,7 +52,7 @@ export function PlanCardActions({
         )}
         <Button
           variant={isCompared ? "destructive" : "outline"}
-          onClick={() => onCompare(plan)}
+          onClick={handleCompare}
           className={`w-full transition-all duration-200 ${
             isCompared 
               ? "bg-destructive hover:bg-destructive/90 text-destructive-foreground" 

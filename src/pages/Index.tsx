@@ -9,10 +9,15 @@ import { filterPlans } from "@/lib/utils/filterPlans";
 import { PlanFilters } from "@/components/PlanFilters";
 import { ComparisonBar } from "@/components/plan/ComparisonBar";
 
-export default function Index() {
+interface IndexProps {
+  comparedPlans: Plan[];
+  onCompare: (plan: Plan) => void;
+  estimatedUse: string;
+}
+
+export default function Index({ comparedPlans, onCompare, estimatedUse }: IndexProps) {
   const [searchParams] = useSearchParams();
   const [search, setSearch] = useState<{ zipCode: string; estimatedUse: string } | null>(null);
-  const [comparedPlans, setComparedPlans] = useState<Plan[]>([]);
   const [sortOrder, setSortOrder] = useState("price-asc");
   const [contractLength, setContractLength] = useState("all");
   const [planType, setPlanType] = useState("all");
@@ -22,7 +27,6 @@ export default function Index() {
   const [renewableFilter, setRenewableFilter] = useState("all");
   const [cancellationFeeRange, setCancellationFeeRange] = useState<[number, number]>([0, 1000]);
   const { toast } = useToast();
-  const estimatedUse = searchParams.get("estimatedUse") || "1000";
 
   const { data: plans, isLoading } = useQuery({
     queryKey: ["plans", search?.zipCode, search?.estimatedUse],
@@ -41,25 +45,6 @@ export default function Index() {
 
   const handleSearch = (zipCode: string, estimatedUse: string) => {
     setSearch({ zipCode, estimatedUse });
-    setComparedPlans([]);
-  };
-
-  const handleCompare = (plan: Plan) => {
-    setComparedPlans(prevPlans => {
-      const isPlanCompared = prevPlans.some(p => p.company_id === plan.company_id);
-      
-      if (isPlanCompared) {
-        return prevPlans.filter(p => p.company_id !== plan.company_id);
-      } else if (prevPlans.length < 3) {
-        return [...prevPlans, plan];
-      } else {
-        toast({
-          title: "Compare Limit Reached",
-          description: "You can compare up to 3 plans at a time. Remove a plan to add another.",
-        });
-        return prevPlans;
-      }
-    });
   };
 
   const filteredPlans = plans ? filterPlans(plans, {
@@ -119,7 +104,7 @@ export default function Index() {
             ) : (
               <PlanGrid
                 plans={filteredPlans}
-                onCompare={handleCompare}
+                onCompare={onCompare}
                 comparedPlans={comparedPlans}
                 estimatedUse={estimatedUse}
               />
@@ -129,7 +114,7 @@ export default function Index() {
 
         <ComparisonBar
           plans={comparedPlans}
-          onRemove={handleCompare}
+          onRemove={onCompare}
         />
       </main>
     </div>
