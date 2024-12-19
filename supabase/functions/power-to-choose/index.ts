@@ -10,65 +10,67 @@ const corsHeaders = {
 
 async function makeRequest(url: string, method: string, headers: Record<string, string>) {
   try {
-    logger.info("Making request to", url);
+    logger.info("🌐 Making request to URL:", url);
     
     const response = await fetch(url, {
       method,
       headers,
     });
 
+    logger.info("📡 API Response Status:", response.status);
+
     if (!response.ok) {
       const errorText = await response.text();
-      logger.error("Error Response", errorText);
+      logger.error("❌ API Error Response:", errorText);
       throw new Error(`HTTP Error ${response.status}: ${errorText}`);
     }
 
     const responseText = await response.text();
-    logger.info("Raw API Response Text:", responseText);
+    logger.info("📝 Raw API Response Text:", responseText);
     
     let data;
     try {
       data = JSON.parse(responseText);
-      logger.info("Parsed API Response:", data);
+      logger.info("🔄 Parsed API Response:", data);
     } catch (parseError) {
-      logger.error("JSON parse error", parseError);
+      logger.error("❌ JSON parse error:", parseError);
       throw new Error("Failed to parse API response as JSON");
     }
 
     if (!data) {
-      logger.error("No data in API response");
+      logger.error("❌ No data in API response");
       return [];
     }
 
     if (Array.isArray(data) && data.length === 0) {
-      logger.info("API returned empty array");
+      logger.info("ℹ️ API returned empty array");
       return [];
     }
 
     let plans = [];
     if (Array.isArray(data)) {
       plans = data;
-      logger.info(`Found ${plans.length} plans in array format`);
+      logger.info(`📊 Found ${plans.length} plans in array format`);
     } else if (data.data && Array.isArray(data.data)) {
       plans = data.data;
-      logger.info(`Found ${plans.length} plans in data.data format`);
+      logger.info(`📊 Found ${plans.length} plans in data.data format`);
     } else if (data.Results && Array.isArray(data.Results)) {
       plans = data.Results;
-      logger.info(`Found ${plans.length} plans in Results format`);
+      logger.info(`📊 Found ${plans.length} plans in Results format`);
     } else {
-      logger.error("Unexpected response structure", data);
+      logger.error("❌ Unexpected response structure:", data);
       throw new Error("Unexpected response structure from API");
     }
 
-    logger.info(`Processing ${plans.length} plans`);
+    logger.info(`🔍 Processing ${plans.length} plans`);
     plans.forEach((plan, index) => {
-      logger.info(`Plan ${index + 1}:`, plan);
+      logger.info(`📋 Plan ${index + 1}:`, plan);
     });
 
     return plans.map(transformPlan);
 
   } catch (error) {
-    logger.error("Request failed", error);
+    logger.error("❌ Request failed:", error);
     throw error;
   }
 }
@@ -85,7 +87,7 @@ serve(async (req) => {
 
   try {
     const { zipCode, estimatedUse } = await req.json();
-    logger.info("Starting search", { zipCode, estimatedUse });
+    logger.info("🔍 Starting search for:", { zipCode, estimatedUse });
 
     if (!zipCode) {
       throw new Error("ZIP code is required");
@@ -106,7 +108,7 @@ serve(async (req) => {
     });
     
     if (!plans || plans.length === 0) {
-      logger.info("No plans found for ZIP code", zipCode);
+      logger.info("⚠️ No plans found for ZIP code:", zipCode);
       return new Response(
         JSON.stringify({ error: "No plans found for this ZIP code" }),
         {
@@ -116,7 +118,7 @@ serve(async (req) => {
       );
     }
 
-    logger.info(`Found ${plans.length} plans for ZIP code ${zipCode}`);
+    logger.success(`✅ Found ${plans.length} plans for ZIP code ${zipCode}`);
 
     // Delete existing plans for this ZIP code
     const { error: deleteError } = await supabaseClient
@@ -125,7 +127,7 @@ serve(async (req) => {
       .eq('zip_code', zipCode);
 
     if (deleteError) {
-      logger.error("Error deleting existing plans", deleteError);
+      logger.error("❌ Error deleting existing plans:", deleteError);
       throw new Error("Failed to update plans in database");
     }
 
@@ -135,11 +137,11 @@ serve(async (req) => {
       .insert(plans);
 
     if (insertError) {
-      logger.error("Error inserting plans", insertError);
+      logger.error("❌ Error inserting plans:", insertError);
       throw new Error("Failed to store plans in database");
     }
 
-    logger.success(`Successfully stored ${plans.length} plans in database`);
+    logger.success(`✅ Successfully stored ${plans.length} plans in database`);
 
     return new Response(JSON.stringify(plans), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -147,7 +149,7 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    logger.error("Error in request handler", error);
+    logger.error("❌ Error in request handler:", error);
     
     return new Response(
       JSON.stringify({
