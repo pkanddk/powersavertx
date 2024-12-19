@@ -1,31 +1,33 @@
-import { Button } from "@/components/ui/button";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ChevronDown } from "lucide-react";
-import { useState } from "react";
-
 interface PlanDetailsProps {
   details: string;
+  timeofuse?: boolean;
+  pricingDetails?: string | null;
+  tduProvider?: string | null;
 }
 
-export function PlanDetails({ details }: PlanDetailsProps) {
-  const [isOpen, setIsOpen] = useState(false);
-
+export function PlanDetails({ details, timeofuse, pricingDetails, tduProvider }: PlanDetailsProps) {
   return (
-    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-      <CollapsibleTrigger asChild>
-        <Button 
-          variant="ghost" 
-          className="w-full flex items-center justify-center gap-2 hover:bg-secondary/50"
-        >
-          Plan Details
-          <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
-        </Button>
-      </CollapsibleTrigger>
-      <CollapsibleContent className="text-sm text-muted-foreground mt-2 space-y-2 animate-accordion-down">
-        <div className="bg-secondary/20 p-4 rounded-md">
-          {details}
+    <div className="space-y-2 text-sm">
+      {timeofuse && (
+        <div className="font-medium text-blue-600">
+          Time of Use Plan
         </div>
-      </CollapsibleContent>
-    </Collapsible>
+      )}
+      {details && (
+        <p className="text-muted-foreground">
+          {details}
+        </p>
+      )}
+      {pricingDetails && (
+        <p className="text-muted-foreground">
+          {pricingDetails}
+        </p>
+      )}
+      {tduProvider && (
+        <p className="text-xs text-muted-foreground">
+          TDU Provider: {tduProvider}
+        </p>
+      )}
+    </div>
   );
 }

@@ -1,43 +1,60 @@
-import { CustomBadge } from "@/components/ui/custom-badge";
+import { Badge } from "@/components/ui/badge";
+import { Clock, Leaf, Star, Users } from "lucide-react";
 
 interface PlanBadgesProps {
   planType: string;
-  contractLength: number;
-  minimumUsage?: boolean;
-  newCustomer?: boolean;
-  renewablePercentage?: number;
+  contractLength: number | null;
+  minimumUsage: boolean | null;
+  newCustomer: boolean | null;
+  renewablePercentage: number | null;
+  timeofuse: boolean | null;
 }
 
 export function PlanBadges({ 
-  planType, 
-  contractLength, 
-  minimumUsage, 
+  planType,
+  contractLength,
+  minimumUsage,
   newCustomer,
-  renewablePercentage 
+  renewablePercentage,
+  timeofuse
 }: PlanBadgesProps) {
-  // Only show plan type badge if it's a non-empty string and not just a number
-  const shouldShowPlanType = planType && isNaN(Number(planType)) && planType.trim() !== '';
-  
   return (
     <div className="flex flex-wrap gap-2">
-      {shouldShowPlanType && (
-        <CustomBadge variant="secondary">{planType}</CustomBadge>
-      )}
+      <Badge variant="secondary">
+        {planType}
+      </Badge>
+      
       {contractLength && (
-        <CustomBadge variant="outline">
+        <Badge variant="outline">
           {contractLength} {contractLength === 1 ? 'month' : 'months'}
-        </CustomBadge>
+        </Badge>
       )}
+
+      {timeofuse && (
+        <Badge variant="secondary" className="flex items-center gap-1">
+          <Clock size={14} />
+          Time of Use
+        </Badge>
+      )}
+      
       {minimumUsage && (
-        <CustomBadge variant="secondary">Min. Usage Required</CustomBadge>
+        <Badge variant="destructive">
+          Minimum Usage
+        </Badge>
       )}
+      
       {newCustomer && (
-        <CustomBadge variant="secondary">New Customers Only</CustomBadge>
+        <Badge variant="secondary" className="flex items-center gap-1">
+          <Users size={14} />
+          New Customers
+        </Badge>
       )}
-      {typeof renewablePercentage === 'number' && (
-        <CustomBadge variant="outline" className="bg-green-50">
+      
+      {renewablePercentage && renewablePercentage > 0 && (
+        <Badge variant="secondary" className="flex items-center gap-1">
+          <Leaf size={14} />
           {renewablePercentage}% Renewable
-        </CustomBadge>
+        </Badge>
       )}
     </div>
   );
