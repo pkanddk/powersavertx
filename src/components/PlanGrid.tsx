@@ -37,7 +37,7 @@ export function PlanGrid({ plans, onCompare, comparedPlans, estimatedUse }: Plan
       </div>
 
       {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-8 mt-6">
+        <div className="flex justify-center items-center space-x-12 mt-6">
           <Button
             variant="outline"
             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
@@ -45,7 +45,7 @@ export function PlanGrid({ plans, onCompare, comparedPlans, estimatedUse }: Plan
           >
             Previous
           </Button>
-          <span className="text-sm">
+          <span className="text-sm font-medium">
             Page {currentPage} of {totalPages}
           </span>
           <Button
