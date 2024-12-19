@@ -59,18 +59,17 @@ export default function Index({ comparedPlans, onCompare, search, onSearch, esti
     <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white">
       <main className="container mx-auto px-4 py-8 md:py-12">
         <div className="text-center mb-12">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <Zap className="h-12 w-12 text-primary" />
-            <h1 className="text-4xl font-bold tracking-tight text-gray-900">
-              Power Saver TX
-            </h1>
-          </div>
+          <h1 className="text-4xl font-bold tracking-tight text-gray-900 mb-4">
+            Power <span className="relative">
+              <Zap className="absolute -left-1 top-1/2 -translate-y-1/2 h-7 w-7 text-primary" />
+              aver
+            </span> TX
+          </h1>
           <h2 className="text-3xl font-bold tracking-tight text-gray-900 mb-4">
             Find the Best Energy Plan in Texas
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Compare electricity rates from trusted providers and save up to 30% on your energy bills. 
-            Join thousands of Texans who've found better rates with Power Saver TX.
+            Compare energy plans and save money with Power Saver TX
           </p>
         </div>
 
@@ -122,7 +121,6 @@ export default function Index({ comparedPlans, onCompare, search, onSearch, esti
 
         <footer className="text-center text-sm text-muted-foreground mt-12">
           <p>© {new Date().getFullYear()} Power Saver TX. All rights reserved.</p>
-          <p className="mt-1">Helping Texans find the best electricity rates since 2024.</p>
         </footer>
       </main>
     </div>
