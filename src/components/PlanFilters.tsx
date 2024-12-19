@@ -68,6 +68,7 @@ export function PlanFilters({
             <SelectValue defaultValue="all">Show All</SelectValue>
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="all">All Lengths</SelectItem>
             <SelectItem value="length-asc">Length: Short to Long</SelectItem>
             <SelectItem value="length-desc">Length: Long to Short</SelectItem>
             <SelectItem value="0-6">0-6 Months</SelectItem>
@@ -87,6 +88,7 @@ export function PlanFilters({
             <SelectItem value="all">All Plan Types</SelectItem>
             <SelectItem value="fixed">Fixed Rate Only</SelectItem>
             <SelectItem value="variable">Variable Rate Only</SelectItem>
+            <SelectItem value="indexed">Indexed Rate Only</SelectItem>
           </SelectContent>
         </Select>
       </div>

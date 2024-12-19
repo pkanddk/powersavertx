@@ -5,9 +5,20 @@ interface PlanBadgesProps {
   contractLength: number;
   minimumUsage?: boolean;
   newCustomer?: boolean;
+  prepaid?: boolean;
+  timeOfUse?: boolean;
+  renewablePercentage?: number;
 }
 
-export function PlanBadges({ planType, contractLength, minimumUsage, newCustomer }: PlanBadgesProps) {
+export function PlanBadges({ 
+  planType, 
+  contractLength, 
+  minimumUsage, 
+  newCustomer,
+  prepaid,
+  timeOfUse,
+  renewablePercentage
+}: PlanBadgesProps) {
   return (
     <div className="flex flex-wrap gap-2">
       <Badge variant="secondary">{planType}</Badge>
@@ -19,6 +30,15 @@ export function PlanBadges({ planType, contractLength, minimumUsage, newCustomer
       )}
       {newCustomer && (
         <Badge variant="secondary">New Customers Only</Badge>
+      )}
+      {prepaid && (
+        <Badge variant="secondary">Prepaid Plan</Badge>
+      )}
+      {timeOfUse && (
+        <Badge variant="secondary">Time of Use</Badge>
+      )}
+      {renewablePercentage !== undefined && renewablePercentage > 0 && (
+        <Badge variant="secondary">{renewablePercentage}% Renewable</Badge>
       )}
     </div>
   );

@@ -15,9 +15,6 @@ interface PlanCardProps {
 }
 
 export function PlanCard({ plan, onCompare, isCompared, estimatedUse }: PlanCardProps) {
-  console.log("Plan Data:", plan);
-  console.log("Estimated Use:", estimatedUse);
-
   return (
     <Card className="flex flex-col h-full hover:shadow-lg transition-shadow animate-fade-in">
       <PlanHeader companyLogo={plan.company_logo} companyName={plan.company_name} />
@@ -25,6 +22,7 @@ export function PlanCard({ plan, onCompare, isCompared, estimatedUse }: PlanCard
         <PlanTitle 
           planName={plan.plan_name}
           companyName={plan.company_name}
+          companyTduName={plan.company_tdu_name}
         />
         
         <div className="space-y-4">
@@ -34,17 +32,24 @@ export function PlanCard({ plan, onCompare, isCompared, estimatedUse }: PlanCard
             priceKwh2000={plan.price_kwh2000}
             baseCharge={plan.base_charge}
             estimatedUse={estimatedUse}
+            pricingDetails={plan.pricing_details}
           />
           
           <PlanBadges 
             planType={plan.plan_type_name}
-            contractLength={plan.contract_length}
+            contractLength={plan.contract_length || 0}
             minimumUsage={plan.minimum_usage}
             newCustomer={plan.new_customer}
+            prepaid={plan.prepaid}
+            timeOfUse={plan.timeofuse}
+            renewablePercentage={plan.renewable_percentage}
           />
           
-          {plan.plan_details && (
-            <PlanDetails details={plan.plan_details} />
+          {(plan.plan_details || plan.promotions) && (
+            <PlanDetails 
+              details={plan.plan_details || ''} 
+              promotions={plan.promotions}
+            />
           )}
         </div>
       </CardContent>
@@ -53,6 +58,8 @@ export function PlanCard({ plan, onCompare, isCompared, estimatedUse }: PlanCard
           plan={plan}
           onCompare={onCompare}
           isCompared={isCompared}
+          enrollPhone={plan.enroll_phone}
+          website={plan.website}
         />
       </CardFooter>
     </Card>
