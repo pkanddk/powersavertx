@@ -27,11 +27,18 @@ export interface BadgeProps
     VariantProps<typeof badgeVariants> {}
 
 function Badge({ className, variant, children, ...props }: BadgeProps) {
-  console.log('Badge content:', { children, className, props });
+  console.log('Badge render:', { 
+    children,
+    className,
+    variant,
+    props,
+    stack: new Error().stack // This will show us where the Badge is being called from
+  });
+  
   return (
     <div 
       data-debug="badge-component"
-      className={cn(badgeVariants({ variant }), className, "debug-outline")} 
+      className={cn(badgeVariants({ variant }), className, "debug-outline whitespace-nowrap")} 
       {...props}
     >
       {children}

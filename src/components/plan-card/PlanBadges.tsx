@@ -19,18 +19,19 @@ export function PlanBadges({
   timeOfUse,
   renewablePercentage
 }: PlanBadgesProps) {
-  console.log('PlanBadges props:', {
+  console.log('PlanBadges render:', {
     planType,
     contractLength,
     minimumUsage,
     newCustomer,
     prepaid,
     timeOfUse,
-    renewablePercentage
+    renewablePercentage,
+    stack: new Error().stack // This will show us where PlanBadges is being called from
   });
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-2" data-debug="plan-badges-container">
       <Badge key="plan-type" variant="secondary">
         {planType}
       </Badge>

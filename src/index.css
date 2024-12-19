@@ -58,12 +58,17 @@
 
 /* Reset any potential list styling */
 [data-debug="badge-component"] {
-  list-style: none;
-  counter-reset: none;
+  list-style: none !important;
+  counter-reset: none !important;
+  counter-increment: none !important;
 }
 
 [data-debug="badge-component"]::before,
 [data-debug="badge-component"]::after {
-  display: none;
-  content: none;
+  display: none !important;
+  content: none !important;
+}
+
+[data-debug="plan-badges-container"] {
+  counter-reset: none !important;
 }
