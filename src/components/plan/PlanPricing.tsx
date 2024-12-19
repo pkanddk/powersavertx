@@ -3,23 +3,18 @@ import { Plan } from "@/lib/api";
 interface PlanPricingProps {
   plan: Plan;
   estimatedUse: string;
-  getPriceForUsage: (plan: Plan) => number;
 }
 
-export function PlanPricing({ plan, estimatedUse, getPriceForUsage }: PlanPricingProps) {
-  // Simple function to get the display text based on estimatedUse
-  const getUsageDisplay = () => {
-    if (estimatedUse === "500") return "500";
-    if (estimatedUse === "2000") return "2,000";
-    return "1,000"; // Default or when "any" is selected
-  };
+export function PlanPricing({ plan, estimatedUse }: PlanPricingProps) {
+  // Direct price lookup based on usage
+  const price = estimatedUse === "500" ? plan.price_kwh500 
+              : estimatedUse === "2000" ? plan.price_kwh2000 
+              : plan.price_kwh1000;
 
-  // Simple function to get the current price based on usage
-  const getCurrentPrice = () => {
-    if (estimatedUse === "500") return plan.price_kwh500;
-    if (estimatedUse === "2000") return plan.price_kwh2000;
-    return plan.price_kwh1000; // Default or when "any" is selected
-  };
+  // Direct usage display
+  const usage = estimatedUse === "500" ? "500" 
+              : estimatedUse === "2000" ? "2,000" 
+              : "1,000";
 
   return (
     <div className="space-y-4">
@@ -27,11 +22,11 @@ export function PlanPricing({ plan, estimatedUse, getPriceForUsage }: PlanPricin
       <div className="bg-primary/5 p-4 rounded-lg">
         <div className="flex items-baseline gap-1">
           <span className="text-3xl font-bold text-gray-900">
-            {getCurrentPrice().toFixed(1)}
+            {price.toFixed(1)}
           </span>
           <span className="text-lg text-gray-900">¢</span>
           <span className="text-sm text-muted-foreground ml-2">
-            at {getUsageDisplay()} kWh
+            at {usage} kWh
           </span>
         </div>
       </div>

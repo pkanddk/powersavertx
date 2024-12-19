@@ -17,21 +17,6 @@ interface PlanGridProps {
 export function PlanGrid({ plans, onCompare, comparedPlans, estimatedUse }: PlanGridProps) {
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
 
-  const getPriceForUsage = (plan: Plan) => {
-    // Remove any non-digit characters and convert to number
-    const usage = parseInt(estimatedUse.replace(/\D/g, ''), 10);
-    
-    switch (usage) {
-      case 500:
-        return plan.price_kwh500;
-      case 2000:
-        return plan.price_kwh2000;
-      case 1000:
-      default:
-        return plan.price_kwh1000;
-    }
-  };
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {plans.map((plan) => (
@@ -62,7 +47,6 @@ export function PlanGrid({ plans, onCompare, comparedPlans, estimatedUse }: Plan
               <PlanPricing
                 plan={plan}
                 estimatedUse={estimatedUse}
-                getPriceForUsage={getPriceForUsage}
               />
 
               {/* Features Section */}
