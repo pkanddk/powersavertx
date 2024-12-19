@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import Index from "@/pages/Index";
 import { ComparePage } from "@/pages/Compare";
@@ -61,6 +61,7 @@ function App() {
                   </RequireAuth>
                 } 
               />
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
             <Toaster />
           </AuthProvider>
