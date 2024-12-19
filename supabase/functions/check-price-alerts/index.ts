@@ -73,7 +73,7 @@ Deno.serve(async (req) => {
           }
 
           if (userData?.user?.email) {
-            // Send email via Resend with new sender address
+            // Send email via Resend with verified domain
             const emailResponse = await fetch('https://api.resend.com/emails', {
               method: 'POST',
               headers: {
