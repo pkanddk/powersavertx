@@ -20,7 +20,6 @@ export default function Index() {
   const [timeOfUseFilter, setTimeOfUseFilter] = useState("all");
   const [companyFilter, setCompanyFilter] = useState("all");
   const [renewableFilter, setRenewableFilter] = useState("all");
-  const [baseChargeRange, setBaseChargeRange] = useState<[number, number]>([0, 1000]);
   const [cancellationFeeRange, setCancellationFeeRange] = useState<[number, number]>([0, 1000]);
   const { toast } = useToast();
   const estimatedUse = searchParams.get("estimatedUse") || "1000";
@@ -66,7 +65,6 @@ export default function Index() {
     companyFilter,
     sortOrder,
     renewableFilter,
-    baseChargeRange,
     cancellationFeeRange,
     estimatedUse: search?.estimatedUse || estimatedUse,
   }) : [];
@@ -97,7 +95,6 @@ export default function Index() {
               onTimeOfUseChange={setTimeOfUseFilter}
               onCompanyChange={setCompanyFilter}
               onRenewableChange={setRenewableFilter}
-              onBaseChargeChange={setBaseChargeRange}
               onCancellationFeeChange={setCancellationFeeRange}
               currentSort={sortOrder}
               currentContractLength={contractLength}
@@ -106,7 +103,6 @@ export default function Index() {
               currentTimeOfUse={timeOfUseFilter}
               currentCompany={companyFilter}
               currentRenewable={renewableFilter}
-              currentBaseCharge={baseChargeRange}
               currentCancellationFee={cancellationFeeRange}
               plans={plans}
             />
