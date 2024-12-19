@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -28,6 +28,7 @@ type ProfileFormData = z.infer<typeof profileSchema>;
 export function ProfileForm() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
@@ -37,6 +38,44 @@ export function ProfileForm() {
       renewable_preference: false,
     },
   });
+
+  // Load user profile data when component mounts
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error("No user found");
+
+        const { data: profile, error } = await supabase
+          .from("user_profiles")
+          .select("*")
+          .eq("user_id", user.id)
+          .single();
+
+        if (error) throw error;
+
+        if (profile) {
+          console.log("[ProfileForm] Loaded profile:", profile);
+          form.reset({
+            zip_code: profile.zip_code || "",
+            current_kwh_usage: profile.current_kwh_usage || "",
+            renewable_preference: profile.renewable_preference || false,
+          });
+        }
+      } catch (error: any) {
+        console.error("[ProfileForm] Error loading profile:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load your profile",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoadingProfile(false);
+      }
+    };
+
+    loadProfile();
+  }, [form, toast]);
 
   const onSubmit = async (data: ProfileFormData) => {
     setIsLoading(true);
@@ -69,6 +108,14 @@ export function ProfileForm() {
       setIsLoading(false);
     }
   };
+
+  if (isLoadingProfile) {
+    return (
+      <div className="flex items-center justify-center p-4">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+      </div>
+    );
+  }
 
   return (
     <Form {...form}>
