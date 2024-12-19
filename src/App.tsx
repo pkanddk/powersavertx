@@ -1,17 +1,14 @@
-import React, { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import Index from "@/pages/Index";
 import { ComparePage } from "@/pages/Compare";
-import { AuthProvider } from "@/components/auth/AuthProvider";
-import { RequireAuth } from "@/components/auth/RequireAuth";
+import { useState } from "react";
 import { Plan } from "./lib/api";
 
 const queryClient = new QueryClient();
 
 function App() {
-  console.log("[App] Component rendering");
   const [comparedPlans, setComparedPlans] = useState<Plan[]>([]);
   const [search, setSearch] = useState<{ zipCode: string; estimatedUse: string } | null>(null);
 
@@ -34,35 +31,31 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <AuthProvider>
-          <Routes>
-            <Route 
-              path="/" 
-              element={
-                <Index 
-                  comparedPlans={comparedPlans} 
-                  onCompare={handleCompare}
-                  search={search}
-                  onSearch={handleSearch}
-                  estimatedUse={search?.estimatedUse || "1000"}
-                />
-              } 
-            />
-            <Route 
-              path="/compare" 
-              element={
-                <RequireAuth>
-                  <ComparePage 
-                    plans={comparedPlans} 
-                    onRemove={handleCompare} 
-                  />
-                </RequireAuth>
-              } 
-            />
-          </Routes>
-          <Toaster />
-        </AuthProvider>
+        <Routes>
+          <Route 
+            path="/" 
+            element={
+              <Index 
+                comparedPlans={comparedPlans} 
+                onCompare={handleCompare}
+                search={search}
+                onSearch={handleSearch}
+                estimatedUse={search?.estimatedUse || "1000"}
+              />
+            } 
+          />
+          <Route 
+            path="/compare" 
+            element={
+              <ComparePage 
+                plans={comparedPlans} 
+                onRemove={handleCompare} 
+              />
+            } 
+          />
+        </Routes>
       </BrowserRouter>
+      <Toaster />
     </QueryClientProvider>
   );
 }
