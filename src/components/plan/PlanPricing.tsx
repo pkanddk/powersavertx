@@ -7,6 +7,12 @@ interface PlanPricingProps {
 }
 
 export function PlanPricing({ plan, estimatedUse, getPriceForUsage }: PlanPricingProps) {
+  // Helper function to format the display usage
+  const getDisplayUsage = (usage: string) => {
+    if (usage === "any") return "1,000";
+    return usage.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+
   return (
     <div className="space-y-4">
       {/* Highlighted Price based on selection */}
@@ -15,7 +21,7 @@ export function PlanPricing({ plan, estimatedUse, getPriceForUsage }: PlanPricin
           <span className="text-3xl font-bold text-gray-900">{getPriceForUsage(plan).toFixed(1)}</span>
           <span className="text-lg text-gray-900">¢</span>
           <span className="text-sm text-muted-foreground ml-2">
-            at {estimatedUse === "any" ? "1,000" : estimatedUse} kWh
+            at {getDisplayUsage(estimatedUse)} kWh
           </span>
         </div>
       </div>
