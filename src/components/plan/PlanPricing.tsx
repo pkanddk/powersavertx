@@ -7,29 +7,31 @@ interface PlanPricingProps {
 }
 
 export function PlanPricing({ plan, estimatedUse, getPriceForUsage }: PlanPricingProps) {
-  // Helper function to format the display usage
-  const getDisplayUsage = () => {
-    // If it's "any", default to 1000
-    if (estimatedUse === "any") return "1,000";
-    
-    // Remove any non-digit characters and convert to number
-    const usageNum = parseInt(estimatedUse.replace(/\D/g, ''), 10);
-    
-    // Format with commas for thousands
-    return usageNum.toLocaleString();
+  // Simple function to get the display text based on estimatedUse
+  const getUsageDisplay = () => {
+    if (estimatedUse === "500") return "500";
+    if (estimatedUse === "2000") return "2,000";
+    return "1,000"; // Default or when "any" is selected
+  };
+
+  // Simple function to get the current price based on usage
+  const getCurrentPrice = () => {
+    if (estimatedUse === "500") return plan.price_kwh500;
+    if (estimatedUse === "2000") return plan.price_kwh2000;
+    return plan.price_kwh1000; // Default or when "any" is selected
   };
 
   return (
     <div className="space-y-4">
-      {/* Highlighted Price based on selection */}
+      {/* Main Price Display */}
       <div className="bg-primary/5 p-4 rounded-lg">
         <div className="flex items-baseline gap-1">
           <span className="text-3xl font-bold text-gray-900">
-            {getPriceForUsage(plan).toFixed(1)}
+            {getCurrentPrice().toFixed(1)}
           </span>
           <span className="text-lg text-gray-900">¢</span>
           <span className="text-sm text-muted-foreground ml-2">
-            at {getDisplayUsage()} kWh
+            at {getUsageDisplay()} kWh
           </span>
         </div>
       </div>
