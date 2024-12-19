@@ -3,16 +3,17 @@ import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 import { SearchForm } from "@/components/SearchForm";
 import { PlanGrid } from "@/components/PlanGrid";
-import { PlanComparisonTable } from "@/components/PlanComparisonTable";
 import { searchPlans, type Plan } from "@/lib/api";
 import { useToast } from "@/components/ui/use-toast";
 import { filterPlans } from "@/lib/utils/filterPlans";
 import { PlanFilters } from "@/components/PlanFilters";
+import { PlanComparisonDialog } from "@/components/plan/PlanComparisonDialog";
 
 export default function Index() {
   const [searchParams] = useSearchParams();
   const [search, setSearch] = useState<{ zipCode: string; estimatedUse: string } | null>(null);
   const [comparedPlans, setComparedPlans] = useState<Plan[]>([]);
+  const [isComparisonOpen, setIsComparisonOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState("price-asc");
   const [contractLength, setContractLength] = useState("all");
   const [planType, setPlanType] = useState("all");
@@ -52,7 +53,8 @@ export default function Index() {
         // Remove the plan if it's already being compared
         return prevPlans.filter(p => p.company_id !== plan.company_id);
       } else if (prevPlans.length < 3) {
-        // Add the plan if we haven't reached the limit
+        // Add the plan if we haven't reached the limit and open the comparison dialog
+        setIsComparisonOpen(true);
         return [...prevPlans, plan];
       } else {
         // Show toast if we've reached the limit
@@ -115,14 +117,6 @@ export default function Index() {
               plans={plans}
             />
 
-            {/* Comparison table section */}
-            <div className={`transition-all duration-300 ${comparedPlans.length > 0 ? 'opacity-100' : 'opacity-0 h-0 overflow-hidden'}`}>
-              <div className="rounded-lg border border-border bg-white p-6 shadow-sm">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-4">Plan Comparison</h2>
-                <PlanComparisonTable plans={comparedPlans} />
-              </div>
-            </div>
-
             {isLoading ? (
               <div className="text-center py-12">
                 <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-primary border-r-transparent" />
@@ -135,6 +129,12 @@ export default function Index() {
                 estimatedUse={estimatedUse}
               />
             )}
+
+            <PlanComparisonDialog
+              isOpen={isComparisonOpen && comparedPlans.length > 0}
+              onClose={() => setIsComparisonOpen(false)}
+              plans={comparedPlans}
+            />
           </div>
         )}
       </main>
