@@ -59,13 +59,17 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
     console.log("[Edge Function] First plan example:", plans[0]);
 
     const transformedPlans = plans.map(plan => {
+      // Get the rate type from the API response
+      const rateType = plan.rate_type || "Fixed";
+      
       const transformed = {
         company_id: String(plan.company_id || ""),
         company_name: String(plan.company_name || ""),
         company_logo: plan.company_logo || null,
         company_tdu_name: plan.company_tdu_name || null,
         plan_name: String(plan.plan_name || ""),
-        plan_type_name: String(plan.plan_type || "Fixed"),
+        // Use rate_type instead of plan_type for determining the plan type
+        plan_type_name: String(rateType || "Fixed"),
         fact_sheet: plan.fact_sheet || null,
         go_to_plan: plan.enroll_plan_url || plan.go_to_plan || plan.enroll_now || null,
         minimum_usage: Boolean(plan.minimum_usage),
@@ -90,6 +94,7 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
         detail_kwh1000: plan.detail_kwh1000 || null,
         detail_kwh2000: plan.detail_kwh2000 || null
       };
+      console.log("[Edge Function] Plan rate_type from API:", rateType);
       console.log("[Edge Function] Transformed plan:", transformed);
       return transformed;
     });
