@@ -5,13 +5,12 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-function parseRenewablePercentage(plan: any): number | null {
-  // First try the direct renewable_percentage field
+// Helper functions
+const parseRenewablePercentage = (plan: any): number | null => {
   if (plan.renewable_percentage !== undefined && plan.renewable_percentage !== null) {
     return Number(plan.renewable_percentage);
   }
 
-  // Then try renewable_energy_id which is sometimes just the percentage
   if (plan.renewable_energy_id) {
     const percentage = Number(plan.renewable_energy_id);
     if (!isNaN(percentage)) {
@@ -19,7 +18,6 @@ function parseRenewablePercentage(plan: any): number | null {
     }
   }
 
-  // Finally try to parse from renewable_energy_description
   if (plan.renewable_energy_description) {
     const match = plan.renewable_energy_description.match(/(\d+)%/);
     if (match) {
@@ -28,15 +26,18 @@ function parseRenewablePercentage(plan: any): number | null {
   }
 
   return null;
-}
+};
 
-async function makeRequest(url: string, method: string, headers: Record<string, string>) {
+const makeRequest = async (url: string, method: string, headers: Record<string, string>) => {
   try {
     console.log("[Edge Function] Making request to:", url);
     console.log("[Edge Function] Request Method:", method);
     console.log("[Edge Function] Request Headers:", headers);
 
-    const response = await fetch(url, {
+    // Remove any trailing colons from the URL
+    const cleanUrl = url.replace(/:\/?$/, '');
+    
+    const response = await fetch(cleanUrl, {
       method,
       headers,
     });
@@ -57,7 +58,6 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
       data = JSON.parse(responseText);
       console.log("[Edge Function] Parsed response:", data);
       
-      // Add detailed logging for each plan
       if (Array.isArray(data)) {
         data.forEach((plan, index) => {
           console.log(`[Edge Function] Plan ${index}:`, {
@@ -94,63 +94,12 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
     }
 
     console.log(`[Edge Function] Found ${plans.length} plans`);
-    console.log("[Edge Function] First plan example:", plans[0]);
-
-    const transformedPlans = plans.map(plan => {
-      // Get the rate type from the API response
-      const rateType = plan.rate_type || "Fixed";
-      
-      // Parse renewable percentage
-      const renewablePercentage = parseRenewablePercentage(plan);
-      console.log("[Edge Function] Parsed renewable percentage:", {
-        original: plan.renewable_energy_description,
-        parsed: renewablePercentage
-      });
-      
-      const transformed = {
-        company_id: String(plan.company_id || ""),
-        company_name: String(plan.company_name || ""),
-        company_logo: plan.company_logo || null,
-        company_tdu_name: plan.company_tdu_name || null,
-        plan_name: String(plan.plan_name || ""),
-        plan_type_name: String(rateType || "Fixed"),
-        fact_sheet: plan.fact_sheet || null,
-        go_to_plan: plan.enroll_plan_url || plan.go_to_plan || plan.enroll_now || null,
-        minimum_usage: Boolean(plan.minimum_usage),
-        new_customer: Boolean(plan.new_customer),
-        plan_details: plan.special_terms || plan.plan_details || null,
-        price_kwh: Number(plan.price_kwh || 0),
-        price_kwh500: Number(plan.price_kwh500 || plan.rate500 || 0),
-        price_kwh1000: Number(plan.price_kwh1000 || plan.rate1000 || 0),
-        price_kwh2000: Number(plan.price_kwh2000 || plan.rate2000 || 0),
-        base_charge: plan.base_charge ? Number(plan.base_charge) : null,
-        contract_length: plan.term_value ? Number(plan.term_value) : null,
-        prepaid: Boolean(plan.prepaid || false),
-        timeofuse: Boolean(plan.timeofuse || false),
-        renewable_percentage: renewablePercentage,
-        pricing_details: plan.pricing_details || null,
-        promotions: plan.promotions || null,
-        enroll_phone: plan.enroll_phone || null,
-        website: plan.website || null,
-        terms_of_service: plan.terms_of_service || null,
-        yrac_url: plan.yrac_url || null,
-        detail_kwh500: plan.detail_kwh500 || null,
-        detail_kwh1000: plan.detail_kwh1000 || null,
-        detail_kwh2000: plan.detail_kwh2000 || null
-      };
-      
-      return transformed;
-    });
-
-    console.log(`[Edge Function] Successfully transformed ${transformedPlans.length} plans`);
-    console.log("[Edge Function] First transformed plan example:", transformedPlans[0]);
-    return transformedPlans;
-
+    return plans;
   } catch (error) {
     console.error(`[Edge Function] Request failed:`, error);
     throw error;
   }
-}
+};
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
