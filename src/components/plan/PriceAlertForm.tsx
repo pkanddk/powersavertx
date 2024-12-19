@@ -3,6 +3,8 @@ import { Plan } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 import {
   Select,
   SelectContent,
@@ -24,10 +26,37 @@ export function PriceAlertForm({ plan, isLoading, onSubmit, onClose }: PriceAler
   const [priceThreshold, setPriceThreshold] = useState(
     String(plan[`price_kwh${kwhUsage}`] || 0)
   );
+  const { toast } = useToast();
+  const [isTesting, setIsTesting] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(kwhUsage, priceThreshold);
+  };
+
+  const handleTest = async () => {
+    setIsTesting(true);
+    try {
+      console.log("[PriceAlertForm] Testing price alert");
+      const { data, error } = await supabase.functions.invoke('test-price-alert');
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Test Completed",
+        description: "Check your email for the test alert. If you don't receive it, check the function logs.",
+      });
+      
+    } catch (error: any) {
+      console.error("[PriceAlertForm] Test error:", error);
+      toast({
+        title: "Test Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsTesting(false);
+    }
   };
 
   return (
@@ -70,16 +99,24 @@ export function PriceAlertForm({ plan, isLoading, onSubmit, onClose }: PriceAler
         </div>
       </div>
 
-      <DialogFooter>
+      <DialogFooter className="gap-2">
         <Button
           variant="outline"
           onClick={onClose}
           type="button"
-          disabled={isLoading}
+          disabled={isLoading || isTesting}
         >
           Cancel
         </Button>
-        <Button type="submit" disabled={isLoading}>
+        <Button 
+          variant="secondary"
+          type="button"
+          onClick={handleTest}
+          disabled={isLoading || isTesting}
+        >
+          {isTesting ? "Testing..." : "Test Alert"}
+        </Button>
+        <Button type="submit" disabled={isLoading || isTesting}>
           {isLoading ? "Setting alert..." : "Set Alert"}
         </Button>
       </DialogFooter>
