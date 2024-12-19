@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/components/ui/use-toast";
 import { BasicProfileSection } from "./profile/BasicProfileSection";
 import { RenewablePreferenceSection } from "./profile/RenewablePreferenceSection";
@@ -22,21 +23,18 @@ export function ProfileForm() {
     resolver: zodResolver(profileSchema),
     defaultValues: {
       zip_code: "",
-      current_kwh_usage: "",
       renewable_preference: false,
       universal_kwh_usage: "",
       universal_price_threshold: "",
     },
   });
 
-  // Load user profile data and price alerts when component mounts
   useEffect(() => {
     const loadProfile = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) throw new Error("No user found");
 
-        // Load profile
         const { data: profile, error: profileError } = await supabase
           .from("user_profiles")
           .select("*")
@@ -49,14 +47,12 @@ export function ProfileForm() {
           console.log("[ProfileForm] Loaded profile:", profile);
           form.reset({
             zip_code: profile.zip_code || "",
-            current_kwh_usage: profile.current_kwh_usage || "",
             renewable_preference: profile.renewable_preference || false,
             universal_kwh_usage: profile.universal_kwh_usage || "",
             universal_price_threshold: profile.universal_price_threshold?.toString() || "",
           });
         }
 
-        // Load price alerts
         const { data: alerts, error: alertsError } = await supabase
           .from("user_plan_tracking")
           .select(`
@@ -65,7 +61,8 @@ export function ProfileForm() {
             price_threshold,
             energy_plans (
               plan_name,
-              company_name
+              company_name,
+              renewable_percentage
             )
           `)
           .eq("user_id", profile.id)
@@ -81,6 +78,8 @@ export function ProfileForm() {
             company_name: alert.energy_plans.company_name,
             kwh_usage: alert.kwh_usage,
             price_threshold: alert.price_threshold,
+            renewable_percentage: alert.energy_plans.renewable_percentage,
+            alert_type: 'specific'
           })));
         }
       } catch (error: any) {
@@ -108,7 +107,6 @@ export function ProfileForm() {
         .from("user_profiles")
         .update({
           zip_code: data.zip_code,
-          current_kwh_usage: data.current_kwh_usage || null,
           renewable_preference: data.renewable_preference,
           universal_kwh_usage: data.universal_kwh_usage || null,
           universal_price_threshold: data.universal_price_threshold ? parseFloat(data.universal_price_threshold) : null,
@@ -164,29 +162,31 @@ export function ProfileForm() {
   }
 
   return (
-    <div className="space-y-6">
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <BasicProfileSection form={form} />
-          <RenewablePreferenceSection form={form} />
-          <Separator className="my-6" />
-          <UniversalAlertSection form={form} />
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Updating..." : "Save Changes"}
-          </Button>
-        </form>
-      </Form>
+    <ScrollArea className="h-[calc(100vh-4rem)] px-4">
+      <div className="space-y-6 max-w-2xl mx-auto py-6">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <BasicProfileSection form={form} />
+            <RenewablePreferenceSection form={form} />
+            <Separator className="my-6" />
+            <UniversalAlertSection form={form} />
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Updating..." : "Save Changes"}
+            </Button>
+          </form>
+        </Form>
 
-      <Separator className="my-6" />
+        <Separator className="my-6" />
 
-      <div className="space-y-4">
-        <h3 className="text-lg font-medium">Active Price Alerts</h3>
-        <ActiveAlertsSection 
-          alerts={priceAlerts} 
-          onDeleteAlert={handleDeleteAlert}
-          renewablePreference={form.watch("renewable_preference")}
-        />
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium">Active Price Alerts</h3>
+          <ActiveAlertsSection 
+            alerts={priceAlerts} 
+            onDeleteAlert={handleDeleteAlert}
+            renewablePreference={form.watch("renewable_preference")}
+          />
+        </div>
       </div>
-    </div>
+    </ScrollArea>
   );
 }
