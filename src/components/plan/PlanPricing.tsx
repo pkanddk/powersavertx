@@ -9,15 +9,11 @@ interface PlanPricingProps {
 export function PlanPricing({ plan, estimatedUse, getPriceForUsage }: PlanPricingProps) {
   // Helper function to format the display usage
   const getDisplayUsage = (usage: string) => {
-    switch (usage) {
-      case "500":
-        return "500";
-      case "2000":
-        return "2,000";
-      case "1000":
-      default:
-        return "1,000";
-    }
+    // Remove any non-digit characters and convert to number
+    const usageNum = parseInt(usage.replace(/\D/g, ''), 10);
+    
+    // Format with commas for thousands
+    return usageNum.toLocaleString();
   };
 
   return (

@@ -18,15 +18,16 @@ export function PlanGrid({ plans, onCompare, comparedPlans, estimatedUse }: Plan
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
 
   const getPriceForUsage = (plan: Plan) => {
-    switch (estimatedUse) {
-      case "500":
+    // Remove any non-digit characters and convert to number
+    const usage = parseInt(estimatedUse.replace(/\D/g, ''), 10);
+    
+    switch (usage) {
+      case 500:
         return plan.price_kwh500;
-      case "1000":
-        return plan.price_kwh1000;
-      case "2000":
+      case 2000:
         return plan.price_kwh2000;
+      case 1000:
       default:
-        // If "any" is selected or no selection, default to 1000 kWh
         return plan.price_kwh1000;
     }
   };
