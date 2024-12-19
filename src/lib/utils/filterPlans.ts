@@ -131,10 +131,26 @@ export function filterPlans(
   // Filter by base charge range
   if (baseChargeRange) {
     console.log('[filterPlans] Filtering by base charge range:', baseChargeRange);
+    console.log('[filterPlans] Plans before base charge filtering:', 
+      filteredPlans.map(plan => ({
+        plan_name: plan.plan_name,
+        base_charge: plan.base_charge
+      }))
+    );
+    
     filteredPlans = filteredPlans.filter(plan => {
       const charge = plan.base_charge || 0;
-      return charge >= baseChargeRange[0] && charge <= baseChargeRange[1];
+      const isInRange = charge >= baseChargeRange[0] && charge <= baseChargeRange[1];
+      console.log(`[filterPlans] Plan ${plan.plan_name} base charge: ${charge}, is in range [${baseChargeRange[0]}, ${baseChargeRange[1]}]: ${isInRange}`);
+      return isInRange;
     });
+
+    console.log('[filterPlans] Plans after base charge filtering:', 
+      filteredPlans.map(plan => ({
+        plan_name: plan.plan_name,
+        base_charge: plan.base_charge
+      }))
+    );
   }
 
   // Get the price for the selected kWh usage

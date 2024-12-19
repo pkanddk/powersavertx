@@ -1,6 +1,7 @@
-import { Slider } from "@/components/ui/slider";
-import { useState, useEffect } from "react";
 import { Plan } from "@/lib/api";
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
+import { useEffect, useMemo } from "react";
 
 interface BaseChargeSliderProps {
   plans: Plan[];
@@ -8,35 +9,56 @@ interface BaseChargeSliderProps {
   currentBaseCharge: [number, number];
 }
 
-export function BaseChargeSlider({ 
-  plans, 
+export function BaseChargeSlider({
+  plans,
   onBaseChargeChange,
-  currentBaseCharge 
+  currentBaseCharge,
 }: BaseChargeSliderProps) {
-  // Find min and max base charges from available plans
-  const baseCharges = plans
-    .map(plan => plan.base_charge || 0)
-    .filter(charge => charge !== null);
-  
-  const minCharge = Math.min(...baseCharges);
-  const maxCharge = Math.max(...baseCharges);
+  // Calculate min and max base charges from plans
+  const { minBaseCharge, maxBaseCharge } = useMemo(() => {
+    const charges = plans
+      .map(plan => plan.base_charge || 0)
+      .filter(charge => charge !== null);
+    
+    console.log('[BaseChargeSlider] All base charges:', charges);
+    
+    return {
+      minBaseCharge: Math.floor(Math.min(...charges, 0)),
+      maxBaseCharge: Math.ceil(Math.max(...charges, 100))
+    };
+  }, [plans]);
+
+  console.log('[BaseChargeSlider] Min/Max base charges:', { minBaseCharge, maxBaseCharge });
+
+  // Update the range if min/max changes
+  useEffect(() => {
+    if (currentBaseCharge[0] < minBaseCharge || currentBaseCharge[1] > maxBaseCharge) {
+      console.log('[BaseChargeSlider] Updating range to match new min/max:', [minBaseCharge, maxBaseCharge]);
+      onBaseChargeChange([minBaseCharge, maxBaseCharge]);
+    }
+  }, [minBaseCharge, maxBaseCharge, currentBaseCharge, onBaseChargeChange]);
+
+  const handleSliderChange = (value: number[]) => {
+    console.log('[BaseChargeSlider] Slider value changed:', value);
+    onBaseChargeChange([value[0], value[1]]);
+  };
 
   return (
-    <div className="flex flex-col gap-2">
-      <label className="text-sm font-medium">Base Charge Range</label>
+    <div className="flex flex-col gap-2 min-w-[200px]">
+      <Label className="text-sm font-medium">Base Charge Range</Label>
       <div className="px-2">
         <Slider
-          min={minCharge}
-          max={maxCharge}
-          step={0.01}
-          value={currentBaseCharge}
-          onValueChange={onBaseChargeChange}
-          className="w-[180px]"
+          min={minBaseCharge}
+          max={maxBaseCharge}
+          step={1}
+          value={[currentBaseCharge[0], currentBaseCharge[1]]}
+          onValueChange={handleSliderChange}
+          className="w-full"
         />
       </div>
-      <div className="flex justify-between text-xs text-muted-foreground px-2">
-        <span>${currentBaseCharge[0].toFixed(2)}</span>
-        <span>${currentBaseCharge[1].toFixed(2)}</span>
+      <div className="flex justify-between text-sm text-muted-foreground">
+        <span>${currentBaseCharge[0]}</span>
+        <span>${currentBaseCharge[1]}</span>
       </div>
     </div>
   );
