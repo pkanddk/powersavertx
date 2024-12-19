@@ -1,10 +1,10 @@
 import { Plan } from "@/lib/api";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import { ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -17,9 +17,9 @@ interface PlanDetailsProps {
 
 export function PlanDetails({ plan, isOpen, onClose }: PlanDetailsProps) {
   return (
-    <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent side="right" className="w-full sm:max-w-xl overflow-y-auto">
-        <SheetHeader className="space-y-4 pb-6">
+    <Drawer open={isOpen} onOpenChange={onClose}>
+      <DrawerContent className="max-h-[95vh] overflow-y-auto">
+        <DrawerHeader className="space-y-4 pb-6">
           <div className="flex items-center gap-4">
             <img
               src={plan.company_logo || "/placeholder.svg"}
@@ -27,15 +27,15 @@ export function PlanDetails({ plan, isOpen, onClose }: PlanDetailsProps) {
               className="h-12 w-12 object-contain"
             />
             <div className="space-y-1">
-              <SheetTitle className="text-xl font-semibold text-foreground">
+              <DrawerTitle className="text-xl font-semibold text-foreground">
                 {plan.plan_name}
-              </SheetTitle>
+              </DrawerTitle>
               <p className="text-sm text-muted-foreground">{plan.company_name}</p>
             </div>
           </div>
-        </SheetHeader>
+        </DrawerHeader>
 
-        <div className="space-y-6">
+        <div className="px-4 pb-8 space-y-6">
           {/* Plan Details Section */}
           {plan.plan_details && (
             <div className="space-y-2">
@@ -171,7 +171,7 @@ export function PlanDetails({ plan, isOpen, onClose }: PlanDetailsProps) {
             )}
           </div>
         </div>
-      </SheetContent>
-    </Sheet>
+      </DrawerContent>
+    </Drawer>
   );
 }
