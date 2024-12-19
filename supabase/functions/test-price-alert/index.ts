@@ -2,6 +2,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') ?? '';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -11,13 +12,17 @@ const corsHeaders = {
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 Deno.serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     console.log('[test-price-alert] Starting test');
+    console.log('[test-price-alert] RESEND_API_KEY present:', !!RESEND_API_KEY);
+    
+    if (!RESEND_API_KEY) {
+      throw new Error('RESEND_API_KEY is not set');
+    }
     
     // Get the first active price alert
     const { data: alerts, error: alertsError } = await supabase
@@ -69,72 +74,40 @@ Deno.serve(async (req) => {
 
     console.log('[test-price-alert] Found user email:', user.email);
 
-    // Get or create zip code record
-    const zipCode = alerts.user_profiles.zip_code || '75001';
-    const { data: existingZipCode, error: zipError } = await supabase
-      .from('zip_codes')
-      .select('id')
-      .eq('zip_code', zipCode)
-      .maybeSingle();
-
-    if (zipError) {
-      console.error('[test-price-alert] Error fetching zip code:', zipError);
-      throw zipError;
-    }
-
-    let zipCodeId;
-    if (existingZipCode) {
-      zipCodeId = existingZipCode.id;
-    } else {
-      const { data: newZipCode, error: insertZipError } = await supabase
-        .from('zip_codes')
-        .insert({ zip_code: zipCode })
-        .select('id')
-        .single();
-
-      if (insertZipError) {
-        console.error('[test-price-alert] Error inserting zip code:', insertZipError);
-        throw insertZipError;
-      }
-      zipCodeId = newZipCode.id;
-    }
-
-    console.log('[test-price-alert] Using zip code ID:', zipCodeId);
-
-    // Insert a new record in api_history with a lower price
-    const { error: insertError } = await supabase
-      .from('api_history')
-      .insert({
-        zip_code_id: zipCodeId,
-        company_id: alerts.energy_plans.company_id,
-        company_name: 'Test Company',
-        plan_name: alerts.energy_plans.plan_name,
-        [`price_kwh${alerts.kwh_usage}`]: Number(alerts.price_threshold) - 0.1
-      });
-
-    if (insertError) {
-      console.error('[test-price-alert] Error inserting test price:', insertError);
-      throw insertError;
-    }
-
-    console.log('[test-price-alert] Inserted test price record');
-
-    // Manually trigger the check-price-alerts function
-    console.log('[test-price-alert] Triggering check-price-alerts function');
-    const { data: checkResult, error: checkError } = await supabase.functions.invoke('check-price-alerts');
+    // Send test email via Resend
+    console.log('[test-price-alert] Sending test email to:', user.email);
     
-    if (checkError) {
-      console.error('[test-price-alert] Error invoking check-price-alerts:', checkError);
-      throw checkError;
-    }
+    const emailResponse = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${RESEND_API_KEY}`,
+      },
+      body: JSON.stringify({
+        from: 'Power Saver TX <alerts@powersavertx.com>',
+        to: [user.email],
+        subject: 'Test Price Alert',
+        html: `
+          <h2>This is a test price alert</h2>
+          <p>Your price alert for ${alerts.energy_plans.plan_name} is working.</p>
+          <p>You will be notified when the price drops below ${alerts.price_threshold}¢/kWh for ${alerts.kwh_usage}kWh usage.</p>
+        `,
+      }),
+    });
 
-    console.log('[test-price-alert] check-price-alerts response:', checkResult);
+    const emailResponseText = await emailResponse.text();
+    console.log('[test-price-alert] Resend API response:', emailResponseText);
+
+    if (!emailResponse.ok) {
+      console.error('[test-price-alert] Error from Resend API:', emailResponseText);
+      throw new Error(`Failed to send email: ${emailResponseText}`);
+    }
 
     return new Response(
       JSON.stringify({ 
         success: true, 
         message: 'Test completed. Check your email for the price alert notification.',
-        email: user.email // Include the email in the response for debugging
+        email: user.email
       }), 
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
