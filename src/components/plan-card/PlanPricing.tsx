@@ -4,6 +4,7 @@ interface PlanPricingProps {
   priceKwh2000: number;
   baseCharge?: number;
   estimatedUse: string;
+  pricingDetails?: string | null;
 }
 
 const formatPrice = (price: number) => {
@@ -15,11 +16,11 @@ export function PlanPricing({
   priceKwh1000, 
   priceKwh2000, 
   baseCharge,
-  estimatedUse
+  estimatedUse,
+  pricingDetails
 }: PlanPricingProps) {
   console.log("Current estimated use:", estimatedUse);
   
-  // Simple array of prices in kWh order
   const prices = [
     { id: "500", kwh: "500 kWh", price: priceKwh500 },
     { id: "1000", kwh: "1,000 kWh", price: priceKwh1000 },
@@ -31,7 +32,6 @@ export function PlanPricing({
       <div className="text-sm font-medium text-gray-700 mb-2">Price per kWh</div>
       <div className="space-y-2">
         {prices.map((item) => {
-          // Compare the estimatedUse directly with the item.id
           const isSelected = estimatedUse === item.id;
           console.log(`Checking ${item.id} against ${estimatedUse}: ${isSelected}`);
           
@@ -62,6 +62,12 @@ export function PlanPricing({
       {baseCharge && (
         <div className="text-xs text-gray-500 border-t pt-2 mt-4">
           Base Charge: ${baseCharge}/month
+        </div>
+      )}
+
+      {pricingDetails && (
+        <div className="text-xs text-gray-500 border-t pt-2">
+          {pricingDetails}
         </div>
       )}
     </div>

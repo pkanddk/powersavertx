@@ -5,9 +5,10 @@ import { useState } from "react";
 
 interface PlanDetailsProps {
   details: string;
+  promotions?: string | null;
 }
 
-export function PlanDetails({ details }: PlanDetailsProps) {
+export function PlanDetails({ details, promotions }: PlanDetailsProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -24,6 +25,11 @@ export function PlanDetails({ details }: PlanDetailsProps) {
       <CollapsibleContent className="text-sm text-muted-foreground mt-2 space-y-2 animate-accordion-down">
         <div className="bg-secondary/20 p-4 rounded-md">
           {details}
+          {promotions && (
+            <div className="mt-2 pt-2 border-t border-secondary">
+              <strong>Promotions:</strong> {promotions}
+            </div>
+          )}
         </div>
       </CollapsibleContent>
     </Collapsible>
