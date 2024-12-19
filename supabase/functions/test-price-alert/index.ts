@@ -25,7 +25,8 @@ Deno.serve(async (req) => {
       .select(`
         *,
         user_profiles:user_id (
-          user_id
+          user_id,
+          zip_code
         ),
         energy_plans:plan_id (
           company_id,
@@ -47,11 +48,35 @@ Deno.serve(async (req) => {
 
     console.log(`[test-price-alert] Found alert for plan: ${alerts.energy_plans.plan_name}`);
 
+    // Get or create zip code record
+    const zipCode = alerts.user_profiles.zip_code || '75001'; // Default to 75001 if no zip code
+    const { data: existingZipCode, error: zipError } = await supabase
+      .from('zip_codes')
+      .select('id')
+      .eq('zip_code', zipCode)
+      .maybeSingle();
+
+    if (zipError) throw zipError;
+
+    let zipCodeId;
+    if (existingZipCode) {
+      zipCodeId = existingZipCode.id;
+    } else {
+      const { data: newZipCode, error: insertZipError } = await supabase
+        .from('zip_codes')
+        .insert({ zip_code: zipCode })
+        .select('id')
+        .single();
+
+      if (insertZipError) throw insertZipError;
+      zipCodeId = newZipCode.id;
+    }
+
     // Insert a new record in api_history with a lower price
     const { error: insertError } = await supabase
       .from('api_history')
       .insert({
-        zip_code_id: '00000000-0000-0000-0000-000000000000', // Dummy ID
+        zip_code_id: zipCodeId,
         company_id: alerts.energy_plans.company_id,
         company_name: 'Test Company',
         plan_name: alerts.energy_plans.plan_name,
