@@ -60,8 +60,10 @@ Deno.serve(async (req) => {
         const currentPrice = latestPrices[`price_kwh${alert.kwh_usage}`];
         console.log(`[check-price-alerts] Current price: ${currentPrice}¢, Threshold: ${alert.price_threshold}¢`);
         
+        // Check if price is already below threshold (immediate notification)
+        // or if it has dropped below threshold since last check
         if (currentPrice && currentPrice <= alert.price_threshold) {
-          console.log(`[check-price-alerts] Alert triggered! Price dropped below threshold`);
+          console.log(`[check-price-alerts] Alert triggered! Price is below threshold`);
           
           // Get user's email
           const { data: userData, error: userError } = await supabase.auth.admin.getUserById(
@@ -84,11 +86,11 @@ Deno.serve(async (req) => {
               body: JSON.stringify({
                 from: 'Power Saver TX <alerts@powersavertx.com>',
                 to: [userData.user.email],
-                subject: `Price Alert: ${alert.energy_plans.plan_name} price has dropped!`,
+                subject: `Price Alert: ${alert.energy_plans.plan_name} price matches your target!`,
                 html: `
-                  <h2>Good news! The price has dropped below your target.</h2>
+                  <h2>Good news! The price matches your criteria.</h2>
                   <p>The ${alert.energy_plans.plan_name} plan from ${alert.energy_plans.company_name} 
-                  is now ${currentPrice}¢/kWh for ${alert.kwh_usage}kWh usage.</p>
+                  is currently ${currentPrice}¢/kWh for ${alert.kwh_usage}kWh usage.</p>
                   <p>Your target price was: ${alert.price_threshold}¢/kWh</p>
                   ${alert.energy_plans.go_to_plan ? 
                     `<p><a href="${alert.energy_plans.go_to_plan}">View the plan</a></p>` : 
