@@ -12,12 +12,21 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
   try {
     logger.info("🌐 Making request to URL:", url);
     
+    // Add User-Agent header to mimic a browser request
+    const requestHeaders = {
+      ...headers,
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    };
+    
+    logger.info("📤 Request headers:", requestHeaders);
+
     const response = await fetch(url, {
       method,
-      headers,
+      headers: requestHeaders,
     });
 
     logger.info("📡 API Response Status:", response.status);
+    logger.info("📡 API Response Headers:", Object.fromEntries(response.headers.entries()));
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -79,11 +88,6 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
 }
 
 serve(async (req) => {
-  const supabaseClient = createClient(
-    Deno.env.get('SUPABASE_URL') ?? '',
-    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-  );
-
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -109,7 +113,7 @@ serve(async (req) => {
 
     const plans = await makeRequest(apiUrl, "GET", {
       "Accept": "application/json",
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     });
     
     if (!plans || plans.length === 0) {
@@ -124,6 +128,12 @@ serve(async (req) => {
     }
 
     logger.success(`✅ Found ${plans.length} plans for ZIP code ${zipCode}`);
+
+    // Create Supabase client
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
 
     // Delete existing plans for this ZIP code
     const { error: deleteError } = await supabaseClient
