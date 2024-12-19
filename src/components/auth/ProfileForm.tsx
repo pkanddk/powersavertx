@@ -56,6 +56,7 @@ export function ProfileForm() {
           .from("user_plan_tracking")
           .select(`
             id,
+            plan_id,
             kwh_usage,
             price_threshold,
             energy_plans (
@@ -73,6 +74,7 @@ export function ProfileForm() {
           console.log("[ProfileForm] Loaded alerts:", alerts);
           setPriceAlerts(alerts.map(alert => ({
             id: alert.id,
+            plan_id: alert.plan_id,
             plan_name: alert.energy_plans.plan_name,
             company_name: alert.energy_plans.company_name,
             kwh_usage: alert.kwh_usage,
