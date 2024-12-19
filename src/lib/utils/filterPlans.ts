@@ -99,12 +99,12 @@ export function filterPlans(
       }))
     );
 
-    if (renewableFilter === "0") {
-      // For "No Renewable" option, only show plans with 0% renewable energy
+    if (renewableFilter === "0-25") {
+      // For "0-25%" option, show plans with 0-25% renewable energy
       filteredPlans = filteredPlans.filter(plan => {
-        const isNonRenewable = plan.renewable_percentage === 0;
-        console.log(`[filterPlans] Plan ${plan.plan_name} renewable percentage: ${plan.renewable_percentage}, isNonRenewable: ${isNonRenewable}`);
-        return isNonRenewable;
+        const isInRange = plan.renewable_percentage !== null && plan.renewable_percentage >= 0 && plan.renewable_percentage < 25;
+        console.log(`[filterPlans] Plan ${plan.plan_name} renewable percentage: ${plan.renewable_percentage}, is in 0-25% range: ${isInRange}`);
+        return isInRange;
       });
     } else {
       // For percentage thresholds (25, 50, 100), show plans with at least that percentage

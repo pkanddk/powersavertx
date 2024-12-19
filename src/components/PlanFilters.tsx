@@ -153,7 +153,7 @@ export function PlanFilters({
             <SelectItem value="100">100% Renewable</SelectItem>
             <SelectItem value="50">50%+ Renewable</SelectItem>
             <SelectItem value="25">25%+ Renewable</SelectItem>
-            <SelectItem value="0">No Renewable</SelectItem>
+            <SelectItem value="0-25">0-25% Renewable</SelectItem>
           </SelectContent>
         </Select>
       </div>
