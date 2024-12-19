@@ -21,10 +21,11 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("[SearchForm] Form submitted with ZIP:", zipCode);
     // Extract just the number from the usage string
     const usageValue = estimatedUse === USAGE_OPTIONS[0] ? "any" :
                       estimatedUse.split(" ")[0].replace(",", "");
-    console.log("[SearchForm] Submitting with usage value:", usageValue);
+    console.log("[SearchForm] Submitting search with:", { zipCode, usageValue });
     onSearch(zipCode, usageValue);
   };
 
@@ -34,7 +35,10 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
         type="text"
         placeholder="Enter ZIP Code"
         value={zipCode}
-        onChange={(e) => setZipCode(e.target.value)}
+        onChange={(e) => {
+          console.log("[SearchForm] ZIP code input changed:", e.target.value);
+          setZipCode(e.target.value);
+        }}
         className="md:flex-1"
         pattern="[0-9]{5}"
         maxLength={5}

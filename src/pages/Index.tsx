@@ -33,24 +33,28 @@ export default function Index() {
       console.log("[Index] Starting plan fetch. Search state:", search);
       
       if (!search?.zipCode) {
+        console.log("[Index] No ZIP code provided, returning empty result");
         return { plans: [], lastUpdated: null };
       }
 
+      console.log("[Index] Fetching plans from Supabase for ZIP:", search.zipCode);
       const { data: plans, error } = await supabase
         .from('plans')
         .select('*')
         .eq('zip_code', search.zipCode);
 
       if (error) {
-        console.error('[Index] Error fetching plans:', error);
+        console.error('[Index] Error fetching plans from Supabase:', error);
         throw error;
       }
 
       if (!plans || plans.length === 0) {
-        console.log('[Index] No plans found in database, fetching from API');
+        console.log('[Index] No plans found in Supabase, fetching from Edge Function');
         const { data: responseData, error: functionError } = await supabase.functions.invoke('power-to-choose', {
           body: { zipCode: search.zipCode, estimatedUse },
         });
+
+        console.log('[Index] Edge Function response:', responseData);
 
         if (functionError) {
           console.error('[Index] Error calling Edge Function:', functionError);
@@ -73,7 +77,7 @@ export default function Index() {
         };
       }
 
-      console.log("[Index] Fetched plans:", plans?.length || 0, "results");
+      console.log("[Index] Found plans in Supabase:", plans?.length || 0, "results");
       return {
         plans: plans || [],
         lastUpdated: plans?.[0]?.updated_at
@@ -160,13 +164,13 @@ export default function Index() {
 
         {isLoading && <LoadingState />}
         {error && <ErrorDisplay error={error} />}
-        {!isLoading && !error && filteredPlans.length === 0 && (
+        {!isLoading && !error && (!plansData?.plans || plansData.plans.length === 0) && (
           <EmptyState hasSearch={!!search?.zipCode} />
         )}
 
-        {filteredPlans.length > 0 && (
+        {plansData?.plans && plansData.plans.length > 0 && (
           <PlanGrid 
-            plans={filteredPlans}
+            plans={plansData.plans}
             onCompare={handleCompare}
             comparedPlans={comparedPlans}
             estimatedUse={estimatedUse}

@@ -72,11 +72,22 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
 
     logger.info(`🔍 Processing ${plans.length} plans for ZIP ${url.split('zip_code=')[1]}`);
     plans.forEach((plan, index) => {
-      logger.info(`📋 Plan ${index + 1} for ZIP ${url.split('zip_code=')[1]}:`, plan);
+      logger.info(`📋 Plan ${index + 1} details:`, {
+        plan_id: plan.plan_id,
+        plan_name: plan.plan_name,
+        zip_code: plan.zip_code,
+        timeofuse: plan.timeofuse
+      });
     });
 
     const transformedPlans = plans.map(transformPlan);
-    logger.info(`✨ Transformed ${transformedPlans.length} plans for ZIP ${url.split('zip_code=')[1]}:`, transformedPlans);
+    logger.info(`✨ Transformed ${transformedPlans.length} plans for ZIP ${url.split('zip_code=')[1]}:`, 
+      transformedPlans.map(p => ({
+        plan_name: p.plan_name,
+        timeofuse: p.timeofuse,
+        zip_code: p.zip_code
+      }))
+    );
 
     return transformedPlans;
 
