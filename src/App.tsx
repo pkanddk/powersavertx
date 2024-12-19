@@ -49,7 +49,10 @@ function App() {
                   />
                 } 
               />
-              <Route path="/auth" element={<AuthPage />} />
+              <Route 
+                path="/auth" 
+                element={<AuthPage />} 
+              />
               <Route 
                 path="/compare" 
                 element={
