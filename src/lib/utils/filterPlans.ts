@@ -98,20 +98,12 @@ export function filterPlans(
     }
   };
 
-  // Sort plans
-  console.log('[filterPlans] Sorting plans by:', sortOrder);
+  // Always sort by price for the selected usage
+  console.log('[filterPlans] Sorting plans by price for usage:', estimatedUse);
   filteredPlans.sort((a, b) => {
-    switch (sortOrder) {
-      case "price-desc":
-        return getPriceForUsage(b) - getPriceForUsage(a);
-      case "length-asc":
-        return (a.contract_length || 0) - (b.contract_length || 0);
-      case "length-desc":
-        return (b.contract_length || 0) - (a.contract_length || 0);
-      case "price-asc":
-      default:
-        return getPriceForUsage(a) - getPriceForUsage(b);
-    }
+    // If sortOrder is price-desc, reverse the sort
+    const multiplier = sortOrder === "price-desc" ? -1 : 1;
+    return (getPriceForUsage(a) - getPriceForUsage(b)) * multiplier;
   });
 
   console.log(`[filterPlans] Returning ${filteredPlans.length} filtered plans`);

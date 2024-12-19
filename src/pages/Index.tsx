@@ -20,7 +20,7 @@ export default function Index() {
   const [timeOfUseFilter, setTimeOfUseFilter] = useState("all");
   const [companyFilter, setCompanyFilter] = useState("all");
   const { toast } = useToast();
-  const estimatedUse = searchParams.get("estimatedUse") || "any";
+  const estimatedUse = searchParams.get("estimatedUse") || "1000"; // Default to 1000 kWh
 
   const { data: plans, isLoading } = useQuery({
     queryKey: ["plans", search?.zipCode, search?.estimatedUse],
@@ -62,7 +62,7 @@ export default function Index() {
     timeOfUseFilter,
     companyFilter,
     sortOrder,
-    estimatedUse: search?.estimatedUse,
+    estimatedUse: search?.estimatedUse || estimatedUse,
   }) : [];
 
   return (
