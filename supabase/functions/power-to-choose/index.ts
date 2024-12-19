@@ -67,7 +67,10 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
       logger.info(`📋 Plan ${index + 1}:`, plan);
     });
 
-    return plans.map(transformPlan);
+    const transformedPlans = plans.map(transformPlan);
+    logger.info("✨ Transformed plans:", transformedPlans);
+
+    return transformedPlans;
 
   } catch (error) {
     logger.error("❌ Request failed:", error);
@@ -102,6 +105,8 @@ serve(async (req) => {
       apiUrl += `&kWh=${estimatedUse}`;
     }
 
+    logger.info("🔗 Constructed API URL:", apiUrl);
+
     const plans = await makeRequest(apiUrl, "GET", {
       "Accept": "application/json",
       "Content-Type": "application/json"
@@ -130,6 +135,8 @@ serve(async (req) => {
       logger.error("❌ Error deleting existing plans:", deleteError);
       throw new Error("Failed to update plans in database");
     }
+
+    logger.info("🗑️ Successfully deleted existing plans for ZIP code:", zipCode);
 
     // Insert new plans
     const { error: insertError } = await supabaseClient
