@@ -34,14 +34,14 @@ export function PlanPricing({ plan, estimatedUse }: PlanPricingProps) {
         </div>
 
         {plan.base_charge && (
-          <div className="flex justify-between items-center pt-2 border-t border-border/40">
+          <div className="flex justify-between items-center py-2 border-t border-border/40">
             <span className="text-muted-foreground">Base Charge:</span>
             <span className="font-medium">${plan.base_charge}/month</span>
           </div>
         )}
 
         {cancellationFee !== null && (
-          <div className="flex justify-between items-center pt-2 border-t border-border/40">
+          <div className="flex justify-between items-center py-2 border-t border-border/40">
             <span className="text-muted-foreground">Cancellation Fee:</span>
             <span className="font-medium">
               {cancellationFee === 0 ? 'No cancellation fee' : `$${cancellationFee}`}
@@ -50,7 +50,7 @@ export function PlanPricing({ plan, estimatedUse }: PlanPricingProps) {
         )}
 
         {plan.pricing_details && cancellationFee === null && (
-          <p className="text-xs text-muted-foreground mt-2 pt-2 border-t border-border/40">
+          <p className="text-xs text-muted-foreground py-2 border-t border-border/40">
             {plan.pricing_details}
           </p>
         )}

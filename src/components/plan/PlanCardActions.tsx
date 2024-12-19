@@ -18,7 +18,7 @@ export function PlanCardActions({
   return (
     <div className="space-y-3 pt-2 border-t border-border/50">
       <div className="grid grid-cols-2 gap-3 pt-4">
-        {plan.go_to_plan && (
+        {plan.go_to_plan ? (
           <Button 
             variant="default" 
             className="w-full bg-primary/90 hover:bg-primary transition-colors" 
@@ -33,6 +33,15 @@ export function PlanCardActions({
               View Plan <ExternalLink className="h-4 w-4" />
             </a>
           </Button>
+        ) : (
+          <Button
+            variant="default"
+            onClick={() => onShowDetails(plan)}
+            className="w-full bg-primary/90 hover:bg-primary transition-colors flex items-center justify-center gap-2"
+          >
+            <Info className="h-4 w-4" />
+            Plan Details
+          </Button>
         )}
         <Button
           variant={isCompared ? "destructive" : "outline"}
@@ -43,14 +52,16 @@ export function PlanCardActions({
         </Button>
       </div>
       <div className="flex items-center justify-between gap-2">
-        <Button 
-          variant="ghost" 
-          onClick={() => onShowDetails(plan)}
-          className="flex items-center justify-center gap-2 text-muted-foreground hover:text-primary transition-colors"
-        >
-          <Info className="h-4 w-4" />
-          Plan Details
-        </Button>
+        {!plan.go_to_plan && (
+          <Button 
+            variant="secondary"
+            onClick={() => onShowDetails(plan)}
+            className="flex-1 bg-primary/5 hover:bg-primary/10 text-primary hover:text-primary/90 transition-colors flex items-center justify-center gap-2 font-medium"
+          >
+            <Info className="h-4 w-4" />
+            View Full Details
+          </Button>
+        )}
         {plan.enroll_phone && (
           <a
             href={`tel:${plan.enroll_phone}`}
