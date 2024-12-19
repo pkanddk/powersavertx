@@ -1,7 +1,12 @@
 import { logger } from './logger.ts';
 
 export const transformPlan = (plan: any) => {
-  logger.info(`Transforming plan ${plan.plan_id || 'unknown'}:`, plan);
+  logger.info(`Raw plan data from API for plan ${plan.plan_id}:`, {
+    plan_id: plan.plan_id,
+    plan_name: plan.plan_name,
+    timeofuse: plan.timeofuse,
+    raw_plan: plan
+  });
   
   const isPrepaid = Boolean(plan.prepaid_plan || plan.is_prepaid || plan.prepaid || false);
   
@@ -14,10 +19,12 @@ export const transformPlan = (plan: any) => {
   }
   
   // Explicitly log the timeofuse value from the API
-  logger.info(`Time of Use value for plan ${plan.plan_name}:`, {
-    raw_value: plan.timeofuse,
+  logger.info(`Time of Use processing for plan ${plan.plan_name}:`, {
     plan_id: plan.plan_id,
-    plan_name: plan.plan_name
+    raw_timeofuse: plan.timeofuse,
+    raw_type: typeof plan.timeofuse,
+    plan_type: plan.plan_type,
+    rate_type: plan.rate_type
   });
 
   // Ensure timeofuse is explicitly converted to boolean
@@ -51,7 +58,8 @@ export const transformPlan = (plan: any) => {
   // Log the transformed plan to verify timeofuse field
   logger.info(`Transformed plan ${plan.plan_name}:`, {
     plan_id: plan.plan_id,
-    timeofuse: transformedPlan.timeofuse
+    timeofuse: transformedPlan.timeofuse,
+    transformed_plan: transformedPlan
   });
 
   return transformedPlan;
