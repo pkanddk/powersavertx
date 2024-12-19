@@ -61,16 +61,13 @@ export default function Index({ comparedPlans, onCompare, search, onSearch, esti
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold tracking-tight text-gray-900 mb-4">
             Power <span className="relative inline-block">
-              <Zap className="absolute -left-1 -top-1 h-7 w-7 text-primary transform -rotate-12" />
+              <Zap className="absolute -left-[2px] -top-[2px] h-7 w-7 text-primary transform -rotate-12" />
               aver
             </span> TX
           </h1>
           <p className="text-2xl font-semibold text-primary mb-6">
             Simple. Savings.
           </p>
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900 mb-4">
-            Find the Best Energy Plan in Texas
-          </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Compare energy plans and save money with Power Saver TX
           </p>
