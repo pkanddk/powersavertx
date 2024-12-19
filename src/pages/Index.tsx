@@ -60,11 +60,14 @@ export default function Index({ comparedPlans, onCompare, search, onSearch, esti
       <main className="container mx-auto px-4 py-8 md:py-12">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold tracking-tight text-gray-900 mb-4">
-            Power <span className="relative">
-              <Zap className="absolute -left-1 top-1/2 -translate-y-1/2 h-7 w-7 text-primary" />
+            Power <span className="relative inline-block">
+              <Zap className="absolute -left-1 -top-1 h-7 w-7 text-primary transform -rotate-12" />
               aver
             </span> TX
           </h1>
+          <p className="text-2xl font-semibold text-primary mb-6">
+            Simple. Savings.
+          </p>
           <h2 className="text-3xl font-bold tracking-tight text-gray-900 mb-4">
             Find the Best Energy Plan in Texas
           </h2>
@@ -76,6 +79,17 @@ export default function Index({ comparedPlans, onCompare, search, onSearch, esti
         <div className="mb-12">
           <SearchForm onSearch={onSearch} isLoading={isLoading} />
         </div>
+
+        {!plans && !isLoading && (
+          <div className="text-center max-w-2xl mx-auto space-y-8 my-16">
+            <p className="text-lg text-muted-foreground">
+              Set your price alert once, and we'll notify you when it's time to save.
+            </p>
+            <p className="text-lg text-muted-foreground">
+              Relax. We're constantly watching the market to make sure you are getting the best deal.
+            </p>
+          </div>
+        )}
 
         {plans && (
           <div className="space-y-6">
