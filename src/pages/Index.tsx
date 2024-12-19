@@ -71,20 +71,24 @@ export default function Index({ comparedPlans, onCompare, search, onSearch, esti
               BETA
             </span>
           </div>
-          <div className="flex items-center justify-center gap-3 md:gap-4 mb-4 md:mb-6">
+          <div className="flex flex-col items-center gap-2">
             <p className="text-xl md:text-2xl font-semibold text-primary">
               Simple. Savings.
             </p>
-            <DevMessageDialog />
-            <BugReportDialog />
+            <div className="flex items-center gap-3 md:gap-4">
+              <DevMessageDialog />
+              <BugReportDialog />
+            </div>
           </div>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-4 mt-4">
             Compare energy plans and save money with Power Saver TX
           </p>
         </div>
 
-        <div className="mb-8 md:mb-12">
-          <SearchForm onSearch={onSearch} isLoading={isLoading} />
+        <div className="flex flex-col md:flex-row gap-4 items-start justify-between mb-8 md:mb-12">
+          <div className="w-full">
+            <SearchForm onSearch={onSearch} isLoading={isLoading} />
+          </div>
         </div>
 
         {!plans && !isLoading && (
