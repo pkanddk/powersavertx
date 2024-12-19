@@ -91,15 +91,38 @@ export function filterPlans(
   if (renewableFilter !== "all") {
     console.log('[filterPlans] Filtering by renewable percentage:', renewableFilter);
     const percentage = parseInt(renewableFilter, 10);
-    if (percentage === 0) {
-      filteredPlans = filteredPlans.filter(plan => 
-        !plan.renewable_percentage || plan.renewable_percentage === 0
-      );
+    
+    // Log the plans and their renewable percentages before filtering
+    console.log('[filterPlans] Plans before renewable filtering:', 
+      filteredPlans.map(plan => ({
+        plan_name: plan.plan_name,
+        renewable_percentage: plan.renewable_percentage
+      }))
+    );
+
+    if (renewableFilter === "0") {
+      // For "No Renewable" option, show plans with 0% or null renewable percentage
+      filteredPlans = filteredPlans.filter(plan => {
+        const isNonRenewable = plan.renewable_percentage === 0 || plan.renewable_percentage === null;
+        console.log(`[filterPlans] Plan ${plan.plan_name} renewable percentage: ${plan.renewable_percentage}, isNonRenewable: ${isNonRenewable}`);
+        return isNonRenewable;
+      });
     } else {
-      filteredPlans = filteredPlans.filter(plan => 
-        plan.renewable_percentage && plan.renewable_percentage >= percentage
-      );
+      // For percentage thresholds (25, 50, 100), show plans with at least that percentage
+      filteredPlans = filteredPlans.filter(plan => {
+        const meetsThreshold = plan.renewable_percentage !== null && plan.renewable_percentage >= percentage;
+        console.log(`[filterPlans] Plan ${plan.plan_name} renewable percentage: ${plan.renewable_percentage}, meets ${percentage}% threshold: ${meetsThreshold}`);
+        return meetsThreshold;
+      });
     }
+
+    // Log the filtered plans
+    console.log('[filterPlans] Plans after renewable filtering:', 
+      filteredPlans.map(plan => ({
+        plan_name: plan.plan_name,
+        renewable_percentage: plan.renewable_percentage
+      }))
+    );
   }
 
   // Get the price for the selected kWh usage
