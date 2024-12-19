@@ -59,13 +59,6 @@ export default function Index({ comparedPlans, onCompare, search, onSearch, esti
     <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white">
       <main className="container mx-auto px-4 py-8 md:py-12">
         <div className="text-center mb-12">
-          <div className="flex justify-center mb-6">
-            <img
-              src="/lovable-uploads/33245e82-69cc-4a62-984b-1c7b600ef642.png"
-              alt="Power Saver TX"
-              className="h-20 w-20"
-            />
-          </div>
           <h1 className="text-4xl font-bold tracking-tight text-gray-900 mb-4">
             Find the Best Energy Plan in Texas
           </h1>
