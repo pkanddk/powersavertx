@@ -22,20 +22,28 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
   // Effect to trigger search when values change
   useEffect(() => {
     if (zipCode.length === 5) {  // Only search when ZIP code is complete
-      const usageValue = estimatedUse === USAGE_OPTIONS[3] ? "any" :
-                        estimatedUse.split(" ")[0].replace(",", "");
-      console.log("[SearchForm] Triggering search with:", { zipCode, usageValue });
-      onSearch(zipCode, usageValue);
+      try {
+        const usageValue = estimatedUse === USAGE_OPTIONS[3] ? "any" :
+                          estimatedUse.split(" ")[0].replace(",", "");
+        console.log("[SearchForm] Triggering search with:", { zipCode, usageValue });
+        onSearch(zipCode, usageValue);
+      } catch (error) {
+        console.error("[SearchForm] Error in search:", error);
+      }
     }
   }, [zipCode, estimatedUse, onSearch]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Extract just the number from the usage string
-    const usageValue = estimatedUse === USAGE_OPTIONS[3] ? "any" :
-                      estimatedUse.split(" ")[0].replace(",", "");
-    console.log("[SearchForm] Manual submit with:", { zipCode, usageValue });
-    onSearch(zipCode, usageValue);
+    try {
+      // Extract just the number from the usage string
+      const usageValue = estimatedUse === USAGE_OPTIONS[3] ? "any" :
+                        estimatedUse.split(" ")[0].replace(",", "");
+      console.log("[SearchForm] Manual submit with:", { zipCode, usageValue });
+      onSearch(zipCode, usageValue);
+    } catch (error) {
+      console.error("[SearchForm] Error in manual submit:", error);
+    }
   };
 
   return (
@@ -45,8 +53,9 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
         placeholder="Enter ZIP Code"
         value={zipCode}
         onChange={(e) => {
-          console.log("[SearchForm] ZIP code changed:", e.target.value);
-          setZipCode(e.target.value);
+          const value = e.target.value.replace(/\D/g, '').slice(0, 5);
+          console.log("[SearchForm] ZIP code changed:", value);
+          setZipCode(value);
         }}
         className="md:flex-1"
         pattern="[0-9]{5}"
@@ -71,7 +80,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
           ))}
         </SelectContent>
       </Select>
-      <Button type="submit" disabled={isLoading}>
+      <Button type="submit" disabled={isLoading || zipCode.length !== 5}>
         {isLoading ? "Searching..." : "Search Plans"}
       </Button>
     </form>

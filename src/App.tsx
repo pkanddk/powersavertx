@@ -10,7 +10,7 @@ import { AuthSidebar } from "./components/auth/AuthSidebar";
 function App() {
   const [comparedPlans, setComparedPlans] = useState<Plan[]>([]);
   const [search, setSearch] = useState<{ zipCode: string; estimatedUse: string } | null>(null);
-  const [estimatedUse, setEstimatedUse] = useState("1000");
+  const [estimatedUse, setEstimatedUse] = useState("500"); // Default to 500 kWh
 
   const handleCompare = (plan: Plan) => {
     setComparedPlans((prev) => {
@@ -26,8 +26,13 @@ function App() {
   };
 
   const handleSearch = (zipCode: string, estimatedUse: string) => {
-    setSearch({ zipCode, estimatedUse });
-    setEstimatedUse(estimatedUse);
+    try {
+      console.log("[App] Handling search:", { zipCode, estimatedUse });
+      setSearch({ zipCode, estimatedUse });
+      setEstimatedUse(estimatedUse);
+    } catch (error) {
+      console.error("[App] Error in handleSearch:", error);
+    }
   };
 
   return (
