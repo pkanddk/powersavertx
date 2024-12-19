@@ -1,6 +1,6 @@
 import { Plan } from "@/lib/api";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Info } from "lucide-react";
+import { ExternalLink, Info, Check } from "lucide-react";
 
 interface PlanCardActionsProps {
   plan: Plan;
@@ -46,9 +46,20 @@ export function PlanCardActions({
         <Button
           variant={isCompared ? "destructive" : "outline"}
           onClick={() => onCompare(plan)}
-          className="w-full hover:border-primary/30"
+          className={`w-full transition-all duration-200 ${
+            isCompared 
+              ? "bg-destructive hover:bg-destructive/90 text-destructive-foreground" 
+              : "hover:border-primary/30"
+          }`}
         >
-          {isCompared ? "Remove" : "Compare"}
+          {isCompared ? (
+            <>
+              <Check className="h-4 w-4 mr-2" />
+              Remove
+            </>
+          ) : (
+            "Compare"
+          )}
         </Button>
       </div>
     </div>

@@ -22,7 +22,9 @@ export function PlanCard({
 }: PlanCardProps) {
   return (
     <Card 
-      className="group overflow-hidden hover:shadow-lg transition-all duration-300 border-border/40 hover:border-primary/40 bg-gradient-to-b from-white to-gray-50/30"
+      className={`group overflow-hidden transition-all duration-300 border-border/40 hover:border-primary/40 bg-gradient-to-b from-white to-gray-50/30 ${
+        isCompared ? "ring-2 ring-primary shadow-lg" : "hover:shadow-lg"
+      }`}
     >
       <CardContent className="p-4">
         <div className="space-y-4">
