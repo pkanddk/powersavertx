@@ -26,7 +26,7 @@ export function PlanBadges({
       
       {contractLength && (
         <Badge variant="outline">
-          {contractLength} {contractLength === 1 ? 'month' : 'months'}
+          {`${contractLength} ${contractLength === 1 ? 'month' : 'months'}`}
         </Badge>
       )}
 
