@@ -81,7 +81,7 @@ Deno.serve(async (req) => {
                 'Authorization': `Bearer ${RESEND_API_KEY}`,
               },
               body: JSON.stringify({
-                from: 'Energy Plans <onboarding@resend.dev>',
+                from: 'Energy Plans <alerts@yourdomain.com>', // Replace with your verified domain
                 to: [userData.user.email],
                 subject: `Price Alert: ${alert.energy_plans.plan_name} price has dropped!`,
                 html: `
