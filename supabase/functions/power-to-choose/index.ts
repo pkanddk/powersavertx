@@ -24,34 +24,47 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
     }
 
     const responseText = await response.text();
+    logger.info("Raw API Response Text:", responseText);
     
     let data;
     try {
       data = JSON.parse(responseText);
-      logger.raw(data);
+      logger.info("Parsed API Response:", data);
     } catch (parseError) {
       logger.error("JSON parse error", parseError);
       throw new Error("Failed to parse API response as JSON");
     }
 
-    if (!data || (Array.isArray(data) && data.length === 0)) {
-      logger.info("No plans found in API response");
+    if (!data) {
+      logger.error("No data in API response");
+      return [];
+    }
+
+    if (Array.isArray(data) && data.length === 0) {
+      logger.info("API returned empty array");
       return [];
     }
 
     let plans = [];
     if (Array.isArray(data)) {
       plans = data;
+      logger.info(`Found ${plans.length} plans in array format`);
     } else if (data.data && Array.isArray(data.data)) {
       plans = data.data;
+      logger.info(`Found ${plans.length} plans in data.data format`);
     } else if (data.Results && Array.isArray(data.Results)) {
       plans = data.Results;
+      logger.info(`Found ${plans.length} plans in Results format`);
     } else {
       logger.error("Unexpected response structure", data);
       throw new Error("Unexpected response structure from API");
     }
 
-    logger.success(`Found ${plans.length} plans`);
+    logger.info(`Processing ${plans.length} plans`);
+    plans.forEach((plan, index) => {
+      logger.info(`Plan ${index + 1}:`, plan);
+    });
+
     return plans.map(transformPlan);
 
   } catch (error) {
@@ -93,6 +106,7 @@ serve(async (req) => {
     });
     
     if (!plans || plans.length === 0) {
+      logger.info("No plans found for ZIP code", zipCode);
       return new Response(
         JSON.stringify({ error: "No plans found for this ZIP code" }),
         {
@@ -101,6 +115,8 @@ serve(async (req) => {
         }
       );
     }
+
+    logger.info(`Found ${plans.length} plans for ZIP code ${zipCode}`);
 
     // Delete existing plans for this ZIP code
     const { error: deleteError } = await supabaseClient
