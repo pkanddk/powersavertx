@@ -13,7 +13,7 @@ export function DevMessageDialog() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="sm" className="gap-2">
+        <Button variant="outline" size="sm" className="gap-2">
           <MessageSquare className="h-4 w-4" />
           Message from the Devs
         </Button>

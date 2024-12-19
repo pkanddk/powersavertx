@@ -85,9 +85,34 @@ export default function Index({ comparedPlans, onCompare, search, onSearch, esti
           </p>
         </div>
 
-        <div className="flex flex-col md:flex-row gap-4 items-start justify-between mb-8 md:mb-12">
-          <div className="w-full">
-            <SearchForm onSearch={onSearch} isLoading={isLoading} />
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex-1">
+            <div className="flex flex-row items-start gap-2">
+              <div className="flex-1">
+                <SearchForm onSearch={onSearch} isLoading={isLoading} />
+              </div>
+              <div className="md:hidden">
+                <PlanFilters
+                  onSortChange={setSortOrder}
+                  onContractLengthChange={setContractLength}
+                  onPlanTypeChange={setPlanType}
+                  onPrepaidChange={setPrepaidFilter}
+                  onTimeOfUseChange={setTimeOfUseFilter}
+                  onCompanyChange={setCompanyFilter}
+                  onRenewableChange={setRenewableFilter}
+                  onCancellationFeeChange={setCancellationFeeRange}
+                  currentSort={sortOrder}
+                  currentContractLength={contractLength}
+                  currentPlanType={planType}
+                  currentPrepaid={prepaidFilter}
+                  currentTimeOfUse={timeOfUseFilter}
+                  currentCompany={companyFilter}
+                  currentRenewable={renewableFilter}
+                  currentCancellationFee={cancellationFeeRange}
+                  plans={plans}
+                />
+              </div>
+            </div>
           </div>
         </div>
 
@@ -98,25 +123,27 @@ export default function Index({ comparedPlans, onCompare, search, onSearch, esti
 
         {plans && (
           <div className="space-y-4 md:space-y-6">
-            <PlanFilters
-              onSortChange={setSortOrder}
-              onContractLengthChange={setContractLength}
-              onPlanTypeChange={setPlanType}
-              onPrepaidChange={setPrepaidFilter}
-              onTimeOfUseChange={setTimeOfUseFilter}
-              onCompanyChange={setCompanyFilter}
-              onRenewableChange={setRenewableFilter}
-              onCancellationFeeChange={setCancellationFeeRange}
-              currentSort={sortOrder}
-              currentContractLength={contractLength}
-              currentPlanType={planType}
-              currentPrepaid={prepaidFilter}
-              currentTimeOfUse={timeOfUseFilter}
-              currentCompany={companyFilter}
-              currentRenewable={renewableFilter}
-              currentCancellationFee={cancellationFeeRange}
-              plans={plans}
-            />
+            <div className="hidden md:block">
+              <PlanFilters
+                onSortChange={setSortOrder}
+                onContractLengthChange={setContractLength}
+                onPlanTypeChange={setPlanType}
+                onPrepaidChange={setPrepaidFilter}
+                onTimeOfUseChange={setTimeOfUseFilter}
+                onCompanyChange={setCompanyFilter}
+                onRenewableChange={setRenewableFilter}
+                onCancellationFeeChange={setCancellationFeeRange}
+                currentSort={sortOrder}
+                currentContractLength={contractLength}
+                currentPlanType={planType}
+                currentPrepaid={prepaidFilter}
+                currentTimeOfUse={timeOfUseFilter}
+                currentCompany={companyFilter}
+                currentRenewable={renewableFilter}
+                currentCancellationFee={cancellationFeeRange}
+                plans={plans}
+              />
+            </div>
 
             {isLoading ? (
               <div className="text-center py-8 md:py-12">
