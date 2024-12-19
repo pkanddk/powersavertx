@@ -16,7 +16,6 @@ interface PlanFiltersProps {
   onTimeOfUseChange: (value: string) => void;
   onCompanyChange: (value: string) => void;
   onRenewableChange: (value: string) => void;
-  onBaseChargeChange: (value: [number, number]) => void;
   onCancellationFeeChange: (value: [number, number]) => void;
   currentSort: string;
   currentContractLength: string;
@@ -25,7 +24,6 @@ interface PlanFiltersProps {
   currentTimeOfUse: string;
   currentCompany: string;
   currentRenewable: string;
-  currentBaseCharge: [number, number];
   currentCancellationFee: [number, number];
   plans?: Plan[];
 }
