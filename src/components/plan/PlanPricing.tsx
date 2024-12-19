@@ -1,5 +1,5 @@
 import { Plan } from "@/lib/api";
-import { parseCancellationFee } from "@/lib/utils/parsePricingDetails";
+import { parseCancellationFee } from "@/lib/utils/parseCancellationFee";
 
 interface PlanPricingProps {
   plan: Plan;
@@ -35,14 +35,16 @@ export function PlanPricing({ plan, estimatedUse }: PlanPricingProps) {
           </div>
         )}
 
-        {cancellationFee && (
+        {cancellationFee !== null && (
           <div className="flex justify-between items-center pt-2 border-t">
             <span className="text-muted-foreground">Cancellation Fee:</span>
-            <span className="font-medium">{cancellationFee}</span>
+            <span className="font-medium">
+              {cancellationFee === 0 ? 'No cancellation fee' : `$${cancellationFee}`}
+            </span>
           </div>
         )}
 
-        {plan.pricing_details && !cancellationFee && (
+        {plan.pricing_details && cancellationFee === null && (
           <p className="text-xs text-muted-foreground mt-2 pt-2 border-t">
             {plan.pricing_details}
           </p>
