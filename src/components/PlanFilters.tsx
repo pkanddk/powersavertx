@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/select";
 import { Plan } from "@/lib/api";
 import { BaseChargeSlider } from "./filters/BaseChargeSlider";
+import { CancellationFeeSlider } from "./filters/CancellationFeeSlider";
 
 interface PlanFiltersProps {
   onSortChange: (value: string) => void;
@@ -17,6 +18,7 @@ interface PlanFiltersProps {
   onCompanyChange: (value: string) => void;
   onRenewableChange: (value: string) => void;
   onBaseChargeChange: (value: [number, number]) => void;
+  onCancellationFeeChange: (value: [number, number]) => void;
   currentSort: string;
   currentContractLength: string;
   currentPlanType: string;
@@ -25,6 +27,7 @@ interface PlanFiltersProps {
   currentCompany: string;
   currentRenewable: string;
   currentBaseCharge: [number, number];
+  currentCancellationFee: [number, number];
   plans?: Plan[];
 }
 
@@ -37,6 +40,7 @@ export function PlanFilters({
   onCompanyChange,
   onRenewableChange,
   onBaseChargeChange,
+  onCancellationFeeChange,
   currentSort,
   currentContractLength,
   currentPlanType,
@@ -45,6 +49,7 @@ export function PlanFilters({
   currentCompany,
   currentRenewable,
   currentBaseCharge,
+  currentCancellationFee,
   plans = [],
 }: PlanFiltersProps) {
   const companies = Array.from(new Set(plans.map(plan => plan.company_id))).map(id => {
@@ -167,6 +172,12 @@ export function PlanFilters({
         plans={plans}
         onBaseChargeChange={onBaseChargeChange}
         currentBaseCharge={currentBaseCharge}
+      />
+
+      <CancellationFeeSlider
+        plans={plans}
+        onCancellationFeeChange={onCancellationFeeChange}
+        currentCancellationFee={currentCancellationFee}
       />
     </div>
   );

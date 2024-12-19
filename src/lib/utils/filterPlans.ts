@@ -1,4 +1,5 @@
 import { Plan } from "@/lib/api";
+import { parseCancellationFee } from "./parseCancellationFee";
 
 export function filterPlans(
   plans: Plan[],
@@ -11,6 +12,7 @@ export function filterPlans(
     sortOrder = "price-asc",
     renewableFilter = "all",
     baseChargeRange = [0, 1000],
+    cancellationFeeRange = [0, 1000],
     estimatedUse,
   }: {
     planType?: string;
@@ -21,6 +23,7 @@ export function filterPlans(
     sortOrder?: string;
     renewableFilter?: string;
     baseChargeRange?: [number, number];
+    cancellationFeeRange?: [number, number];
     estimatedUse?: string;
   }
 ) {
@@ -33,6 +36,7 @@ export function filterPlans(
     sortOrder,
     renewableFilter,
     baseChargeRange,
+    cancellationFeeRange,
     estimatedUse
   });
 
@@ -149,6 +153,31 @@ export function filterPlans(
       filteredPlans.map(plan => ({
         plan_name: plan.plan_name,
         base_charge: plan.base_charge
+      }))
+    );
+  }
+
+  // Filter by cancellation fee range
+  if (cancellationFeeRange) {
+    console.log('[filterPlans] Filtering by cancellation fee range:', cancellationFeeRange);
+    console.log('[filterPlans] Plans before cancellation fee filtering:', 
+      filteredPlans.map(plan => ({
+        plan_name: plan.plan_name,
+        pricing_details: plan.pricing_details
+      }))
+    );
+    
+    filteredPlans = filteredPlans.filter(plan => {
+      const fee = parseCancellationFee(plan.pricing_details) ?? 0;
+      const isInRange = fee >= cancellationFeeRange[0] && fee <= cancellationFeeRange[1];
+      console.log(`[filterPlans] Plan ${plan.plan_name} cancellation fee: ${fee}, is in range [${cancellationFeeRange[0]}, ${cancellationFeeRange[1]}]: ${isInRange}`);
+      return isInRange;
+    });
+
+    console.log('[filterPlans] Plans after cancellation fee filtering:', 
+      filteredPlans.map(plan => ({
+        plan_name: plan.plan_name,
+        pricing_details: plan.pricing_details
       }))
     );
   }
