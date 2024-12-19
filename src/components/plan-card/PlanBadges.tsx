@@ -20,13 +20,15 @@ export function PlanBadges({
 }: PlanBadgesProps) {
   return (
     <div className="flex flex-wrap gap-2">
-      <Badge variant="secondary">
-        {planType}
-      </Badge>
+      {planType && planType !== "1" && (
+        <Badge variant="secondary">
+          {planType}
+        </Badge>
+      )}
       
-      {contractLength && (
+      {contractLength && contractLength > 0 && (
         <Badge variant="outline">
-          {`${contractLength} ${contractLength === 1 ? 'month' : 'months'}`}
+          {contractLength} {contractLength === 1 ? 'month' : 'months'}
         </Badge>
       )}
 
