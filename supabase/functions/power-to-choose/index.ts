@@ -5,6 +5,31 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+function parseRenewablePercentage(plan: any): number | null {
+  // First try the direct renewable_percentage field
+  if (plan.renewable_percentage !== undefined && plan.renewable_percentage !== null) {
+    return Number(plan.renewable_percentage);
+  }
+
+  // Then try renewable_energy_id which is sometimes just the percentage
+  if (plan.renewable_energy_id) {
+    const percentage = Number(plan.renewable_energy_id);
+    if (!isNaN(percentage)) {
+      return percentage;
+    }
+  }
+
+  // Finally try to parse from renewable_energy_description
+  if (plan.renewable_energy_description) {
+    const match = plan.renewable_energy_description.match(/(\d+)%/);
+    if (match) {
+      return Number(match[1]);
+    }
+  }
+
+  return null;
+}
+
 async function makeRequest(url: string, method: string, headers: Record<string, string>) {
   try {
     console.log("[Edge Function] Making request to:", url);
@@ -62,13 +87,19 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
       // Get the rate type from the API response
       const rateType = plan.rate_type || "Fixed";
       
+      // Parse renewable percentage
+      const renewablePercentage = parseRenewablePercentage(plan);
+      console.log("[Edge Function] Parsed renewable percentage:", {
+        original: plan.renewable_energy_description,
+        parsed: renewablePercentage
+      });
+      
       const transformed = {
         company_id: String(plan.company_id || ""),
         company_name: String(plan.company_name || ""),
         company_logo: plan.company_logo || null,
         company_tdu_name: plan.company_tdu_name || null,
         plan_name: String(plan.plan_name || ""),
-        // Use rate_type instead of plan_type for determining the plan type
         plan_type_name: String(rateType || "Fixed"),
         fact_sheet: plan.fact_sheet || null,
         go_to_plan: plan.enroll_plan_url || plan.go_to_plan || plan.enroll_now || null,
@@ -83,7 +114,7 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
         contract_length: plan.term_value ? Number(plan.term_value) : null,
         prepaid: Boolean(plan.prepaid || false),
         timeofuse: Boolean(plan.timeofuse || false),
-        renewable_percentage: plan.renewable_percentage ? Number(plan.renewable_percentage) : null,
+        renewable_percentage: renewablePercentage,
         pricing_details: plan.pricing_details || null,
         promotions: plan.promotions || null,
         enroll_phone: plan.enroll_phone || null,
@@ -94,8 +125,7 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
         detail_kwh1000: plan.detail_kwh1000 || null,
         detail_kwh2000: plan.detail_kwh2000 || null
       };
-      console.log("[Edge Function] Plan rate_type from API:", rateType);
-      console.log("[Edge Function] Transformed plan:", transformed);
+      
       return transformed;
     });
 
