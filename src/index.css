@@ -50,3 +50,20 @@
     transform: translateY(0);
   }
 }
+
+/* Debug styles */
+.debug-outline {
+  outline: 1px solid rgba(255, 0, 0, 0.2);
+}
+
+/* Reset any potential list styling */
+[data-debug="badge-component"] {
+  list-style: none;
+  counter-reset: none;
+}
+
+[data-debug="badge-component"]::before,
+[data-debug="badge-component"]::after {
+  display: none;
+  content: none;
+}
