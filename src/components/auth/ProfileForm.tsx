@@ -11,7 +11,8 @@ import { UniversalAlertSection } from "./profile/UniversalAlertSection";
 import { ActiveAlertsSection } from "./profile/ActiveAlertsSection";
 import { profileSchema, type ProfileFormData, type PriceAlert } from "./types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { RenewablePreferenceSection } from "./profile/RenewablePreferenceSection";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Info } from "lucide-react";
 
 export function ProfileForm() {
   const { toast } = useToast();
@@ -176,6 +177,14 @@ export function ProfileForm() {
             <TabsContent value="settings" className="space-y-6">
               <BasicProfileSection form={form} />
               <UniversalAlertSection form={form} />
+              
+              <Alert className="mt-6 bg-muted">
+                <Info className="h-4 w-4" />
+                <AlertDescription className="text-sm ml-2">
+                  You can also set individual plan alerts by clicking the "Set Price Alert" button on any plan in the main page.
+                </AlertDescription>
+              </Alert>
+
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? "Updating..." : "Save Changes"}
               </Button>
@@ -189,7 +198,6 @@ export function ProfileForm() {
                   alerts={priceAlerts} 
                   onDeleteAlert={handleDeleteAlert}
                   onCompare={(planId) => {
-                    // Handle plan comparison
                     console.log("Compare plan:", planId);
                   }}
                 />
