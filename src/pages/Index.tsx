@@ -3,10 +3,12 @@ import { useQuery } from "@tanstack/react-query";
 import { SearchForm } from "@/components/SearchForm";
 import { PlanGrid } from "@/components/PlanGrid";
 import { searchPlans, type Plan } from "@/lib/api";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { filterPlans } from "@/lib/utils/filterPlans";
 import { PlanFilters } from "@/components/PlanFilters";
 import { ComparisonBar } from "@/components/plan/ComparisonBar";
+import { WelcomeDialog } from "@/components/WelcomeDialog";
+import { BugReportDialog } from "@/components/BugReportDialog";
 
 interface IndexProps {
   comparedPlans: Plan[];
@@ -56,14 +58,23 @@ export default function Index({ comparedPlans, onCompare, search, onSearch, esti
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white">
+      <WelcomeDialog />
       <main className="container mx-auto px-4 py-8 md:py-12">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold tracking-tight text-gray-900 mb-4">
-            Power Saver TX
-          </h1>
-          <p className="text-2xl font-semibold text-primary mb-6">
-            Simple. Savings.
-          </p>
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <h1 className="text-4xl font-bold tracking-tight text-gray-900">
+              Power Saver TX
+            </h1>
+            <span className="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-md border border-red-200">
+              BETA
+            </span>
+          </div>
+          <div className="flex items-center justify-center gap-4 mb-6">
+            <p className="text-2xl font-semibold text-primary">
+              Simple. Savings.
+            </p>
+            <BugReportDialog />
+          </div>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Compare energy plans and save money with Power Saver TX
           </p>
