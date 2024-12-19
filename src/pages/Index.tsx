@@ -46,6 +46,7 @@ export default function Index() {
 
   const handleCompare = (plan: Plan) => {
     setComparedPlans(prevPlans => {
+      // Check if the plan is already being compared
       const isPlanCompared = prevPlans.some(p => p.company_id === plan.company_id);
       
       if (isPlanCompared) {
@@ -115,6 +116,7 @@ export default function Index() {
               plans={plans}
             />
 
+            {/* Only render comparison table if there are plans to compare */}
             {comparedPlans.length > 0 && (
               <div className="rounded-lg border border-border bg-white p-6 shadow-sm">
                 <h2 className="text-2xl font-semibold text-gray-900 mb-4">Plan Comparison</h2>
