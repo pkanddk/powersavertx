@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Plan } from "@/lib/api";
-import { CompareIcon, X } from "lucide-react";
+import { GitCompare, X } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface ComparisonBarProps {
@@ -17,7 +17,7 @@ export function ComparisonBar({ plans, onRemove }: ComparisonBarProps) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <CompareIcon className="h-5 w-5 text-primary" />
+              <GitCompare className="h-5 w-5 text-primary" />
               <span className="font-medium">
                 {plans.length} {plans.length === 1 ? 'Plan' : 'Plans'} Selected
               </span>
