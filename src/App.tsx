@@ -41,15 +41,13 @@ function App() {
               <Route 
                 path="/" 
                 element={
-                  <RequireAuth>
-                    <Index 
-                      comparedPlans={comparedPlans} 
-                      onCompare={handleCompare}
-                      search={search}
-                      onSearch={handleSearch}
-                      estimatedUse={search?.estimatedUse || "1000"}
-                    />
-                  </RequireAuth>
+                  <Index 
+                    comparedPlans={comparedPlans} 
+                    onCompare={handleCompare}
+                    search={search}
+                    onSearch={handleSearch}
+                    estimatedUse={search?.estimatedUse || "1000"}
+                  />
                 } 
               />
               <Route 
