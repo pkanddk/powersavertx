@@ -5,6 +5,7 @@ export const PlanSchema = z.object({
   company_id: z.string(),
   company_name: z.string(),
   company_logo: z.string().nullable(),
+  company_tdu_name: z.string().nullable(),
   plan_name: z.string(),
   plan_type_name: z.string(),
   fact_sheet: z.string().nullable(),
@@ -16,13 +17,21 @@ export const PlanSchema = z.object({
   price_kwh500: z.number(),
   price_kwh1000: z.number(),
   price_kwh2000: z.number(),
+  detail_kwh500: z.string().nullable(),
+  detail_kwh1000: z.string().nullable(),
+  detail_kwh2000: z.string().nullable(),
   base_charge: z.number().nullable(),
   contract_length: z.number().nullable(),
   jdp_rating: z.number().nullable(),
   jdp_rating_year: z.string().nullable(),
   prepaid: z.boolean().nullable(),
   renewable_percentage: z.number().nullable(),
-  timeofuse: z.boolean().nullable()
+  timeofuse: z.boolean().nullable(),
+  pricing_details: z.string().nullable(),
+  terms_of_service: z.string().nullable(),
+  yrac_url: z.string().nullable(),
+  enroll_phone: z.string().nullable(),
+  website: z.string().nullable()
 });
 
 export type Plan = z.infer<typeof PlanSchema>;
