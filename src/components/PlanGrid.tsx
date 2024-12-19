@@ -11,12 +11,49 @@ interface PlanGridProps {
 }
 
 export function PlanGrid({ plans, onCompare, comparedPlans, estimatedUse }: PlanGridProps) {
-  console.log('PlanGrid - Received plans:', plans);
-  console.log('PlanGrid - Estimated Use:', estimatedUse);
+  console.log('PlanGrid - Full plan data:', plans.map(plan => ({
+    id: plan.id,
+    company_name: plan.company_name,
+    plan_name: plan.plan_name,
+    plan_details: plan.plan_details,
+    plan_type_name: plan.plan_type_name,
+    prices: {
+      base: plan.price_kwh,
+      kwh500: plan.price_kwh500,
+      kwh1000: plan.price_kwh1000,
+      kwh2000: plan.price_kwh2000,
+      base_charge: plan.base_charge
+    },
+    contract: {
+      length: plan.contract_length,
+      terms: plan.terms_of_service
+    },
+    features: {
+      renewable: plan.renewable_percentage,
+      prepaid: plan.prepaid,
+      timeofuse: plan.timeofuse,
+      minimum_usage: plan.minimum_usage,
+      new_customer: plan.new_customer
+    },
+    details: {
+      kwh500: plan.detail_kwh500,
+      kwh1000: plan.detail_kwh1000,
+      kwh2000: plan.detail_kwh2000,
+      pricing: plan.pricing_details
+    },
+    contact: {
+      phone: plan.enroll_phone,
+      website: plan.website,
+      enroll_url: plan.go_to_plan
+    },
+    documents: {
+      fact_sheet: plan.fact_sheet,
+      yrac_url: plan.yrac_url
+    }
+  })));
 
   const getPriceForUsage = (plan: Plan) => {
     let price;
-    // Default to 1000 kWh price if no specific usage is selected
     if (estimatedUse === "any") {
       price = plan.price_kwh1000;
     } else {
@@ -31,24 +68,12 @@ export function PlanGrid({ plans, onCompare, comparedPlans, estimatedUse }: Plan
           price = plan.price_kwh2000;
           break;
         default:
-          price = plan.price_kwh1000; // Default to 1000 kWh price
+          price = plan.price_kwh1000;
       }
     }
-    
-    console.log(`Price for plan ${plan.plan_name}:`, {
-      estimatedUse,
-      price,
-      raw: {
-        price_kwh: plan.price_kwh,
-        price_kwh500: plan.price_kwh500,
-        price_kwh1000: plan.price_kwh1000,
-        price_kwh2000: plan.price_kwh2000
-      }
-    });
     return price;
   };
 
-  // Sanitize plan type name to remove unwanted numbers
   const formatPlanType = (planType: string) => {
     return planType.replace(/[0-9]/g, '').trim() || 'Fixed Rate';
   };
@@ -72,7 +97,7 @@ export function PlanGrid({ plans, onCompare, comparedPlans, estimatedUse }: Plan
               {/* Plan Details Section */}
               <div className="space-y-2">
                 <h4 className="text-lg font-semibold text-gray-900">{plan.plan_name}</h4>
-                <p className="text-sm text-muted-foreground line-clamp-2">{plan.plan_details}</p>
+                <p className="text-sm text-muted-foreground">{plan.plan_details}</p>
                 {plan.contract_length && (
                   <p className="text-sm text-primary font-medium">
                     {plan.contract_length} {plan.contract_length === 1 ? 'month' : 'months'} contract
@@ -98,20 +123,34 @@ export function PlanGrid({ plans, onCompare, comparedPlans, estimatedUse }: Plan
                   <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">500 kWh Usage:</span>
                     <span className="font-medium">{plan.price_kwh500.toFixed(1)}¢</span>
+                    {plan.detail_kwh500 && (
+                      <p className="text-xs text-muted-foreground mt-1">{plan.detail_kwh500}</p>
+                    )}
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">1,000 kWh Usage:</span>
                     <span className="font-medium">{plan.price_kwh1000.toFixed(1)}¢</span>
+                    {plan.detail_kwh1000 && (
+                      <p className="text-xs text-muted-foreground mt-1">{plan.detail_kwh1000}</p>
+                    )}
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">2,000 kWh Usage:</span>
                     <span className="font-medium">{plan.price_kwh2000.toFixed(1)}¢</span>
+                    {plan.detail_kwh2000 && (
+                      <p className="text-xs text-muted-foreground mt-1">{plan.detail_kwh2000}</p>
+                    )}
                   </div>
                   {plan.base_charge && (
                     <div className="flex justify-between items-center pt-2 border-t">
                       <span className="text-muted-foreground">Base Charge:</span>
                       <span className="font-medium">${plan.base_charge}/month</span>
                     </div>
+                  )}
+                  {plan.pricing_details && (
+                    <p className="text-xs text-muted-foreground mt-2 pt-2 border-t">
+                      {plan.pricing_details}
+                    </p>
                   )}
                 </div>
               </div>
@@ -140,6 +179,18 @@ export function PlanGrid({ plans, onCompare, comparedPlans, estimatedUse }: Plan
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Check className="h-4 w-4 text-primary" />
                       <span>Time of Use</span>
+                    </div>
+                  )}
+                  {plan.minimum_usage && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Minimum Usage Required</span>
+                    </div>
+                  )}
+                  {plan.new_customer && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>New Customers Only</span>
                     </div>
                   )}
                 </div>
