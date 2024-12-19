@@ -12,7 +12,7 @@ export const PlanSchema = z.object({
   go_to_plan: z.string().nullable(),
   minimum_usage: z.boolean(),
   new_customer: z.boolean(),
-  plan_details: z.string(),
+  plan_details: z.string().nullable(),
   price_kwh: z.number(),
   price_kwh500: z.number(),
   price_kwh1000: z.number(),
@@ -21,11 +21,13 @@ export const PlanSchema = z.object({
   contract_length: z.number().nullable(),
   prepaid: z.boolean(),
   timeofuse: z.boolean(),
-  renewable_percentage: z.number(),
-  pricing_details: z.string(),
-  promotions: z.string(),
-  enroll_phone: z.string(),
-  website: z.string()
+  renewable_percentage: z.number().nullable(),
+  pricing_details: z.string().nullable(),
+  promotions: z.string().nullable(),
+  enroll_phone: z.string().nullable(),
+  website: z.string().nullable(),
+  terms_of_service: z.string().nullable(),
+  yrac_url: z.string().nullable()
 });
 
 export type Plan = z.infer<typeof PlanSchema>;
