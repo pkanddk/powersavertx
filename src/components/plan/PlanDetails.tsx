@@ -1,11 +1,11 @@
 import { Plan } from "@/lib/api";
 import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 
 interface PlanDetailsProps {
   plan: Plan;
@@ -15,13 +15,13 @@ interface PlanDetailsProps {
 
 export function PlanDetails({ plan, isOpen, onClose }: PlanDetailsProps) {
   return (
-    <Drawer open={isOpen} onOpenChange={onClose}>
-      <DrawerContent>
-        <DrawerHeader>
-          <DrawerTitle>{plan.plan_name}</DrawerTitle>
-          <DrawerDescription>{plan.company_name}</DrawerDescription>
-        </DrawerHeader>
-        <div className="p-6 space-y-6">
+    <Sheet open={isOpen} onOpenChange={onClose}>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>{plan.plan_name}</SheetTitle>
+          <SheetDescription>{plan.company_name}</SheetDescription>
+        </SheetHeader>
+        <div className="mt-6 space-y-6">
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Plan Details</h3>
             <p className="text-sm text-muted-foreground">{plan.plan_details}</p>
@@ -65,7 +65,7 @@ export function PlanDetails({ plan, isOpen, onClose }: PlanDetailsProps) {
             </div>
           )}
         </div>
-      </DrawerContent>
-    </Drawer>
+      </SheetContent>
+    </Sheet>
   );
 }
