@@ -11,6 +11,7 @@ import { RenewablePreferenceSection } from "./profile/RenewablePreferenceSection
 import { UniversalAlertSection } from "./profile/UniversalAlertSection";
 import { ActiveAlertsSection } from "./profile/ActiveAlertsSection";
 import { profileSchema, type ProfileFormData, type PriceAlert } from "./profile/types";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export function ProfileForm() {
   const { toast } = useToast();
@@ -163,36 +164,43 @@ export function ProfileForm() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-6 max-w-6xl">
-      <div className="space-y-6">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <BasicProfileSection form={form} />
-            <RenewablePreferenceSection form={form} />
-            <Separator className="my-6" />
-            <UniversalAlertSection form={form} />
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Updating..." : "Save Changes"}
-            </Button>
-          </form>
-        </Form>
+    <div className="container mx-auto px-4 py-6 max-w-6xl h-[calc(100vh-4rem)] overflow-y-auto">
+      <Tabs defaultValue="settings" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="settings">Settings</TabsTrigger>
+          <TabsTrigger value="alerts">Price Alerts</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="settings" className="space-y-6">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <BasicProfileSection form={form} />
+              <RenewablePreferenceSection form={form} />
+              <Separator className="my-6" />
+              <UniversalAlertSection form={form} />
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? "Updating..." : "Save Changes"}
+              </Button>
+            </form>
+          </Form>
+        </TabsContent>
 
-        <Separator className="my-6" />
-
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium">Active Price Alerts</h3>
-          <ActiveAlertsSection 
-            alerts={priceAlerts} 
-            onDeleteAlert={handleDeleteAlert}
-            renewablePreference={form.watch("renewable_preference")}
-            onCompare={(planId) => {
-              // Handle plan comparison
-              console.log("Compare plan:", planId);
-              // You might want to implement the comparison logic here
-            }}
-          />
-        </div>
-      </div>
+        <TabsContent value="alerts" className="space-y-4">
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium">Active Price Alerts</h3>
+            <ActiveAlertsSection 
+              alerts={priceAlerts} 
+              onDeleteAlert={handleDeleteAlert}
+              renewablePreference={form.watch("renewable_preference")}
+              onCompare={(planId) => {
+                // Handle plan comparison
+                console.log("Compare plan:", planId);
+                // You might want to implement the comparison logic here
+              }}
+            />
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
