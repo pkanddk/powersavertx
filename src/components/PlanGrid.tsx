@@ -1,7 +1,7 @@
 import { Plan } from "@/lib/api";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Phone } from "lucide-react";
+import { ExternalLink, Phone, Info } from "lucide-react";
 import { useState } from "react";
 import { PlanFeatures } from "./plan/PlanFeatures";
 import { PlanPricing } from "./plan/PlanPricing";
@@ -58,13 +58,6 @@ export function PlanGrid({ plans, onCompare, comparedPlans, estimatedUse }: Plan
               {/* Plan Details Section */}
               <div className="space-y-2">
                 <h4 className="text-lg font-semibold text-gray-900">{plan.plan_name}</h4>
-                <Button 
-                  variant="link" 
-                  className="p-0 h-auto text-sm text-muted-foreground hover:text-primary"
-                  onClick={() => setSelectedPlan(plan)}
-                >
-                  View Plan Details
-                </Button>
                 {plan.contract_length && (
                   <p className="text-sm text-primary font-medium">
                     {plan.contract_length} {plan.contract_length === 1 ? 'month' : 'months'} contract
@@ -105,6 +98,15 @@ export function PlanGrid({ plans, onCompare, comparedPlans, estimatedUse }: Plan
                   {comparedPlans.some(p => p.company_id === plan.company_id)
                     ? "Remove"
                     : "Compare"}
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="lg"
+                  onClick={() => setSelectedPlan(plan)}
+                  className="w-full flex items-center justify-center gap-2"
+                >
+                  <Info className="h-4 w-4" />
+                  Plan Details
                 </Button>
                 {plan.enroll_phone && (
                   <a
