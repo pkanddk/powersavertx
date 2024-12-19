@@ -10,34 +10,33 @@ import { ArrowLeft } from "lucide-react";
 export function AuthPage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const from = location.state?.from?.pathname || "/";
 
   console.log("[Auth] Rendering AuthPage, current location:", location);
 
   useEffect(() => {
-    // Check if user is already logged in
     const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       console.log("[Auth] Current session:", session);
       if (session) {
-        console.log("[Auth] User already logged in, redirecting to home");
-        navigate("/");
+        console.log("[Auth] User already logged in, redirecting to:", from);
+        navigate(from);
       }
     };
 
     checkUser();
 
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("[Auth] Auth state changed:", event, "Session:", session);
       if (session) {
-        navigate("/");
+        navigate(from);
       }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate]);
+  }, [navigate, from]);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">

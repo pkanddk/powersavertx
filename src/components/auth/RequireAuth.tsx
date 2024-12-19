@@ -10,7 +10,7 @@ export function RequireAuth({ children }: { children: React.ReactNode }) {
   }
 
   if (!user) {
-    console.log("[RequireAuth] No user found, redirecting to login");
+    // Only redirect to auth when trying to access protected routes
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 

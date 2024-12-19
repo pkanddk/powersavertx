@@ -8,21 +8,8 @@ import { AuthPage } from "@/pages/Auth";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { RequireAuth } from "@/components/auth/RequireAuth";
 import { Plan } from "./lib/api";
-import { useAuth } from "./components/auth/AuthProvider";
 
 const queryClient = new QueryClient();
-
-// Separate component for auth page to handle redirects
-const AuthRoute = () => {
-  const { user } = useAuth();
-  
-  // If user is already logged in, redirect to home
-  if (user) {
-    return <Navigate to="/" replace />;
-  }
-  
-  return <AuthPage />;
-};
 
 function App() {
   console.log("[App] Component rendering");
@@ -64,9 +51,9 @@ function App() {
                   />
                 } 
               />
-              {/* Auth page with redirect logic */}
-              <Route path="/auth" element={<AuthRoute />} />
-              {/* Protected compare route */}
+              {/* Auth page */}
+              <Route path="/auth" element={<AuthPage />} />
+              {/* Protected compare route - redirects to auth only when trying to access /compare */}
               <Route 
                 path="/compare" 
                 element={
@@ -78,8 +65,6 @@ function App() {
                   </RequireAuth>
                 } 
               />
-              {/* Redirect all unknown routes to home */}
-              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
             <Toaster />
           </AuthProvider>
