@@ -10,6 +10,7 @@ const queryClient = new QueryClient();
 
 function App() {
   const [comparedPlans, setComparedPlans] = useState<Plan[]>([]);
+  const [search, setSearch] = useState<{ zipCode: string; estimatedUse: string } | null>(null);
 
   const handleCompare = (plan: Plan) => {
     setComparedPlans(prevPlans => {
@@ -22,6 +23,11 @@ function App() {
     });
   };
 
+  const handleSearch = (zipCode: string, estimatedUse: string) => {
+    console.log("[App] Setting search:", { zipCode, estimatedUse });
+    setSearch({ zipCode, estimatedUse });
+  };
+
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
@@ -31,8 +37,10 @@ function App() {
             element={
               <Index 
                 comparedPlans={comparedPlans} 
-                onCompare={handleCompare} 
-                estimatedUse="1000"
+                onCompare={handleCompare}
+                search={search}
+                onSearch={handleSearch}
+                estimatedUse={search?.estimatedUse || "1000"}
               />
             } 
           />

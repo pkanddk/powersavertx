@@ -12,12 +12,12 @@ import { ComparisonBar } from "@/components/plan/ComparisonBar";
 interface IndexProps {
   comparedPlans: Plan[];
   onCompare: (plan: Plan) => void;
+  search: { zipCode: string; estimatedUse: string } | null;
+  onSearch: (zipCode: string, estimatedUse: string) => void;
   estimatedUse: string;
 }
 
-export default function Index({ comparedPlans, onCompare, estimatedUse }: IndexProps) {
-  const [searchParams] = useSearchParams();
-  const [search, setSearch] = useState<{ zipCode: string; estimatedUse: string } | null>(null);
+export default function Index({ comparedPlans, onCompare, search, onSearch, estimatedUse }: IndexProps) {
   const [sortOrder, setSortOrder] = useState("price-asc");
   const [contractLength, setContractLength] = useState("all");
   const [planType, setPlanType] = useState("all");
@@ -43,10 +43,6 @@ export default function Index({ comparedPlans, onCompare, estimatedUse }: IndexP
     },
   });
 
-  const handleSearch = (zipCode: string, estimatedUse: string) => {
-    setSearch({ zipCode, estimatedUse });
-  };
-
   const filteredPlans = plans ? filterPlans(plans, {
     planType,
     contractLength,
@@ -56,7 +52,7 @@ export default function Index({ comparedPlans, onCompare, estimatedUse }: IndexP
     sortOrder,
     renewableFilter,
     cancellationFeeRange,
-    estimatedUse: search?.estimatedUse || estimatedUse,
+    estimatedUse,
   }) : [];
 
   return (
@@ -72,7 +68,7 @@ export default function Index({ comparedPlans, onCompare, estimatedUse }: IndexP
         </div>
 
         <div className="mb-12">
-          <SearchForm onSearch={handleSearch} isLoading={isLoading} />
+          <SearchForm onSearch={onSearch} isLoading={isLoading} />
         </div>
 
         {plans && (
