@@ -33,29 +33,29 @@ Deno.serve(async (req) => {
         )
       `)
       .eq('active', true)
-      .limit(1);
+      .limit(1)
+      .maybeSingle();
 
     if (alertsError) throw alertsError;
     
-    if (!alerts || alerts.length === 0) {
+    if (!alerts) {
       return new Response(
         JSON.stringify({ error: 'No active price alerts found. Please create one first.' }), 
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const alert = alerts[0];
-    console.log(`[test-price-alert] Found alert for plan: ${alert.energy_plans.plan_name}`);
+    console.log(`[test-price-alert] Found alert for plan: ${alerts.energy_plans.plan_name}`);
 
     // Insert a new record in api_history with a lower price
     const { error: insertError } = await supabase
       .from('api_history')
       .insert({
         zip_code_id: '00000000-0000-0000-0000-000000000000', // Dummy ID
-        company_id: alert.energy_plans.company_id,
+        company_id: alerts.energy_plans.company_id,
         company_name: 'Test Company',
-        plan_name: alert.energy_plans.plan_name,
-        [`price_kwh${alert.kwh_usage}`]: alert.price_threshold - 0.1 // Set price just below threshold
+        plan_name: alerts.energy_plans.plan_name,
+        [`price_kwh${alerts.kwh_usage}`]: alerts.price_threshold - 0.1 // Set price just below threshold
       });
 
     if (insertError) throw insertError;

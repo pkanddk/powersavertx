@@ -51,12 +51,13 @@ Deno.serve(async (req) => {
         .eq('company_id', alert.energy_plans.company_id)
         .eq('plan_name', alert.energy_plans.plan_name)
         .order('created_at', { ascending: false })
-        .limit(1);
+        .limit(1)
+        .maybeSingle();
 
       if (pricesError) throw pricesError;
 
-      if (latestPrices?.[0]) {
-        const currentPrice = latestPrices[0][`price_kwh${alert.kwh_usage}`];
+      if (latestPrices) {
+        const currentPrice = latestPrices[`price_kwh${alert.kwh_usage}`];
         console.log(`[check-price-alerts] Current price: ${currentPrice}¢, Threshold: ${alert.price_threshold}¢`);
         
         if (currentPrice && currentPrice <= alert.price_threshold) {
