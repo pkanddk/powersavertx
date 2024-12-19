@@ -7,7 +7,8 @@ interface PlanPricingProps {
 
 export function PlanPricing({ plan, estimatedUse }: PlanPricingProps) {
   const isSelected = (usage: string) => {
-    return estimatedUse === usage;
+    // Convert estimatedUse to match the format we're comparing against
+    return estimatedUse === usage.split(" ")[0].replace(",", "");
   };
 
   return (
