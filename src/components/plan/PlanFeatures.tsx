@@ -1,5 +1,4 @@
 import { Plan } from "@/lib/api";
-import { Badge } from "@/components/ui/badge";
 
 interface PlanFeaturesProps {
   plan: Plan;
@@ -8,13 +7,8 @@ interface PlanFeaturesProps {
 export function PlanFeatures({ plan }: PlanFeaturesProps) {
   return (
     <div className="space-y-2">
-      {/* Primary Features Row */}
+      {/* Primary Features Row - Intentionally empty now that badges are moved to drawer */}
       <div className="flex flex-wrap justify-between gap-2">
-        {plan.plan_type_name && (
-          <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20">
-            {plan.plan_type_name}
-          </Badge>
-        )}
       </div>
     </div>
   );
