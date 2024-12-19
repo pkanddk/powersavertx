@@ -6,7 +6,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Plan } from "@/lib/api";
-import { BaseChargeSlider } from "./filters/BaseChargeSlider";
 import { CancellationFeeSlider } from "./filters/CancellationFeeSlider";
 
 interface PlanFiltersProps {
@@ -39,7 +38,6 @@ export function PlanFilters({
   onTimeOfUseChange,
   onCompanyChange,
   onRenewableChange,
-  onBaseChargeChange,
   onCancellationFeeChange,
   currentSort,
   currentContractLength,
@@ -48,7 +46,6 @@ export function PlanFilters({
   currentTimeOfUse,
   currentCompany,
   currentRenewable,
-  currentBaseCharge,
   currentCancellationFee,
   plans = [],
 }: PlanFiltersProps) {
@@ -167,12 +164,6 @@ export function PlanFilters({
           </SelectContent>
         </Select>
       </div>
-
-      <BaseChargeSlider
-        plans={plans}
-        onBaseChargeChange={onBaseChargeChange}
-        currentBaseCharge={currentBaseCharge}
-      />
 
       <CancellationFeeSlider
         plans={plans}

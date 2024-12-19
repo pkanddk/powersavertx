@@ -1,5 +1,5 @@
 export function parseCancellationFee(pricingDetails: string | null): number | null {
-  if (!pricingDetails) return null;
+  if (!pricingDetails) return 0; // Return 0 for plans with no pricing details
   
   // Convert to lowercase for case-insensitive matching
   const lowerDetails = pricingDetails.toLowerCase();
@@ -20,5 +20,6 @@ export function parseCancellationFee(pricingDetails: string | null): number | nu
     return parseFloat(match[1]);
   }
   
-  return null;
+  // If no cancellation fee is mentioned, return 0
+  return 0;
 }
