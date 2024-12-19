@@ -2,6 +2,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') ?? '';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -72,36 +73,47 @@ Deno.serve(async (req) => {
           }
 
           if (userData?.user?.email) {
-            // Send email notification
-            const { error: emailError } = await supabase.auth.admin.createUser({
-              email: userData.user.email,
-              email_confirm: true,
-              user_metadata: {
-                price_alert: {
-                  plan_name: alert.energy_plans.plan_name,
-                  company_name: alert.energy_plans.company_name,
-                  current_price: currentPrice,
-                  threshold_price: alert.price_threshold,
-                  go_to_plan: alert.energy_plans.go_to_plan,
-                },
+            // Send email via Resend
+            const emailResponse = await fetch('https://api.resend.com/emails', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${RESEND_API_KEY}`,
               },
+              body: JSON.stringify({
+                from: 'Energy Plans <onboarding@resend.dev>',
+                to: [userData.user.email],
+                subject: `Price Alert: ${alert.energy_plans.plan_name} price has dropped!`,
+                html: `
+                  <h2>Good news! The price has dropped below your target.</h2>
+                  <p>The ${alert.energy_plans.plan_name} plan from ${alert.energy_plans.company_name} 
+                  is now ${currentPrice}¢/kWh for ${alert.kwh_usage}kWh usage.</p>
+                  <p>Your target price was: ${alert.price_threshold}¢/kWh</p>
+                  ${alert.energy_plans.go_to_plan ? 
+                    `<p><a href="${alert.energy_plans.go_to_plan}">View the plan</a></p>` : 
+                    ''
+                  }
+                `,
+              }),
             });
 
-            if (emailError) {
-              console.error('[check-price-alerts] Error sending email:', emailError);
-            } else {
-              console.log(`[check-price-alerts] Email notification sent to ${userData.user.email}`);
+            if (!emailResponse.ok) {
+              const errorData = await emailResponse.text();
+              console.error('[check-price-alerts] Error sending email:', errorData);
+              continue;
             }
-          }
 
-          // Deactivate the alert after notification
-          const { error: updateError } = await supabase
-            .from('user_plan_tracking')
-            .update({ active: false })
-            .eq('id', alert.id);
+            console.log(`[check-price-alerts] Email notification sent to ${userData.user.email}`);
 
-          if (updateError) {
-            console.error('[check-price-alerts] Error deactivating alert:', updateError);
+            // Deactivate the alert after successful notification
+            const { error: updateError } = await supabase
+              .from('user_plan_tracking')
+              .update({ active: false })
+              .eq('id', alert.id);
+
+            if (updateError) {
+              console.error('[check-price-alerts] Error deactivating alert:', updateError);
+            }
           }
         }
       }
