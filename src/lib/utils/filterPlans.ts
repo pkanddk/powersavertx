@@ -90,10 +90,9 @@ export function filterPlans(
   // Filter by renewable percentage
   if (renewableFilter !== "all") {
     console.log('[filterPlans] Filtering by renewable percentage:', renewableFilter);
-    const percentage = parseInt(renewableFilter, 10);
     
-    // Log the plans and their renewable percentages before filtering
-    console.log('[filterPlans] Plans before renewable filtering:', 
+    // Log all plans and their renewable percentages before filtering
+    console.log('[filterPlans] All plans before renewable filtering:', 
       filteredPlans.map(plan => ({
         plan_name: plan.plan_name,
         renewable_percentage: plan.renewable_percentage
@@ -101,14 +100,15 @@ export function filterPlans(
     );
 
     if (renewableFilter === "0") {
-      // For "No Renewable" option, show plans with 0% or null renewable percentage
+      // For "No Renewable" option, only show plans with 0% renewable energy
       filteredPlans = filteredPlans.filter(plan => {
-        const isNonRenewable = plan.renewable_percentage === 0 || plan.renewable_percentage === null;
+        const isNonRenewable = plan.renewable_percentage === 0;
         console.log(`[filterPlans] Plan ${plan.plan_name} renewable percentage: ${plan.renewable_percentage}, isNonRenewable: ${isNonRenewable}`);
         return isNonRenewable;
       });
     } else {
       // For percentage thresholds (25, 50, 100), show plans with at least that percentage
+      const percentage = parseInt(renewableFilter, 10);
       filteredPlans = filteredPlans.filter(plan => {
         const meetsThreshold = plan.renewable_percentage !== null && plan.renewable_percentage >= percentage;
         console.log(`[filterPlans] Plan ${plan.plan_name} renewable percentage: ${plan.renewable_percentage}, meets ${percentage}% threshold: ${meetsThreshold}`);
