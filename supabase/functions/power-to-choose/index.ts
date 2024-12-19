@@ -36,6 +36,7 @@ const makeRequest = async (url: string, method: string, headers: Record<string, 
 
     // Remove any trailing colons from the URL
     const cleanUrl = url.replace(/:\/?$/, '');
+    console.log("[Edge Function] Cleaned URL:", cleanUrl);
     
     const response = await fetch(cleanUrl, {
       method,
@@ -94,7 +95,43 @@ const makeRequest = async (url: string, method: string, headers: Record<string, 
     }
 
     console.log(`[Edge Function] Found ${plans.length} plans`);
-    return plans;
+    
+    // Transform the plans to match our schema
+    const transformedPlans = plans.map(plan => ({
+      company_id: String(plan.company_id || ""),
+      company_name: String(plan.company_name || ""),
+      company_logo: plan.company_logo || null,
+      company_tdu_name: plan.company_tdu_name || null,
+      plan_name: String(plan.plan_name || ""),
+      plan_type_name: String(plan.rate_type || "Fixed"),
+      fact_sheet: plan.fact_sheet || null,
+      go_to_plan: plan.enroll_plan_url || plan.go_to_plan || plan.enroll_now || null,
+      minimum_usage: Boolean(plan.minimum_usage),
+      new_customer: Boolean(plan.new_customer),
+      plan_details: plan.special_terms || plan.plan_details || null,
+      price_kwh: Number(plan.price_kwh || 0),
+      price_kwh500: Number(plan.price_kwh500 || plan.rate500 || 0),
+      price_kwh1000: Number(plan.price_kwh1000 || plan.rate1000 || 0),
+      price_kwh2000: Number(plan.price_kwh2000 || plan.rate2000 || 0),
+      base_charge: plan.base_charge ? Number(plan.base_charge) : null,
+      contract_length: plan.term_value ? Number(plan.term_value) : null,
+      prepaid: Boolean(plan.prepaid || false),
+      timeofuse: Boolean(plan.timeofuse || false),
+      renewable_percentage: parseRenewablePercentage(plan),
+      pricing_details: plan.pricing_details || null,
+      promotions: plan.promotions || null,
+      enroll_phone: plan.enroll_phone || null,
+      website: plan.website || null,
+      terms_of_service: plan.terms_of_service || null,
+      yrac_url: plan.yrac_url || null,
+      detail_kwh500: plan.detail_kwh500 || null,
+      detail_kwh1000: plan.detail_kwh1000 || null,
+      detail_kwh2000: plan.detail_kwh2000 || null
+    }));
+
+    console.log(`[Edge Function] Transformed ${transformedPlans.length} plans`);
+    return transformedPlans;
+
   } catch (error) {
     console.error(`[Edge Function] Request failed:`, error);
     throw error;
@@ -114,12 +151,7 @@ serve(async (req) => {
       throw new Error("ZIP code is required");
     }
 
-    let apiUrl = `http://api.powertochoose.org/api/PowerToChoose/plans?zip_code=${zipCode}`;
-    
-    if (estimatedUse && estimatedUse !== "any") {
-      apiUrl += `&kWh=${estimatedUse}`;
-    }
-
+    const apiUrl = `http://api.powertochoose.org/api/PowerToChoose/plans?zip_code=${zipCode}${estimatedUse && estimatedUse !== "any" ? `&kWh=${estimatedUse}` : ''}`;
     console.log("[Edge Function] Making request to URL:", apiUrl);
 
     const plans = await makeRequest(apiUrl, "GET", {

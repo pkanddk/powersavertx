@@ -24,7 +24,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
     if (zipCode.length === 5) {  // Only search when ZIP code is complete
       const usageValue = estimatedUse === USAGE_OPTIONS[0] ? "any" :
                         estimatedUse.split(" ")[0].replace(",", "");
-      console.log("[SearchForm] Auto-triggering search with usage value:", usageValue);
+      console.log("[SearchForm] Triggering search with:", { zipCode, usageValue });
       onSearch(zipCode, usageValue);
     }
   }, [zipCode, estimatedUse, onSearch]);
@@ -34,7 +34,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
     // Extract just the number from the usage string
     const usageValue = estimatedUse === USAGE_OPTIONS[0] ? "any" :
                       estimatedUse.split(" ")[0].replace(",", "");
-    console.log("[SearchForm] Manual submit with usage value:", usageValue);
+    console.log("[SearchForm] Manual submit with:", { zipCode, usageValue });
     onSearch(zipCode, usageValue);
   };
 
@@ -44,7 +44,10 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
         type="text"
         placeholder="Enter ZIP Code"
         value={zipCode}
-        onChange={(e) => setZipCode(e.target.value)}
+        onChange={(e) => {
+          console.log("[SearchForm] ZIP code changed:", e.target.value);
+          setZipCode(e.target.value);
+        }}
         className="md:flex-1"
         pattern="[0-9]{5}"
         maxLength={5}
@@ -52,7 +55,10 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
       />
       <Select 
         value={estimatedUse} 
-        onValueChange={setEstimatedUse}
+        onValueChange={(value) => {
+          console.log("[SearchForm] Usage changed:", value);
+          setEstimatedUse(value);
+        }}
       >
         <SelectTrigger className="md:w-64">
           <SelectValue placeholder="Estimated Usage" />
