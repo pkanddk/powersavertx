@@ -7,8 +7,7 @@ interface PlanPricingProps {
 
 export function PlanPricing({ plan, estimatedUse }: PlanPricingProps) {
   const isSelected = (usage: string) => {
-    return estimatedUse === usage || 
-           (estimatedUse === "any" && usage === "1000"); // Default to 1000 if "any" is selected
+    return estimatedUse === usage;
   };
 
   return (
