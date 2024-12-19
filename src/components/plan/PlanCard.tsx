@@ -38,6 +38,7 @@ export function PlanCard({
             <PlanPricing
               plan={plan}
               estimatedUse={estimatedUse}
+              onShowDetails={onShowDetails}
             />
           </div>
 

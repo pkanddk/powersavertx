@@ -1,6 +1,6 @@
 import { Plan } from "@/lib/api";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Phone, Info } from "lucide-react";
+import { ExternalLink, Info } from "lucide-react";
 
 interface PlanCardActionsProps {
   plan: Plan;
@@ -16,8 +16,8 @@ export function PlanCardActions({
   onShowDetails 
 }: PlanCardActionsProps) {
   return (
-    <div className="space-y-3 pt-2 border-t border-border/50">
-      <div className="grid grid-cols-2 gap-3 pt-4">
+    <div className="space-y-3">
+      <div className="grid grid-cols-2 gap-3">
         {plan.go_to_plan ? (
           <Button 
             variant="default" 
@@ -50,24 +50,6 @@ export function PlanCardActions({
         >
           {isCompared ? "Remove" : "Compare"}
         </Button>
-      </div>
-      <div className="flex items-center justify-between gap-2">
-        <Button 
-          variant="secondary"
-          onClick={() => onShowDetails(plan)}
-          className="flex-1 bg-primary/5 hover:bg-primary/10 text-primary hover:text-primary/90 transition-colors flex items-center justify-center gap-2 font-medium"
-        >
-          <Info className="h-4 w-4" />
-          View Full Details
-        </Button>
-        {plan.enroll_phone && (
-          <a
-            href={`tel:${plan.enroll_phone}`}
-            className="flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
-          >
-            <Phone className="h-4 w-4" /> {plan.enroll_phone}
-          </a>
-        )}
       </div>
     </div>
   );

@@ -1,19 +1,17 @@
 import { Plan } from "@/lib/api";
 import { parseCancellationFee } from "@/lib/utils/parseCancellationFee";
+import { Button } from "@/components/ui/button";
+import { Info } from "lucide-react";
 
 interface PlanPricingProps {
   plan: Plan;
   estimatedUse: string;
+  onShowDetails: (plan: Plan) => void;
 }
 
-export function PlanPricing({ plan, estimatedUse }: PlanPricingProps) {
+export function PlanPricing({ plan, estimatedUse, onShowDetails }: PlanPricingProps) {
   const cancellationFee = parseCancellationFee(plan.pricing_details);
   
-  // Add debug logging
-  console.log('Plan:', plan.plan_name);
-  console.log('Raw pricing details:', plan.pricing_details);
-  console.log('Parsed cancellation fee:', cancellationFee);
-
   return (
     <div className="space-y-3">
       {/* Price Breakdown */}
@@ -55,6 +53,15 @@ export function PlanPricing({ plan, estimatedUse }: PlanPricingProps) {
           </p>
         )}
       </div>
+
+      <Button 
+        variant="secondary"
+        onClick={() => onShowDetails(plan)}
+        className="w-full bg-primary/5 hover:bg-primary/10 text-primary hover:text-primary/90 transition-colors flex items-center justify-center gap-2 font-medium"
+      >
+        <Info className="h-4 w-4" />
+        View Full Details
+      </Button>
     </div>
   );
 }
