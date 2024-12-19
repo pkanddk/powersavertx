@@ -16,19 +16,25 @@ export function PlanGrid({ plans, onCompare, comparedPlans, estimatedUse }: Plan
 
   const getPriceForUsage = (plan: Plan) => {
     let price;
-    switch (estimatedUse) {
-      case "500":
-        price = plan.price_kwh500;
-        break;
-      case "1000":
-        price = plan.price_kwh1000;
-        break;
-      case "2000":
-        price = plan.price_kwh2000;
-        break;
-      default:
-        price = plan.price_kwh;
+    // Default to 1000 kWh price if no specific usage is selected
+    if (estimatedUse === "any") {
+      price = plan.price_kwh1000;
+    } else {
+      switch (estimatedUse) {
+        case "500":
+          price = plan.price_kwh500;
+          break;
+        case "1000":
+          price = plan.price_kwh1000;
+          break;
+        case "2000":
+          price = plan.price_kwh2000;
+          break;
+        default:
+          price = plan.price_kwh1000; // Default to 1000 kWh price
+      }
     }
+    
     console.log(`Price for plan ${plan.plan_name}:`, {
       estimatedUse,
       price,
