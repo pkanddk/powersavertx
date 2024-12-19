@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { useNavigate } from "react-router-dom";
@@ -13,11 +13,27 @@ import {
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { ProfileForm } from "./ProfileForm";
 
 export function AuthSidebar() {
   const [open, setOpen] = useState(false);
+  const [session, setSession] = useState<any>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
@@ -58,21 +74,38 @@ export function AuthSidebar() {
           </SheetTitle>
         </SheetHeader>
         <div className="mt-8">
-          <Auth
-            supabaseClient={supabase}
-            appearance={{
-              theme: ThemeSupa,
-              variables: {
-                default: {
-                  colors: {
-                    brand: 'rgb(147, 51, 234)',
-                    brandAccent: 'rgb(126, 34, 206)',
+          {session ? (
+            <div className="space-y-6">
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-semibold tracking-tight">
+                  Profile Settings
+                </h2>
+                <Button
+                  variant="outline"
+                  onClick={handleSignOut}
+                >
+                  Sign Out
+                </Button>
+              </div>
+              <ProfileForm />
+            </div>
+          ) : (
+            <Auth
+              supabaseClient={supabase}
+              appearance={{
+                theme: ThemeSupa,
+                variables: {
+                  default: {
+                    colors: {
+                      brand: 'rgb(147, 51, 234)',
+                      brandAccent: 'rgb(126, 34, 206)',
+                    },
                   },
                 },
-              },
-            }}
-            providers={[]}
-          />
+              }}
+              providers={[]}
+            />
+          )}
         </div>
       </SheetContent>
     </Sheet>
