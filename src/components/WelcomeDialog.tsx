@@ -7,16 +7,19 @@ import {
   DialogTitle,
 } from "./ui/dialog";
 
-export function WelcomeDialog() {
+export function WelcomeDialog({ zipCode }: { zipCode?: string }) {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    const hasSeenWelcome = localStorage.getItem("hasSeenWelcome");
-    if (!hasSeenWelcome) {
-      setIsOpen(true);
-      localStorage.setItem("hasSeenWelcome", "true");
+    // Show dialog when ZIP code is entered and dialog hasn't been shown before
+    if (zipCode && zipCode.length === 5) {
+      const hasSeenWelcome = localStorage.getItem("hasSeenWelcome");
+      if (!hasSeenWelcome) {
+        setIsOpen(true);
+        localStorage.setItem("hasSeenWelcome", "true");
+      }
     }
-  }, []);
+  }, [zipCode]);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>

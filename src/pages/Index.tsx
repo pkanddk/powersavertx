@@ -58,7 +58,7 @@ export default function Index({ comparedPlans, onCompare, search, onSearch, esti
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white">
-      <WelcomeDialog />
+      <WelcomeDialog zipCode={search?.zipCode} />
       <main className="container mx-auto px-4 py-8 md:py-12">
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-2 mb-4">
