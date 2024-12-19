@@ -73,7 +73,7 @@ Deno.serve(async (req) => {
           }
 
           if (userData?.user?.email) {
-            // Send email via Resend
+            // Send email via Resend with proper sender configuration
             const emailResponse = await fetch('https://api.resend.com/emails', {
               method: 'POST',
               headers: {
@@ -81,7 +81,7 @@ Deno.serve(async (req) => {
                 'Authorization': `Bearer ${RESEND_API_KEY}`,
               },
               body: JSON.stringify({
-                from: 'Power Saver TX <alerts@powersavertx.com>',
+                from: 'Power Saver TX <powersavertx@resend.dev>',  // Use resend.dev domain for now
                 to: [userData.user.email],
                 subject: `Price Alert: ${alert.energy_plans.plan_name} price has dropped!`,
                 html: `
