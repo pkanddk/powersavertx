@@ -31,16 +31,16 @@ export function DevMessageDialog() {
             <p className="bg-gradient-to-r from-blue-50 to-green-50 p-4 rounded-lg border border-green-100 shadow-sm">
               As an early visitor, you have the unique opportunity to explore our app and provide valuable feedback. While you may encounter some bugs or quirks, your contributions will help shape the future while saving you money!
             </p>
-            <p>
+            <p className="bg-gradient-to-r from-green-50 to-yellow-50 p-4 rounded-lg border border-yellow-100 shadow-sm">
               Feel free to dive in, test out the features, and let us know your thoughts. If you like what you see, don&apos;t forget to bookmark our site for the official launch, coming soon! We&apos;re working tirelessly to bring you the most user-friendly and efficient way to save on your power bills.
             </p>
-            <p>
+            <p className="bg-gradient-to-r from-yellow-50 to-orange-50 p-4 rounded-lg border border-orange-100 shadow-sm">
               Thank you for being a part of our journey. Together, we&apos;re revolutionizing the way people manage their energy costs.
             </p>
-            <p className="font-medium">
+            <p className="bg-gradient-to-r from-orange-50 to-red-50 p-4 rounded-lg border border-red-100 shadow-sm">
               Stay tuned for updates and get ready to experience the future of energy savings!
             </p>
-            <p className="font-semibold text-primary">
+            <p className="font-semibold text-primary text-center">
               The Power Saving Dev Team
             </p>
           </DialogDescription>

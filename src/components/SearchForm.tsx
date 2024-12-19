@@ -68,7 +68,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
             setEstimatedUse(value);
           }}
         >
-          <SelectTrigger className="w-[140px]">
+          <SelectTrigger className="w-[180px] md:w-[140px]">
             <SelectValue placeholder="Estimated Usage" />
           </SelectTrigger>
           <SelectContent>
