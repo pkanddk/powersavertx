@@ -9,117 +9,122 @@ import { useNavigate } from "react-router-dom";
 interface ActiveAlertsSectionProps {
   alerts: PriceAlert[];
   onDeleteAlert: (alertId: string) => void;
-  renewablePreference?: boolean;
-  onCompare?: (planId: string) => void;
+  onCompare: (planId: string) => void;
+  renewablePreference: boolean;
 }
 
 export function ActiveAlertsSection({ 
   alerts, 
   onDeleteAlert, 
-  renewablePreference = false,
-  onCompare
+  onCompare,
+  renewablePreference 
 }: ActiveAlertsSectionProps) {
   const navigate = useNavigate();
-
-  // Query to get current prices for each plan
-  const { data: currentPrices } = useQuery({
-    queryKey: ["currentPrices", alerts.map(a => a.plan_id)],
-    queryFn: async () => {
-      const planIds = alerts.map(alert => alert.plan_id).filter(Boolean);
-      if (planIds.length === 0) return {};
-
-      const { data, error } = await supabase
-        .from('energy_plans')
-        .select('*')
-        .in('id', planIds);
-
-      if (error) throw error;
-
-      return data.reduce((acc: Record<string, any>, plan) => {
-        acc[plan.id] = plan;
-        return acc;
-      }, {});
-    },
-    enabled: alerts.length > 0,
-  });
-
-  if (alerts.length === 0) {
-    return (
-      <p className="text-sm text-muted-foreground">
-        You haven't set up any price alerts yet.
-      </p>
-    );
-  }
 
   // Sort alerts based on renewable preference
   const sortedAlerts = [...alerts].sort((a, b) => {
     if (renewablePreference) {
       return (b.renewable_percentage || 0) - (a.renewable_percentage || 0);
     }
-    return a.price_threshold - b.price_threshold;
+    return 0; // Keep original order if renewable preference is off
   });
+
+  const { data: currentPrices } = useQuery({
+    queryKey: ['currentPrices', alerts.map(a => a.plan_id)],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('plans')
+        .select('id, price_kwh500, price_kwh1000, price_kwh2000')
+        .in('id', alerts.map(a => a.plan_id));
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: alerts.length > 0
+  });
+
+  const getCurrentPrice = (planId: string, usage: string) => {
+    const plan = currentPrices?.find(p => p.id === planId);
+    if (!plan) return null;
+
+    switch (usage) {
+      case '500':
+        return plan.price_kwh500;
+      case '1000':
+        return plan.price_kwh1000;
+      case '2000':
+        return plan.price_kwh2000;
+      default:
+        return plan.price_kwh1000;
+    }
+  };
 
   const handleViewPlan = (planId: string) => {
     navigate(`/?plan=${planId}`);
   };
 
   return (
-    <div className="space-y-4 pb-6">
-      {sortedAlerts.map((alert) => {
-        const currentPlan = currentPrices?.[alert.plan_id];
-        const currentPrice = currentPlan?.[`price_kwh${alert.kwh_usage}`];
-        
-        return (
-          <div
-            key={alert.id}
-            className="flex items-center justify-between rounded-lg border p-4"
-          >
-            <div className="space-y-1">
-              <p className="font-medium">{alert.company_name}</p>
-              <p className="text-sm text-muted-foreground">
-                {alert.plan_name}
-              </p>
-              <p className="text-sm">
-                Alert when price is below {formatPrice(alert.price_threshold)} at {alert.kwh_usage} kWh usage
-              </p>
-              {currentPrice && (
-                <p className="text-sm font-medium text-muted-foreground">
-                  Current price: {formatPrice(currentPrice)}/kWh
-                </p>
-              )}
-              <p className="text-xs text-muted-foreground">
-                Alert Type: {alert.alert_type === 'universal' ? 'Universal' : 'Specific'}
-              </p>
+    <div className="space-y-4">
+      {sortedAlerts.length === 0 ? (
+        <p className="text-muted-foreground">No active price alerts</p>
+      ) : (
+        sortedAlerts.map((alert) => {
+          const currentPrice = getCurrentPrice(alert.plan_id, alert.kwh_usage);
+          const isAboveThreshold = currentPrice && currentPrice > alert.price_threshold;
+
+          return (
+            <div
+              key={alert.id}
+              className={`p-4 rounded-lg border ${
+                isAboveThreshold ? 'border-red-500 bg-red-50' : 'border-gray-200'
+              }`}
+            >
+              <div className="flex justify-between items-start">
+                <div>
+                  <h4 className="font-medium">{alert.company_name}</h4>
+                  <p className="text-sm text-muted-foreground">{alert.plan_name}</p>
+                  <div className="mt-2 space-y-1">
+                    <p className="text-sm">
+                      Usage: {alert.kwh_usage} kWh
+                    </p>
+                    <p className="text-sm">
+                      Alert Threshold: {formatPrice(alert.price_threshold)}/kWh
+                    </p>
+                    {currentPrice && (
+                      <p className="text-sm font-medium">
+                        Current Price: {formatPrice(currentPrice)}/kWh
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleViewPlan(alert.plan_id)}
+                  >
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onCompare(alert.plan_id)}
+                  >
+                    <GitCompare className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onDeleteAlert(alert.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
             </div>
-            <div className="flex flex-col gap-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => handleViewPlan(alert.plan_id)}
-                title="View Plan"
-              >
-                <Eye className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => onCompare?.(alert.plan_id)}
-                title="Compare Plan"
-              >
-                <GitCompare className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => onDeleteAlert(alert.id)}
-                title="Delete Alert"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        );
-      })}
+          );
+        })
+      )}
     </div>
   );
 }
