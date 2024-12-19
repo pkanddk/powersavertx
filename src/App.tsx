@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import Index from "@/pages/Index";
 import { ComparePage } from "@/pages/Compare";
-import { AuthPage } from "@/pages/Auth";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { RequireAuth } from "@/components/auth/RequireAuth";
 import { Plan } from "./lib/api";
@@ -51,9 +50,7 @@ function App() {
                   />
                 } 
               />
-              {/* Auth page */}
-              <Route path="/auth" element={<AuthPage />} />
-              {/* Protected compare route - redirects to auth only when trying to access /compare */}
+              {/* Protected compare route - shows auth UI inline when needed */}
               <Route 
                 path="/compare" 
                 element={
