@@ -20,10 +20,21 @@ export function filterPlans(
     estimatedUse?: string;
   }
 ) {
+  console.log('[filterPlans] Starting filtering with:', {
+    planType,
+    contractLength,
+    prepaidFilter,
+    timeOfUseFilter,
+    companyFilter,
+    sortOrder,
+    estimatedUse
+  });
+
   let filteredPlans = [...plans];
 
   // Filter by plan type
   if (planType !== "all") {
+    console.log('[filterPlans] Filtering by plan type:', planType);
     filteredPlans = filteredPlans.filter(plan => 
       plan.plan_type_name.toLowerCase().includes(planType.toLowerCase())
     );
@@ -31,6 +42,7 @@ export function filterPlans(
 
   // Filter by contract length
   if (contractLength !== "all") {
+    console.log('[filterPlans] Filtering by contract length:', contractLength);
     if (contractLength === "0-6") {
       filteredPlans = filteredPlans.filter(plan => 
         plan.contract_length !== null && plan.contract_length <= 6
@@ -50,20 +62,25 @@ export function filterPlans(
 
   // Filter by prepaid
   if (prepaidFilter === "prepaid-only") {
+    console.log('[filterPlans] Filtering for prepaid plans only');
     filteredPlans = filteredPlans.filter(plan => plan.prepaid === true);
   } else if (prepaidFilter === "no-prepaid") {
+    console.log('[filterPlans] Filtering out prepaid plans');
     filteredPlans = filteredPlans.filter(plan => plan.prepaid === false);
   }
 
   // Filter by time of use
   if (timeOfUseFilter === "tou-only") {
+    console.log('[filterPlans] Filtering for time of use plans only');
     filteredPlans = filteredPlans.filter(plan => plan.timeofuse === true);
   } else if (timeOfUseFilter === "no-tou") {
+    console.log('[filterPlans] Filtering out time of use plans');
     filteredPlans = filteredPlans.filter(plan => plan.timeofuse === false);
   }
 
   // Filter by company
   if (companyFilter !== "all") {
+    console.log('[filterPlans] Filtering by company:', companyFilter);
     filteredPlans = filteredPlans.filter(plan => plan.company_id === companyFilter);
   }
 
@@ -77,11 +94,12 @@ export function filterPlans(
       case "2000":
         return plan.price_kwh2000;
       default:
-        return plan.price_kwh;
+        return plan.price_kwh1000; // Default to 1000 kWh price
     }
   };
 
   // Sort plans
+  console.log('[filterPlans] Sorting plans by:', sortOrder);
   filteredPlans.sort((a, b) => {
     switch (sortOrder) {
       case "price-desc":
@@ -96,5 +114,6 @@ export function filterPlans(
     }
   });
 
+  console.log(`[filterPlans] Returning ${filteredPlans.length} filtered plans`);
   return filteredPlans;
 }
