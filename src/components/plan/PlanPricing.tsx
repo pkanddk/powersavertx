@@ -13,7 +13,7 @@ export function PlanPricing({ plan, estimatedUse, onShowDetails }: PlanPricingPr
   const cancellationFee = parseCancellationFee(plan.pricing_details);
   
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {/* Price Breakdown */}
       <div className="space-y-2 text-sm">
         <div className="flex justify-between items-center py-1.5">
@@ -60,7 +60,7 @@ export function PlanPricing({ plan, estimatedUse, onShowDetails }: PlanPricingPr
         className="w-full bg-primary/5 hover:bg-primary/10 text-primary hover:text-primary/90 transition-colors flex items-center justify-center gap-2 font-medium"
       >
         <Info className="h-4 w-4" />
-        View Full Details
+        Full Details
       </Button>
     </div>
   );

@@ -1,6 +1,6 @@
 import { Plan } from "@/lib/api";
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { PlanDetailsHeader } from "./PlanDetailsHeader";
@@ -18,6 +18,19 @@ export function PlanDetails({ plan, isOpen, onClose }: PlanDetailsProps) {
         <PlanDetailsHeader plan={plan} onClose={onClose} />
 
         <div className="px-4 pb-8 space-y-6">
+          {/* Contact Information */}
+          {plan.enroll_phone && (
+            <div className="space-y-2">
+              <h3 className="text-lg font-semibold">Contact Information</h3>
+              <div className="rounded-lg bg-muted/50 p-4">
+                <p className="text-sm text-muted-foreground flex items-center gap-2">
+                  <Phone className="h-4 w-4" />
+                  Enrollment Phone: {plan.enroll_phone}
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Plan Details Section */}
           {plan.plan_details && (
             <div className="space-y-2">
