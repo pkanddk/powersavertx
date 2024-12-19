@@ -61,7 +61,7 @@ export default function Index({ comparedPlans, onCompare, search, onSearch, esti
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold tracking-tight text-gray-900 mb-4">
             Power <span className="relative inline-block">
-              <Zap className="absolute -left-[2px] -top-[2px] h-7 w-7 text-primary transform -rotate-12" />
+              <Zap className="absolute -left-[1px] top-[1px] h-6 w-6 text-primary transform -rotate-12" />
               aver
             </span> TX
           </h1>
