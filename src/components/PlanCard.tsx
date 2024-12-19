@@ -18,42 +18,42 @@ export function PlanCard({ plan, onCompare, isCompared, estimatedUse }: PlanCard
   return (
     <Card className="flex flex-col h-full hover:shadow-lg transition-shadow animate-fade-in">
       <PlanHeader companyLogo={plan.company_logo} companyName={plan.company_name} />
-      <CardContent className="flex-1 p-6">
+      
+      <CardContent className="flex-1 p-6 space-y-6">
         <PlanTitle 
           planName={plan.plan_name}
           companyName={plan.company_name}
           companyTduName={plan.company_tdu_name}
         />
         
-        <div className="space-y-4">
-          <PlanPricing 
-            priceKwh500={plan.price_kwh500}
-            priceKwh1000={plan.price_kwh1000}
-            priceKwh2000={plan.price_kwh2000}
-            baseCharge={plan.base_charge}
-            estimatedUse={estimatedUse}
-            pricingDetails={plan.pricing_details}
+        <PlanPricing 
+          priceKwh500={plan.price_kwh500}
+          priceKwh1000={plan.price_kwh1000}
+          priceKwh2000={plan.price_kwh2000}
+          baseCharge={plan.base_charge}
+          estimatedUse={estimatedUse}
+          pricingDetails={plan.pricing_details}
+        />
+        
+        <PlanBadges 
+          planType={plan.plan_type_name}
+          contractLength={plan.contract_length || 0}
+          minimumUsage={plan.minimum_usage}
+          newCustomer={plan.new_customer}
+          prepaid={plan.prepaid}
+          timeOfUse={plan.timeofuse}
+          renewablePercentage={plan.renewable_percentage}
+        />
+        
+        {(plan.plan_details || plan.promotions) && (
+          <PlanDetails 
+            details={plan.plan_details || ''} 
+            promotions={plan.promotions}
           />
-          
-          <PlanBadges 
-            planType={plan.plan_type_name}
-            contractLength={plan.contract_length || 0}
-            minimumUsage={plan.minimum_usage}
-            newCustomer={plan.new_customer}
-            prepaid={plan.prepaid}
-            timeOfUse={plan.timeofuse}
-            renewablePercentage={plan.renewable_percentage}
-          />
-          
-          {(plan.plan_details || plan.promotions) && (
-            <PlanDetails 
-              details={plan.plan_details || ''} 
-              promotions={plan.promotions}
-            />
-          )}
-        </div>
+        )}
       </CardContent>
-      <CardFooter className="flex-none p-6 pt-0">
+      
+      <CardFooter className="p-6 pt-0">
         <PlanActions 
           plan={plan}
           onCompare={onCompare}
