@@ -1,6 +1,8 @@
 import { Plan } from "@/lib/api";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Info, Check } from "lucide-react";
+import { useState } from "react";
+import { PriceAlertDialog } from "./PriceAlertDialog";
+import { Bell } from "lucide-react";
 
 interface PlanCardActionsProps {
   plan: Plan;
@@ -9,66 +11,49 @@ interface PlanCardActionsProps {
   onShowDetails: (plan: Plan) => void;
 }
 
-export function PlanCardActions({ 
-  plan, 
-  onCompare, 
-  isCompared, 
-  onShowDetails 
+export function PlanCardActions({
+  plan,
+  onCompare,
+  isCompared,
+  onShowDetails,
 }: PlanCardActionsProps) {
-  const handleCompare = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    console.log('Compare button clicked for plan:', plan.plan_name);
-    onCompare(plan);
-  };
+  const [showAlertDialog, setShowAlertDialog] = useState(false);
 
   return (
-    <div className="space-y-3">
-      <div className="grid grid-cols-2 gap-3">
-        {plan.go_to_plan ? (
-          <Button 
-            variant="default" 
-            className="w-full bg-primary/90 hover:bg-primary transition-colors" 
-            asChild
-          >
-            <a
-              href={plan.go_to_plan}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2"
-            >
-              View Plan <ExternalLink className="h-4 w-4" />
-            </a>
-          </Button>
-        ) : (
-          <Button
-            variant="default"
-            onClick={() => onShowDetails(plan)}
-            className="w-full bg-primary/90 hover:bg-primary transition-colors flex items-center justify-center gap-2"
-          >
-            <Info className="h-4 w-4" />
-            Plan Details
-          </Button>
-        )}
+    <div className="flex flex-col gap-2">
+      <div className="flex gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          className="flex-1"
+          onClick={() => onShowDetails(plan)}
+        >
+          View Details
+        </Button>
         <Button
           variant={isCompared ? "destructive" : "outline"}
-          onClick={handleCompare}
-          className={`w-full transition-all duration-200 ${
-            isCompared 
-              ? "bg-destructive hover:bg-destructive/90 text-destructive-foreground" 
-              : "hover:border-primary/30"
-          }`}
+          size="sm"
+          className="flex-1"
+          onClick={() => onCompare(plan)}
         >
-          {isCompared ? (
-            <>
-              <Check className="h-4 w-4 mr-2" />
-              Remove
-            </>
-          ) : (
-            "Compare"
-          )}
+          {isCompared ? "Remove" : "Compare"}
         </Button>
       </div>
+      <Button
+        variant="secondary"
+        size="sm"
+        className="w-full"
+        onClick={() => setShowAlertDialog(true)}
+      >
+        <Bell className="mr-2 h-4 w-4" />
+        Set Price Alert
+      </Button>
+
+      <PriceAlertDialog
+        plan={plan}
+        isOpen={showAlertDialog}
+        onClose={() => setShowAlertDialog(false)}
+      />
     </div>
   );
 }

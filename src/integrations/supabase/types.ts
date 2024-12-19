@@ -9,6 +9,145 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      api_history: {
+        Row: {
+          company_id: string
+          company_name: string
+          contract_length: number | null
+          created_at: string
+          id: string
+          plan_name: string
+          price_kwh1000: number | null
+          price_kwh2000: number | null
+          price_kwh500: number | null
+          zip_code_id: string
+        }
+        Insert: {
+          company_id: string
+          company_name: string
+          contract_length?: number | null
+          created_at?: string
+          id?: string
+          plan_name: string
+          price_kwh1000?: number | null
+          price_kwh2000?: number | null
+          price_kwh500?: number | null
+          zip_code_id: string
+        }
+        Update: {
+          company_id?: string
+          company_name?: string
+          contract_length?: number | null
+          created_at?: string
+          id?: string
+          plan_name?: string
+          price_kwh1000?: number | null
+          price_kwh2000?: number | null
+          price_kwh500?: number | null
+          zip_code_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "api_history_zip_code_id_fkey"
+            columns: ["zip_code_id"]
+            isOneToOne: false
+            referencedRelation: "zip_codes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      energy_plans: {
+        Row: {
+          base_charge: number | null
+          company_id: string
+          company_logo: string | null
+          company_name: string
+          contract_length: number | null
+          created_at: string
+          fact_sheet: string | null
+          go_to_plan: string | null
+          id: string
+          minimum_usage: boolean | null
+          new_customer: boolean | null
+          plan_details: string | null
+          plan_name: string
+          plan_type_name: string
+          updated_at: string
+        }
+        Insert: {
+          base_charge?: number | null
+          company_id: string
+          company_logo?: string | null
+          company_name: string
+          contract_length?: number | null
+          created_at?: string
+          fact_sheet?: string | null
+          go_to_plan?: string | null
+          id?: string
+          minimum_usage?: boolean | null
+          new_customer?: boolean | null
+          plan_details?: string | null
+          plan_name: string
+          plan_type_name: string
+          updated_at?: string
+        }
+        Update: {
+          base_charge?: number | null
+          company_id?: string
+          company_logo?: string | null
+          company_name?: string
+          contract_length?: number | null
+          created_at?: string
+          fact_sheet?: string | null
+          go_to_plan?: string | null
+          id?: string
+          minimum_usage?: boolean | null
+          new_customer?: boolean | null
+          plan_details?: string | null
+          plan_name?: string
+          plan_type_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      log_api_history: {
+        Row: {
+          company_id: string
+          company_name: string
+          contract_length: number | null
+          created_at: string
+          id: string
+          plan_name: string
+          zip_code_id: string
+        }
+        Insert: {
+          company_id: string
+          company_name: string
+          contract_length?: number | null
+          created_at?: string
+          id?: string
+          plan_name: string
+          zip_code_id: string
+        }
+        Update: {
+          company_id?: string
+          company_name?: string
+          contract_length?: number | null
+          created_at?: string
+          id?: string
+          plan_name?: string
+          zip_code_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "log_api_history_zip_code_id_fkey"
+            columns: ["zip_code_id"]
+            isOneToOne: false
+            referencedRelation: "zip_codes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       plans: {
         Row: {
           base_charge: number | null
@@ -123,11 +262,60 @@ export type Database = {
         }
         Relationships: []
       }
+      user_plan_tracking: {
+        Row: {
+          active: boolean | null
+          created_at: string
+          id: string
+          kwh_usage: string
+          plan_id: string
+          price_threshold: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string
+          id?: string
+          kwh_usage: string
+          plan_id: string
+          price_threshold: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string
+          id?: string
+          kwh_usage?: string
+          plan_id?: string
+          price_threshold?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_plan_tracking_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "energy_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_plan_tracking_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_profiles: {
         Row: {
           created_at: string
           current_kwh_usage: string | null
           id: string
+          preferred_usage: string | null
           renewable_preference: boolean | null
           updated_at: string
           user_id: string
@@ -137,6 +325,7 @@ export type Database = {
           created_at?: string
           current_kwh_usage?: string | null
           id?: string
+          preferred_usage?: string | null
           renewable_preference?: boolean | null
           updated_at?: string
           user_id: string
@@ -146,10 +335,35 @@ export type Database = {
           created_at?: string
           current_kwh_usage?: string | null
           id?: string
+          preferred_usage?: string | null
           renewable_preference?: boolean | null
           updated_at?: string
           user_id?: string
           zip_code?: string | null
+        }
+        Relationships: []
+      }
+      zip_codes: {
+        Row: {
+          created_at: string
+          id: string
+          last_used: string | null
+          updated_at: string
+          zip_code: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_used?: string | null
+          updated_at?: string
+          zip_code: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_used?: string | null
+          updated_at?: string
+          zip_code?: string
         }
         Relationships: []
       }
