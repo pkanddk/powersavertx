@@ -10,22 +10,22 @@ export const PlanSchema = z.object({
   plan_type_name: z.string(),
   fact_sheet: z.string().nullable(),
   go_to_plan: z.string().nullable(),
-  minimum_usage: z.boolean().nullable(),
-  new_customer: z.boolean().nullable(),
-  plan_details: z.string().nullable(),
+  minimum_usage: z.boolean(),
+  new_customer: z.boolean(),
+  plan_details: z.string(),
   price_kwh: z.number(),
   price_kwh500: z.number(),
   price_kwh1000: z.number(),
   price_kwh2000: z.number(),
   base_charge: z.number().nullable(),
   contract_length: z.number().nullable(),
-  prepaid: z.boolean().nullable(),
-  timeofuse: z.boolean().nullable(),
-  renewable_percentage: z.number().nullable(),
-  pricing_details: z.string().nullable(),
-  promotions: z.string().nullable(),
-  enroll_phone: z.string().nullable(),
-  website: z.string().nullable()
+  prepaid: z.boolean(),
+  timeofuse: z.boolean(),
+  renewable_percentage: z.number(),
+  pricing_details: z.string(),
+  promotions: z.string(),
+  enroll_phone: z.string(),
+  website: z.string()
 });
 
 export type Plan = z.infer<typeof PlanSchema>;
@@ -80,14 +80,4 @@ export const searchPlans = async (zipCode: string, estimatedUse?: string) => {
     console.error("[Frontend] Error fetching plans:", error);
     throw error;
   }
-};
-
-export const getPlanTypes = async () => {
-  // Mock response for plan types
-  return ["Fixed Rate", "Variable Rate", "Indexed Rate"];
-};
-
-export const getRenewableOptions = async () => {
-  // Mock response for renewable options
-  return ["0%", "6%", "15%", "100%"];
 };

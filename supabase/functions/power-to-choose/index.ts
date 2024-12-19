@@ -57,52 +57,32 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
 
     console.log(`[Edge Function] Found ${plans.length} plans`);
 
-    const transformedPlans = plans.map(plan => {
-      console.log(`[Edge Function] Processing plan: ${plan.plan_name}`);
-
-      const parseRate = (rate: string | number | null | undefined): number => {
-        if (!rate) return 0;
-        const cleanRate = String(rate).replace(/[^\d.]/g, '');
-        const parsed = parseFloat(cleanRate);
-        const result = isNaN(parsed) ? 0 : parsed / 100;
-        console.log(`[Edge Function] Parsing rate: ${rate} -> ${cleanRate} -> ${parsed} -> ${result}`);
-        return result;
-      };
-
-      // Parse all three rate tiers
-      const price_kwh500 = parseRate(plan.price_kwh500 || plan.rate500);
-      const price_kwh1000 = parseRate(plan.price_kwh1000 || plan.rate1000);
-      const price_kwh2000 = parseRate(plan.price_kwh2000 || plan.rate2000);
-
-      // Default to 500 kWh rate if no usage specified
-      const price_kwh = price_kwh500;
-
-      console.log(`[Edge Function] Final rates for plan ${plan.plan_name}:`, {
-        price_kwh500,
-        price_kwh1000,
-        price_kwh2000,
-        selected_price: price_kwh
-      });
-
-      return {
-        company_id: String(plan.company_id || ""),
-        company_name: String(plan.company_name || ""),
-        company_logo: plan.company_logo || null,
-        plan_name: String(plan.plan_name || ""),
-        plan_type_name: String(plan.plan_type || ""),
-        fact_sheet: plan.fact_sheet || null,
-        go_to_plan: plan.enroll_plan_url || plan.go_to_plan || plan.enroll_now || null,
-        minimum_usage: Boolean(plan.minimum_usage),
-        new_customer: Boolean(plan.new_customer),
-        plan_details: String(plan.special_terms || ""),
-        price_kwh,
-        price_kwh500,
-        price_kwh1000,
-        price_kwh2000,
-        base_charge: plan.base_charge ? parseFloat(plan.base_charge) : null,
-        contract_length: plan.term_value ? parseInt(plan.term_value) : null
-      };
-    });
+    const transformedPlans = plans.map(plan => ({
+      company_id: String(plan.company_id || ""),
+      company_name: String(plan.company_name || ""),
+      company_logo: plan.company_logo || null,
+      company_tdu_name: plan.company_tdu_name || null,
+      plan_name: String(plan.plan_name || ""),
+      plan_type_name: String(plan.plan_type || "Fixed"),
+      fact_sheet: plan.fact_sheet || null,
+      go_to_plan: plan.enroll_plan_url || plan.go_to_plan || plan.enroll_now || null,
+      minimum_usage: Boolean(plan.minimum_usage),
+      new_customer: Boolean(plan.new_customer),
+      plan_details: String(plan.special_terms || plan.plan_details || ""),
+      price_kwh: Number(plan.price_kwh || 0),
+      price_kwh500: Number(plan.price_kwh500 || plan.rate500 || 0),
+      price_kwh1000: Number(plan.price_kwh1000 || plan.rate1000 || 0),
+      price_kwh2000: Number(plan.price_kwh2000 || plan.rate2000 || 0),
+      base_charge: plan.base_charge ? Number(plan.base_charge) : null,
+      contract_length: plan.term_value ? Number(plan.term_value) : null,
+      prepaid: Boolean(plan.prepaid || false),
+      timeofuse: Boolean(plan.timeofuse || false),
+      renewable_percentage: Number(plan.renewable_percentage || 0),
+      pricing_details: String(plan.pricing_details || ""),
+      promotions: String(plan.promotions || ""),
+      enroll_phone: String(plan.enroll_phone || ""),
+      website: String(plan.website || "")
+    }));
 
     console.log(`[Edge Function] Successfully transformed ${transformedPlans.length} plans`);
     return transformedPlans;
@@ -128,13 +108,8 @@ serve(async (req) => {
 
     let apiUrl = `http://api.powertochoose.org/api/PowerToChoose/plans?zip_code=${zipCode}`;
     
-    if (estimatedUse && estimatedUse !== "Any Range") {
-      const usageParam = estimatedUse === "between 500 and 1,000" ? "500-1000" :
-                        estimatedUse === "between 1,001 and 2,000" ? "1001-2000" :
-                        estimatedUse === "more than 2,000" ? "2001+" : null;
-      if (usageParam) {
-        apiUrl += `&kwh=${usageParam}`;
-      }
+    if (estimatedUse && estimatedUse !== "any") {
+      apiUrl += `&kWh=${estimatedUse}`;
     }
 
     console.log("[Edge Function] Making request to URL:", apiUrl);
