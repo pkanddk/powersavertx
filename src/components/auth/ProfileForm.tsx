@@ -1,42 +1,16 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
-import { useToast } from "@/components/ui/use-toast";
+import { Form } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
-import { Trash2 } from "lucide-react";
-import { formatPrice } from "@/lib/utils/formatPrice";
-
-const profileSchema = z.object({
-  zip_code: z.string().min(5).max(10),
-  current_kwh_usage: z.string().optional(),
-  renewable_preference: z.boolean().default(false),
-  universal_kwh_usage: z.string().optional(),
-  universal_price_threshold: z.string().optional(),
-});
-
-type ProfileFormData = z.infer<typeof profileSchema>;
-
-interface PriceAlert {
-  id: string;
-  plan_name: string;
-  company_name: string;
-  kwh_usage: string;
-  price_threshold: number;
-}
+import { useToast } from "@/components/ui/use-toast";
+import { BasicProfileSection } from "./profile/BasicProfileSection";
+import { RenewablePreferenceSection } from "./profile/RenewablePreferenceSection";
+import { UniversalAlertSection } from "./profile/UniversalAlertSection";
+import { ActiveAlertsSection } from "./profile/ActiveAlertsSection";
+import { profileSchema, type ProfileFormData, type PriceAlert } from "./profile/types";
 
 export function ProfileForm() {
   const { toast } = useToast();
@@ -193,102 +167,10 @@ export function ProfileForm() {
     <div className="space-y-6">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <FormField
-            control={form.control}
-            name="zip_code"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>ZIP Code</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter your ZIP code" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="current_kwh_usage"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Current kWh Usage</FormLabel>
-                <FormControl>
-                  <Input placeholder="e.g., 1000" {...field} />
-                </FormControl>
-                <FormDescription>
-                  Optional: Enter your typical monthly usage
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="renewable_preference"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                <div className="space-y-0.5">
-                  <FormLabel className="text-base">
-                    Renewable Energy Preference
-                  </FormLabel>
-                  <FormDescription>
-                    Prioritize renewable energy plans in your search results
-                  </FormDescription>
-                </div>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
+          <BasicProfileSection form={form} />
+          <RenewablePreferenceSection form={form} />
           <Separator className="my-6" />
-
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium">Universal Price Alert</h3>
-            <p className="text-sm text-muted-foreground">
-              Get notified when any plan matches these criteria
-            </p>
-
-            <FormField
-              control={form.control}
-              name="universal_kwh_usage"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Usage Level (kWh)</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g., 1000" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="universal_price_threshold"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Price Threshold (¢/kWh)</FormLabel>
-                  <FormControl>
-                    <Input 
-                      type="number" 
-                      step="0.1" 
-                      placeholder="e.g., 12.5" 
-                      {...field} 
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
+          <UniversalAlertSection form={form} />
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? "Updating..." : "Save Changes"}
           </Button>
@@ -299,37 +181,10 @@ export function ProfileForm() {
 
       <div className="space-y-4">
         <h3 className="text-lg font-medium">Active Price Alerts</h3>
-        {priceAlerts.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            You haven't set up any price alerts yet.
-          </p>
-        ) : (
-          <div className="space-y-4">
-            {priceAlerts.map((alert) => (
-              <div
-                key={alert.id}
-                className="flex items-center justify-between rounded-lg border p-4"
-              >
-                <div className="space-y-1">
-                  <p className="font-medium">{alert.company_name}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {alert.plan_name}
-                  </p>
-                  <p className="text-sm">
-                    Alert when price is below {formatPrice(alert.price_threshold)} at {alert.kwh_usage} kWh usage
-                  </p>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleDeleteAlert(alert.id)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
-          </div>
-        )}
+        <ActiveAlertsSection 
+          alerts={priceAlerts} 
+          onDeleteAlert={handleDeleteAlert}
+        />
       </div>
     </div>
   );
