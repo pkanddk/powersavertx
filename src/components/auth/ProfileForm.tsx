@@ -163,7 +163,7 @@ export function ProfileForm() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-6 max-w-5xl h-screen overflow-y-auto">
+    <div className="container mx-auto px-4 py-6 max-w-6xl">
       <div className="space-y-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -185,6 +185,11 @@ export function ProfileForm() {
             alerts={priceAlerts} 
             onDeleteAlert={handleDeleteAlert}
             renewablePreference={form.watch("renewable_preference")}
+            onCompare={(planId) => {
+              // Handle plan comparison
+              console.log("Compare plan:", planId);
+              // You might want to implement the comparison logic here
+            }}
           />
         </div>
       </div>

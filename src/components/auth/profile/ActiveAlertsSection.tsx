@@ -1,21 +1,26 @@
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { Trash2, Eye, GitCompare } from "lucide-react";
 import { formatPrice } from "@/lib/utils/formatPrice";
 import { PriceAlert } from "./types";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 interface ActiveAlertsSectionProps {
   alerts: PriceAlert[];
   onDeleteAlert: (alertId: string) => void;
   renewablePreference?: boolean;
+  onCompare?: (planId: string) => void;
 }
 
 export function ActiveAlertsSection({ 
   alerts, 
   onDeleteAlert, 
-  renewablePreference = false 
+  renewablePreference = false,
+  onCompare
 }: ActiveAlertsSectionProps) {
+  const navigate = useNavigate();
+
   // Query to get current prices for each plan
   const { data: currentPrices } = useQuery({
     queryKey: ["currentPrices", alerts.map(a => a.plan_id)],
@@ -54,8 +59,13 @@ export function ActiveAlertsSection({
     return a.price_threshold - b.price_threshold;
   });
 
+  const handleViewPlan = (planId: string) => {
+    // Navigate to the plan details or trigger a modal
+    navigate(`/?plan=${planId}`);
+  };
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pb-6">
       {sortedAlerts.map((alert) => {
         const currentPlan = currentPrices?.[alert.plan_id];
         const currentPrice = currentPlan?.[`price_kwh${alert.kwh_usage}`];
@@ -78,22 +88,36 @@ export function ActiveAlertsSection({
                   Current price: {formatPrice(currentPrice)}/kWh
                 </p>
               )}
-              {alert.renewable_percentage !== undefined && (
-                <p className="text-sm text-muted-foreground">
-                  Renewable Energy: {alert.renewable_percentage}%
-                </p>
-              )}
               <p className="text-xs text-muted-foreground">
                 Alert Type: {alert.alert_type === 'universal' ? 'Universal' : 'Specific'}
               </p>
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onDeleteAlert(alert.id)}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+            <div className="flex flex-col gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => handleViewPlan(alert.plan_id)}
+                title="View Plan"
+              >
+                <Eye className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onCompare?.(alert.plan_id)}
+                title="Compare Plan"
+              >
+                <GitCompare className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onDeleteAlert(alert.id)}
+                title="Delete Alert"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         );
       })}
