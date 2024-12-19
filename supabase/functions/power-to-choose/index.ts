@@ -56,40 +56,46 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
     }
 
     console.log(`[Edge Function] Found ${plans.length} plans`);
+    console.log("[Edge Function] First plan example:", plans[0]);
 
-    const transformedPlans = plans.map(plan => ({
-      company_id: String(plan.company_id || ""),
-      company_name: String(plan.company_name || ""),
-      company_logo: plan.company_logo || null,
-      company_tdu_name: plan.company_tdu_name || null,
-      plan_name: String(plan.plan_name || ""),
-      plan_type_name: String(plan.plan_type || "Fixed"),
-      fact_sheet: plan.fact_sheet || null,
-      go_to_plan: plan.enroll_plan_url || plan.go_to_plan || plan.enroll_now || null,
-      minimum_usage: Boolean(plan.minimum_usage),
-      new_customer: Boolean(plan.new_customer),
-      plan_details: plan.special_terms || plan.plan_details || null,
-      price_kwh: Number(plan.price_kwh || 0),
-      price_kwh500: Number(plan.price_kwh500 || plan.rate500 || 0),
-      price_kwh1000: Number(plan.price_kwh1000 || plan.rate1000 || 0),
-      price_kwh2000: Number(plan.price_kwh2000 || plan.rate2000 || 0),
-      base_charge: plan.base_charge ? Number(plan.base_charge) : null,
-      contract_length: plan.term_value ? Number(plan.term_value) : null,
-      prepaid: Boolean(plan.prepaid || false),
-      timeofuse: Boolean(plan.timeofuse || false),
-      renewable_percentage: plan.renewable_percentage ? Number(plan.renewable_percentage) : null,
-      pricing_details: plan.pricing_details || null,
-      promotions: plan.promotions || null,
-      enroll_phone: plan.enroll_phone || null,
-      website: plan.website || null,
-      terms_of_service: plan.terms_of_service || null,
-      yrac_url: plan.yrac_url || null,
-      detail_kwh500: plan.detail_kwh500 || null,
-      detail_kwh1000: plan.detail_kwh1000 || null,
-      detail_kwh2000: plan.detail_kwh2000 || null
-    }));
+    const transformedPlans = plans.map(plan => {
+      const transformed = {
+        company_id: String(plan.company_id || ""),
+        company_name: String(plan.company_name || ""),
+        company_logo: plan.company_logo || null,
+        company_tdu_name: plan.company_tdu_name || null,
+        plan_name: String(plan.plan_name || ""),
+        plan_type_name: String(plan.plan_type || "Fixed"),
+        fact_sheet: plan.fact_sheet || null,
+        go_to_plan: plan.enroll_plan_url || plan.go_to_plan || plan.enroll_now || null,
+        minimum_usage: Boolean(plan.minimum_usage),
+        new_customer: Boolean(plan.new_customer),
+        plan_details: plan.special_terms || plan.plan_details || null,
+        price_kwh: Number(plan.price_kwh || 0),
+        price_kwh500: Number(plan.price_kwh500 || plan.rate500 || 0),
+        price_kwh1000: Number(plan.price_kwh1000 || plan.rate1000 || 0),
+        price_kwh2000: Number(plan.price_kwh2000 || plan.rate2000 || 0),
+        base_charge: plan.base_charge ? Number(plan.base_charge) : null,
+        contract_length: plan.term_value ? Number(plan.term_value) : null,
+        prepaid: Boolean(plan.prepaid || false),
+        timeofuse: Boolean(plan.timeofuse || false),
+        renewable_percentage: plan.renewable_percentage ? Number(plan.renewable_percentage) : null,
+        pricing_details: plan.pricing_details || null,
+        promotions: plan.promotions || null,
+        enroll_phone: plan.enroll_phone || null,
+        website: plan.website || null,
+        terms_of_service: plan.terms_of_service || null,
+        yrac_url: plan.yrac_url || null,
+        detail_kwh500: plan.detail_kwh500 || null,
+        detail_kwh1000: plan.detail_kwh1000 || null,
+        detail_kwh2000: plan.detail_kwh2000 || null
+      };
+      console.log("[Edge Function] Transformed plan:", transformed);
+      return transformed;
+    });
 
     console.log(`[Edge Function] Successfully transformed ${transformedPlans.length} plans`);
+    console.log("[Edge Function] First transformed plan example:", transformedPlans[0]);
     return transformedPlans;
 
   } catch (error) {
