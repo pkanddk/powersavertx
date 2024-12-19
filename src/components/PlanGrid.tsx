@@ -22,7 +22,7 @@ export function PlanGrid({ plans, onCompare, comparedPlans, estimatedUse }: Plan
       {plans.map((plan) => (
         <Card 
           key={`${plan.company_id}-${plan.plan_name}`} 
-          className="overflow-hidden hover:shadow-lg transition-shadow border-border/40"
+          className="group overflow-hidden hover:shadow-lg transition-all duration-300 border-border/40 hover:border-primary/40 bg-gradient-to-b from-white to-gray-50/30"
         >
           <CardContent className="p-6">
             <div className="space-y-8">
@@ -32,12 +32,12 @@ export function PlanGrid({ plans, onCompare, comparedPlans, estimatedUse }: Plan
                   <img
                     src={plan.company_logo || "/placeholder.svg"}
                     alt={plan.company_name}
-                    className="h-12 object-contain"
+                    className="h-12 object-contain opacity-90 group-hover:opacity-100 transition-opacity"
                   />
-                  <h3 className="text-sm text-muted-foreground">{plan.company_name}</h3>
+                  <h3 className="text-sm text-muted-foreground/80">{plan.company_name}</h3>
                 </div>
                 {plan.contract_length && (
-                  <span className="text-xs font-medium text-primary bg-primary/10 px-3 py-1 rounded-full">
+                  <span className="text-xs font-medium text-primary bg-primary/5 px-3 py-1 rounded-full ring-1 ring-primary/10">
                     {plan.contract_length} {plan.contract_length === 1 ? 'month' : 'months'}
                   </span>
                 )}
@@ -45,13 +45,13 @@ export function PlanGrid({ plans, onCompare, comparedPlans, estimatedUse }: Plan
 
               {/* Plan Name */}
               <div>
-                <h4 className="text-xl font-semibold text-foreground tracking-tight">
+                <h4 className="text-xl font-semibold text-foreground/90 tracking-tight group-hover:text-foreground transition-colors">
                   {plan.plan_name}
                 </h4>
               </div>
 
               {/* Price Section */}
-              <div className="bg-muted/30 rounded-xl p-4">
+              <div className="bg-muted/20 backdrop-blur-sm rounded-xl p-4 group-hover:bg-muted/30 transition-colors">
                 <PlanPricing
                   plan={plan}
                   estimatedUse={estimatedUse}
@@ -62,10 +62,14 @@ export function PlanGrid({ plans, onCompare, comparedPlans, estimatedUse }: Plan
               <PlanFeatures plan={plan} />
 
               {/* Actions Section */}
-              <div className="space-y-3 pt-2 border-t">
+              <div className="space-y-3 pt-2 border-t border-border/50">
                 <div className="grid grid-cols-2 gap-3 pt-4">
                   {plan.go_to_plan && (
-                    <Button variant="default" className="w-full" asChild>
+                    <Button 
+                      variant="default" 
+                      className="w-full bg-primary/90 hover:bg-primary transition-colors" 
+                      asChild
+                    >
                       <a
                         href={plan.go_to_plan}
                         target="_blank"
@@ -79,7 +83,7 @@ export function PlanGrid({ plans, onCompare, comparedPlans, estimatedUse }: Plan
                   <Button
                     variant={comparedPlans.some(p => p.company_id === plan.company_id) ? "destructive" : "outline"}
                     onClick={() => onCompare(plan)}
-                    className="w-full"
+                    className="w-full hover:border-primary/30"
                   >
                     {comparedPlans.some(p => p.company_id === plan.company_id)
                       ? "Remove"
@@ -90,7 +94,7 @@ export function PlanGrid({ plans, onCompare, comparedPlans, estimatedUse }: Plan
                   <Button 
                     variant="ghost" 
                     onClick={() => setSelectedPlan(plan)}
-                    className="flex items-center justify-center gap-2 text-muted-foreground hover:text-primary"
+                    className="flex items-center justify-center gap-2 text-muted-foreground hover:text-primary transition-colors"
                   >
                     <Info className="h-4 w-4" />
                     Plan Details
