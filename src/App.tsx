@@ -5,6 +5,7 @@ import Index from "@/pages/Index";
 import { ComparePage } from "@/pages/Compare";
 import { useState } from "react";
 import { Plan } from "./lib/api";
+import { AuthSidebar } from "./components/auth/AuthSidebar";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
+        <AuthSidebar />
         <Routes>
           <Route 
             path="/" 
