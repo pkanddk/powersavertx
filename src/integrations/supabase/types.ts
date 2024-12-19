@@ -11,6 +11,7 @@ export type Database = {
     Tables: {
       alert_history: {
         Row: {
+          alert_type: string
           created_at: string
           email_sent: boolean | null
           email_sent_at: string | null
@@ -22,6 +23,7 @@ export type Database = {
           zip_code: string
         }
         Insert: {
+          alert_type?: string
           created_at?: string
           email_sent?: boolean | null
           email_sent_at?: string | null
@@ -33,6 +35,7 @@ export type Database = {
           zip_code: string
         }
         Update: {
+          alert_type?: string
           created_at?: string
           email_sent?: boolean | null
           email_sent_at?: string | null
@@ -357,7 +360,6 @@ export type Database = {
       user_profiles: {
         Row: {
           created_at: string
-          current_kwh_usage: string | null
           id: string
           preferred_usage: string | null
           renewable_preference: boolean | null
@@ -369,7 +371,6 @@ export type Database = {
         }
         Insert: {
           created_at?: string
-          current_kwh_usage?: string | null
           id?: string
           preferred_usage?: string | null
           renewable_preference?: boolean | null
@@ -381,7 +382,6 @@ export type Database = {
         }
         Update: {
           created_at?: string
-          current_kwh_usage?: string | null
           id?: string
           preferred_usage?: string | null
           renewable_preference?: boolean | null

@@ -184,6 +184,7 @@ export function ProfileForm() {
         <ActiveAlertsSection 
           alerts={priceAlerts} 
           onDeleteAlert={handleDeleteAlert}
+          renewablePreference={form.watch("renewable_preference")}
         />
       </div>
     </div>
