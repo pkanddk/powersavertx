@@ -39,19 +39,16 @@ export const searchPlans = async (zipCode: string, estimatedUse?: string) => {
   try {
     console.log(`[Frontend] Searching plans for ZIP: ${zipCode}, Usage: ${estimatedUse}`);
     
-    // Construct API URL
-    let apiUrl = `http://api.powertochoose.org/api/PowerToChoose/plans?zip_code=${zipCode}`;
-    if (estimatedUse && estimatedUse !== "any") {
-      apiUrl += `&kWh=${estimatedUse}`;
-    }
-
-    console.log('[Frontend] Calling API with URL:', apiUrl);
-    
-    const response = await fetch(apiUrl, {
+    // Call our Supabase Edge Function instead of the API directly
+    const response = await fetch('https://ucdahnlndirmiecyptkt.supabase.co/functions/v1/power-to-choose', {
+      method: 'POST',
       headers: {
-        'Accept': 'application/json',
         'Content-Type': 'application/json',
-      }
+      },
+      body: JSON.stringify({
+        zipCode,
+        estimatedUse: estimatedUse !== 'any' ? estimatedUse : undefined
+      })
     });
 
     if (!response.ok) {
@@ -61,58 +58,14 @@ export const searchPlans = async (zipCode: string, estimatedUse?: string) => {
     }
 
     const data = await response.json();
-    console.log('[Frontend] Raw API response:', data);
+    console.log('[Frontend] API response:', data);
 
-    // Handle different response formats
-    let plans = [];
-    if (Array.isArray(data)) {
-      plans = data;
-    } else if (data.data && Array.isArray(data.data)) {
-      plans = data.data;
-    } else if (data.Results && Array.isArray(data.Results)) {
-      plans = data.Results;
-    } else {
-      console.error('[Frontend] Unexpected response structure:', data);
-      throw new Error("Unexpected response structure from API");
+    if (data.error) {
+      throw new Error(data.error);
     }
 
-    // Transform the data to match our schema
-    const transformedPlans = plans.map(plan => ({
-      company_id: String(plan.company_id || ""),
-      company_name: String(plan.company_name || ""),
-      company_logo: plan.company_logo || null,
-      company_tdu_name: plan.company_tdu_name || null,
-      plan_name: String(plan.plan_name || ""),
-      plan_type_name: String(plan.rate_type || ""),
-      fact_sheet: plan.fact_sheet || null,
-      go_to_plan: plan.go_to_plan || plan.enroll_now || null,
-      minimum_usage: Boolean(plan.minimum_usage),
-      new_customer: Boolean(plan.new_customer),
-      plan_details: String(plan.special_terms || ""),
-      price_kwh: parseFloat(plan.price_kwh1000 || plan.rate1000 || 0),
-      price_kwh500: parseFloat(plan.price_kwh500 || plan.rate500 || 0),
-      price_kwh1000: parseFloat(plan.price_kwh1000 || plan.rate1000 || 0),
-      price_kwh2000: parseFloat(plan.price_kwh2000 || plan.rate2000 || 0),
-      detail_kwh500: plan.detail_kwh500 || null,
-      detail_kwh1000: plan.detail_kwh1000 || null,
-      detail_kwh2000: plan.detail_kwh2000 || null,
-      base_charge: null, // We'll update this if we find it in pricing_details
-      contract_length: plan.term_value ? parseInt(plan.term_value) : null,
-      jdp_rating: plan.jdp_rating ? parseFloat(plan.jdp_rating) : null,
-      jdp_rating_year: plan.jdp_rating_year || null,
-      prepaid: Boolean(plan.prepaid_plan || plan.is_prepaid || plan.prepaid || false),
-      renewable_percentage: plan.renewable_energy_description ? 
-        parseInt(plan.renewable_energy_description.match(/(\d+)%/)?.[1] || "0") : 0,
-      timeofuse: Boolean(plan.timeofuse),
-      pricing_details: plan.pricing_details || null,
-      terms_of_service: plan.terms_of_service || null,
-      yrac_url: plan.yrac_url || null,
-      enroll_phone: plan.enroll_phone || null,
-      website: plan.website || null
-    }));
-
-    // Parse and validate each plan
-    const validatedPlans = transformedPlans.map((plan, index) => {
+    // Transform and validate the plans
+    const validatedPlans = data.map((plan: any, index: number) => {
       try {
         return PlanSchema.parse(plan);
       } catch (error) {
