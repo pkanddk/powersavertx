@@ -8,9 +8,12 @@ interface PlanPricingProps {
 
 export function PlanPricing({ plan, estimatedUse, getPriceForUsage }: PlanPricingProps) {
   // Helper function to format the display usage
-  const getDisplayUsage = (usage: string) => {
+  const getDisplayUsage = () => {
+    // If it's "any", default to 1000
+    if (estimatedUse === "any") return "1,000";
+    
     // Remove any non-digit characters and convert to number
-    const usageNum = parseInt(usage.replace(/\D/g, ''), 10);
+    const usageNum = parseInt(estimatedUse.replace(/\D/g, ''), 10);
     
     // Format with commas for thousands
     return usageNum.toLocaleString();
@@ -21,10 +24,12 @@ export function PlanPricing({ plan, estimatedUse, getPriceForUsage }: PlanPricin
       {/* Highlighted Price based on selection */}
       <div className="bg-primary/5 p-4 rounded-lg">
         <div className="flex items-baseline gap-1">
-          <span className="text-3xl font-bold text-gray-900">{getPriceForUsage(plan).toFixed(1)}</span>
+          <span className="text-3xl font-bold text-gray-900">
+            {getPriceForUsage(plan).toFixed(1)}
+          </span>
           <span className="text-lg text-gray-900">¢</span>
           <span className="text-sm text-muted-foreground ml-2">
-            at {getDisplayUsage(estimatedUse)} kWh
+            at {getDisplayUsage()} kWh
           </span>
         </div>
       </div>
