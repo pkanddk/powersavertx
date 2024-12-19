@@ -133,20 +133,12 @@ export function filterPlans(
   if (cancellationFeeRange) {
     console.log('[filterPlans] Filtering by cancellation fee range:', cancellationFeeRange);
     
-    // Special case for "not specified" (-1, -1)
-    if (cancellationFeeRange[0] === -1 && cancellationFeeRange[1] === -1) {
-      filteredPlans = filteredPlans.filter(plan => {
-        const fee = parseCancellationFee(plan.pricing_details);
-        return fee === null || fee === undefined;
-      });
-    } else {
-      filteredPlans = filteredPlans.filter(plan => {
-        const fee = parseCancellationFee(plan.pricing_details) ?? 0;
-        const isInRange = fee >= cancellationFeeRange[0] && fee <= cancellationFeeRange[1];
-        console.log(`[filterPlans] Plan ${plan.plan_name} cancellation fee: ${fee}, is in range [${cancellationFeeRange[0]}, ${cancellationFeeRange[1]}]: ${isInRange}`);
-        return isInRange;
-      });
-    }
+    filteredPlans = filteredPlans.filter(plan => {
+      const fee = parseCancellationFee(plan.pricing_details) ?? 0;
+      const isInRange = fee >= cancellationFeeRange[0] && fee <= cancellationFeeRange[1];
+      console.log(`[filterPlans] Plan ${plan.plan_name} cancellation fee: ${fee}, is in range [${cancellationFeeRange[0]}, ${cancellationFeeRange[1]}]: ${isInRange}`);
+      return isInRange;
+    });
   }
 
   // Get the price for the selected kWh usage
