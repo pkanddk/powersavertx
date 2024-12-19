@@ -9,20 +9,20 @@ interface SearchFormProps {
 }
 
 const USAGE_OPTIONS = [
-  "Any Range",
   "500 kWh",
   "1,000 kWh",
-  "2,000 kWh"
+  "2,000 kWh",
+  "Any Range"
 ];
 
 export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
   const [zipCode, setZipCode] = useState("");
-  const [estimatedUse, setEstimatedUse] = useState(USAGE_OPTIONS[0]);
+  const [estimatedUse, setEstimatedUse] = useState(USAGE_OPTIONS[0]); // Default to 500 kWh
 
   // Effect to trigger search when values change
   useEffect(() => {
     if (zipCode.length === 5) {  // Only search when ZIP code is complete
-      const usageValue = estimatedUse === USAGE_OPTIONS[0] ? "any" :
+      const usageValue = estimatedUse === USAGE_OPTIONS[3] ? "any" :
                         estimatedUse.split(" ")[0].replace(",", "");
       console.log("[SearchForm] Triggering search with:", { zipCode, usageValue });
       onSearch(zipCode, usageValue);
@@ -32,7 +32,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Extract just the number from the usage string
-    const usageValue = estimatedUse === USAGE_OPTIONS[0] ? "any" :
+    const usageValue = estimatedUse === USAGE_OPTIONS[3] ? "any" :
                       estimatedUse.split(" ")[0].replace(",", "");
     console.log("[SearchForm] Manual submit with:", { zipCode, usageValue });
     onSearch(zipCode, usageValue);
