@@ -37,7 +37,6 @@ function App() {
         <BrowserRouter>
           <AuthProvider>
             <Routes>
-              <Route path="/auth" element={<AuthPage />} />
               <Route 
                 path="/" 
                 element={
@@ -50,6 +49,7 @@ function App() {
                   />
                 } 
               />
+              <Route path="/auth" element={<AuthPage />} />
               <Route 
                 path="/compare" 
                 element={
