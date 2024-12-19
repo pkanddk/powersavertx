@@ -52,16 +52,14 @@ export function PlanCardActions({
         </Button>
       </div>
       <div className="flex items-center justify-between gap-2">
-        {!plan.go_to_plan && (
-          <Button 
-            variant="secondary"
-            onClick={() => onShowDetails(plan)}
-            className="flex-1 bg-primary/5 hover:bg-primary/10 text-primary hover:text-primary/90 transition-colors flex items-center justify-center gap-2 font-medium"
-          >
-            <Info className="h-4 w-4" />
-            View Full Details
-          </Button>
-        )}
+        <Button 
+          variant="secondary"
+          onClick={() => onShowDetails(plan)}
+          className="flex-1 bg-primary/5 hover:bg-primary/10 text-primary hover:text-primary/90 transition-colors flex items-center justify-center gap-2 font-medium"
+        >
+          <Info className="h-4 w-4" />
+          View Full Details
+        </Button>
         {plan.enroll_phone && (
           <a
             href={`tel:${plan.enroll_phone}`}
