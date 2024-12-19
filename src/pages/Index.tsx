@@ -28,63 +28,75 @@ export default function Index() {
   const estimatedUse = searchParams.get("estimatedUse") || "any";
 
   const { data: plansData, isLoading, error } = useQuery({
-    queryKey: ["plans", search?.zipCode],
+    queryKey: ["plans", search?.zipCode, search?.estimatedUse],
     queryFn: async () => {
-      console.log("[Index] Starting plan fetch. Search state:", search);
+      console.log("[Index] Starting plan fetch with search state:", search);
       
       if (!search?.zipCode) {
         console.log("[Index] No ZIP code provided, returning empty result");
         return { plans: [], lastUpdated: null };
       }
 
-      console.log("[Index] Fetching plans from Supabase for ZIP:", search.zipCode);
-      const { data: plans, error } = await supabase
-        .from('plans')
-        .select('*')
-        .eq('zip_code', search.zipCode);
+      try {
+        console.log("[Index] Fetching plans from Supabase for ZIP:", search.zipCode);
+        const { data: plans, error } = await supabase
+          .from('plans')
+          .select('*')
+          .eq('zip_code', search.zipCode);
 
-      if (error) {
-        console.error('[Index] Error fetching plans from Supabase:', error);
+        if (error) {
+          console.error('[Index] Error fetching plans from Supabase:', error);
+          throw error;
+        }
+
+        if (!plans || plans.length === 0) {
+          console.log('[Index] No plans found in Supabase, invoking Edge Function');
+          console.log('[Index] Edge Function params:', { zipCode: search.zipCode, estimatedUse: search.estimatedUse });
+          
+          const { data: responseData, error: functionError } = await supabase.functions.invoke('power-to-choose', {
+            body: { 
+              zipCode: search.zipCode, 
+              estimatedUse: search.estimatedUse 
+            },
+          });
+
+          console.log('[Index] Edge Function raw response:', responseData);
+
+          if (functionError) {
+            console.error('[Index] Edge Function error:', functionError);
+            throw functionError;
+          }
+
+          if (!responseData) {
+            console.error('[Index] No data received from Edge Function');
+            throw new Error('No data received from Edge Function');
+          }
+
+          if ('error' in responseData) {
+            console.error('[Index] Error from Edge Function:', responseData.error);
+            throw new Error(responseData.error);
+          }
+
+          console.log('[Index] Edge Function success, plans received:', Array.isArray(responseData) ? responseData.length : 'non-array response');
+          return {
+            plans: Array.isArray(responseData) ? responseData : [],
+            lastUpdated: new Date().toISOString()
+          };
+        }
+
+        console.log("[Index] Found plans in Supabase:", plans.length, "results");
+        return {
+          plans: plans || [],
+          lastUpdated: plans?.[0]?.updated_at
+        };
+      } catch (error) {
+        console.error("[Index] Error in queryFn:", error);
         throw error;
       }
-
-      if (!plans || plans.length === 0) {
-        console.log('[Index] No plans found in Supabase, fetching from Edge Function');
-        const { data: responseData, error: functionError } = await supabase.functions.invoke('power-to-choose', {
-          body: { zipCode: search.zipCode, estimatedUse },
-        });
-
-        console.log('[Index] Edge Function response:', responseData);
-
-        if (functionError) {
-          console.error('[Index] Error calling Edge Function:', functionError);
-          throw functionError;
-        }
-
-        if (!responseData) {
-          console.error('[Index] No data received from Edge Function');
-          throw new Error('No plans found for this ZIP code');
-        }
-
-        if ('error' in responseData) {
-          console.error('[Index] Error from Edge Function:', responseData.error);
-          throw new Error(responseData.error);
-        }
-
-        return {
-          plans: Array.isArray(responseData) ? responseData : [],
-          lastUpdated: new Date().toISOString()
-        };
-      }
-
-      console.log("[Index] Found plans in Supabase:", plans?.length || 0, "results");
-      return {
-        plans: plans || [],
-        lastUpdated: plans?.[0]?.updated_at
-      };
     },
     meta: {
       onError: (error: Error) => {
+        console.error("[Index] Query error:", error);
         toast({
           title: "Error",
           description: error.message || "Failed to fetch energy plans. Please try again.",
@@ -164,13 +176,13 @@ export default function Index() {
 
         {isLoading && <LoadingState />}
         {error && <ErrorDisplay error={error} />}
-        {!isLoading && !error && (!plansData?.plans || plansData.plans.length === 0) && (
+        {!isLoading && !error && (!filteredPlans || filteredPlans.length === 0) && (
           <EmptyState hasSearch={!!search?.zipCode} />
         )}
 
-        {plansData?.plans && plansData.plans.length > 0 && (
+        {filteredPlans && filteredPlans.length > 0 && (
           <PlanGrid 
-            plans={plansData.plans}
+            plans={filteredPlans}
             onCompare={handleCompare}
             comparedPlans={comparedPlans}
             estimatedUse={estimatedUse}

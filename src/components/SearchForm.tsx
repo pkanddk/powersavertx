@@ -29,22 +29,35 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
     onSearch(zipCode, usageValue);
   };
 
+  const handleZipCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    console.log("[SearchForm] ZIP code input changed:", newValue);
+    // Only allow numbers and limit to 5 digits
+    if (/^\d{0,5}$/.test(newValue)) {
+      setZipCode(newValue);
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4 md:space-y-0 md:flex md:gap-4 max-w-2xl mx-auto">
       <Input
         type="text"
         placeholder="Enter ZIP Code"
         value={zipCode}
-        onChange={(e) => {
-          console.log("[SearchForm] ZIP code input changed:", e.target.value);
-          setZipCode(e.target.value);
-        }}
+        onChange={handleZipCodeChange}
         className="md:flex-1"
         pattern="[0-9]{5}"
         maxLength={5}
         required
+        aria-label="ZIP Code"
       />
-      <Select value={estimatedUse} onValueChange={setEstimatedUse}>
+      <Select 
+        value={estimatedUse} 
+        onValueChange={(value) => {
+          console.log("[SearchForm] Usage selection changed:", value);
+          setEstimatedUse(value);
+        }}
+      >
         <SelectTrigger className="md:w-64">
           <SelectValue placeholder="Estimated Usage" />
         </SelectTrigger>
