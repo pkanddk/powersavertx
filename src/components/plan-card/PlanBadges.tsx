@@ -20,9 +20,9 @@ export function PlanBadges({
   renewablePercentage
 }: PlanBadgesProps) {
   return (
-    <div className="flex flex-wrap gap-2">
-      <Badge variant="secondary">{planType}</Badge>
-      <Badge variant="outline" className="bg-white">
+    <div className="flex flex-wrap gap-2 list-none">
+      <Badge variant="secondary" className="list-none">{planType}</Badge>
+      <Badge variant="outline" className="bg-white list-none">
         {contractLength} {contractLength === 1 ? 'month' : 'months'}
       </Badge>
       {minimumUsage && (
