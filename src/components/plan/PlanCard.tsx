@@ -26,17 +26,15 @@ export function PlanCard({
         isCompared ? "ring-2 ring-primary shadow-lg" : "hover:shadow-lg"
       }`}
     >
-      <CardContent className="p-4">
-        <div className="space-y-4">
+      <CardContent className="p-3 md:p-4">
+        <div className="space-y-3 md:space-y-4">
           <PlanCardHeader plan={plan} />
           
-          {/* Plan Name */}
-          <h4 className="text-lg font-semibold text-foreground/90 tracking-tight group-hover:text-foreground transition-colors -mt-1">
+          <h4 className="text-base md:text-lg font-semibold text-foreground/90 tracking-tight group-hover:text-foreground transition-colors -mt-1">
             {plan.plan_name}
           </h4>
 
-          {/* Price Section */}
-          <div className="bg-muted/20 backdrop-blur-sm rounded-lg p-3">
+          <div className="bg-muted/20 backdrop-blur-sm rounded-lg p-2.5 md:p-3">
             <PlanPricing
               plan={plan}
               estimatedUse={estimatedUse}
@@ -44,10 +42,8 @@ export function PlanCard({
             />
           </div>
 
-          {/* Features Section */}
           <PlanFeatures plan={plan} />
 
-          {/* Actions Section */}
           <PlanCardActions 
             plan={plan}
             onCompare={onCompare}

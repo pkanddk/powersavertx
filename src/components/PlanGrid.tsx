@@ -22,8 +22,8 @@ export function PlanGrid({ plans, onCompare, comparedPlans, estimatedUse }: Plan
   const totalPages = Math.ceil(plans.length / plansPerPage);
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="space-y-4 md:space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         {currentPlans.map((plan) => (
           <PlanCard
             key={`${plan.company_id}-${plan.plan_name}`}
@@ -37,21 +37,23 @@ export function PlanGrid({ plans, onCompare, comparedPlans, estimatedUse }: Plan
       </div>
 
       {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-16 mt-8">
+        <div className="flex justify-center items-center gap-4 md:gap-16 mt-6 md:mt-8">
           <Button
             variant="outline"
             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
+            className="text-sm md:text-base"
           >
             Previous
           </Button>
-          <span className="text-sm font-medium min-w-[100px] text-center">
+          <span className="text-sm md:text-base font-medium min-w-[80px] md:min-w-[100px] text-center">
             Page {currentPage} of {totalPages}
           </span>
           <Button
             variant="outline"
             onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
             disabled={currentPage === totalPages}
+            className="text-sm md:text-base"
           >
             Next
           </Button>
