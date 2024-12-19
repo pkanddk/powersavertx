@@ -7,9 +7,10 @@ import { Plan } from "@/lib/api";
 interface ComparePageProps {
   plans: Plan[];
   onRemove: (plan: Plan) => void;
+  estimatedUse: string;
 }
 
-export function ComparePage({ plans, onRemove }: ComparePageProps) {
+export default function ComparePage({ plans, onRemove, estimatedUse }: ComparePageProps) {
   const navigate = useNavigate();
 
   if (plans.length === 0) {

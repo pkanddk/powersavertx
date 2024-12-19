@@ -50,7 +50,13 @@ export default function Alerts() {
 
         if (alertsError) throw alertsError;
 
-        setAlertHistory(alerts);
+        // Type assertion to ensure the plans field is correctly typed
+        const typedAlerts: AlertHistory[] = alerts?.map(alert => ({
+          ...alert,
+          plans: alert.plans as AlertHistory['plans']
+        })) || [];
+
+        setAlertHistory(typedAlerts);
       } catch (error: any) {
         console.error('Error loading alert history:', error);
         toast({
