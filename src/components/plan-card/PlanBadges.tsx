@@ -50,7 +50,7 @@ export function PlanBadges({
         </Badge>
       )}
       
-      {renewablePercentage && renewablePercentage > 0 && (
+      {renewablePercentage !== undefined && renewablePercentage > 0 && (
         <Badge variant="secondary" className="flex items-center gap-1">
           <Leaf size={14} />
           {renewablePercentage}% Renewable
