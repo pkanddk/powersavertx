@@ -32,13 +32,17 @@ export function PlanBadges({
 
   return (
     <div className="flex flex-wrap gap-2" data-debug="plan-badges-container">
-      <Badge key="plan-type" variant="secondary">
-        {planType}
-      </Badge>
+      {planType && (
+        <Badge key="plan-type" variant="secondary">
+          {planType}
+        </Badge>
+      )}
       
-      <Badge key="contract-length" variant="outline" className="bg-white">
-        {`${contractLength} ${contractLength === 1 ? 'month' : 'months'}`}
-      </Badge>
+      {contractLength > 0 && (
+        <Badge key="contract-length" variant="outline" className="bg-white">
+          {`${contractLength} ${contractLength === 1 ? 'month' : 'months'}`}
+        </Badge>
+      )}
       
       {minimumUsage && (
         <Badge key="min-usage" variant="secondary">
