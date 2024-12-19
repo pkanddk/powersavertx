@@ -56,6 +56,19 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
     try {
       data = JSON.parse(responseText);
       console.log("[Edge Function] Parsed response:", data);
+      
+      // Add detailed logging for each plan
+      if (Array.isArray(data)) {
+        data.forEach((plan, index) => {
+          console.log(`[Edge Function] Plan ${index}:`, {
+            id: plan.id,
+            plan_name: plan.plan_name,
+            pricing_details: plan.pricing_details,
+            company_name: plan.company_name
+          });
+        });
+      }
+      
     } catch (parseError) {
       console.error("[Edge Function] JSON parse error:", parseError);
       throw new Error("Failed to parse API response as JSON");
