@@ -45,16 +45,24 @@ export default function Index() {
   };
 
   const handleCompare = (plan: Plan) => {
-    if (comparedPlans.find(p => p.company_id === plan.company_id)) {
-      setComparedPlans(comparedPlans.filter(p => p.company_id !== plan.company_id));
-    } else if (comparedPlans.length < 3) {
-      setComparedPlans([...comparedPlans, plan]);
-    } else {
-      toast({
-        title: "Compare Limit Reached",
-        description: "You can compare up to 3 plans at a time. Remove a plan to add another.",
-      });
-    }
+    setComparedPlans(prevPlans => {
+      const isPlanCompared = prevPlans.some(p => p.company_id === plan.company_id);
+      
+      if (isPlanCompared) {
+        // Remove the plan if it's already being compared
+        return prevPlans.filter(p => p.company_id !== plan.company_id);
+      } else if (prevPlans.length < 3) {
+        // Add the plan if we haven't reached the limit
+        return [...prevPlans, plan];
+      } else {
+        // Show toast if we've reached the limit
+        toast({
+          title: "Compare Limit Reached",
+          description: "You can compare up to 3 plans at a time. Remove a plan to add another.",
+        });
+        return prevPlans;
+      }
+    });
   };
 
   const filteredPlans = plans ? filterPlans(plans, {
