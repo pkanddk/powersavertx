@@ -39,7 +39,7 @@ export function PlanBadges({
       
       {minimumUsage && (
         <Badge variant="destructive">
-          Minimum Usage
+          Minimum Usage Required
         </Badge>
       )}
       
