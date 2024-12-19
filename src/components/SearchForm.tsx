@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -19,12 +19,22 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
   const [zipCode, setZipCode] = useState("");
   const [estimatedUse, setEstimatedUse] = useState(USAGE_OPTIONS[0]);
 
+  // Effect to trigger search when values change
+  useEffect(() => {
+    if (zipCode.length === 5) {  // Only search when ZIP code is complete
+      const usageValue = estimatedUse === USAGE_OPTIONS[0] ? "any" :
+                        estimatedUse.split(" ")[0].replace(",", "");
+      console.log("[SearchForm] Auto-triggering search with usage value:", usageValue);
+      onSearch(zipCode, usageValue);
+    }
+  }, [zipCode, estimatedUse, onSearch]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Extract just the number from the usage string
     const usageValue = estimatedUse === USAGE_OPTIONS[0] ? "any" :
                       estimatedUse.split(" ")[0].replace(",", "");
-    console.log("[SearchForm] Submitting with usage value:", usageValue);
+    console.log("[SearchForm] Manual submit with usage value:", usageValue);
     onSearch(zipCode, usageValue);
   };
 
@@ -40,7 +50,12 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
         maxLength={5}
         required
       />
-      <Select value={estimatedUse} onValueChange={setEstimatedUse}>
+      <Select 
+        value={estimatedUse} 
+        onValueChange={(value) => {
+          setEstimatedUse(value);
+        }}
+      >
         <SelectTrigger className="md:w-64">
           <SelectValue placeholder="Estimated Usage" />
         </SelectTrigger>
