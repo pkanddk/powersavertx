@@ -119,6 +119,7 @@ export type Database = {
           plan_details: string | null
           plan_name: string
           plan_type_name: string
+          renewable_percentage: number | null
           updated_at: string
         }
         Insert: {
@@ -136,6 +137,7 @@ export type Database = {
           plan_details?: string | null
           plan_name: string
           plan_type_name: string
+          renewable_percentage?: number | null
           updated_at?: string
         }
         Update: {
@@ -153,6 +155,7 @@ export type Database = {
           plan_details?: string | null
           plan_name?: string
           plan_type_name?: string
+          renewable_percentage?: number | null
           updated_at?: string
         }
         Relationships: []

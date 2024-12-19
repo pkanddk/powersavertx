@@ -5,7 +5,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/components/ui/use-toast";
 import { BasicProfileSection } from "./profile/BasicProfileSection";
 import { RenewablePreferenceSection } from "./profile/RenewablePreferenceSection";
@@ -162,8 +161,8 @@ export function ProfileForm() {
   }
 
   return (
-    <ScrollArea className="h-[calc(100vh-4rem)] px-4">
-      <div className="space-y-6 max-w-2xl mx-auto py-6">
+    <div className="container mx-auto px-4 py-6 max-w-4xl">
+      <div className="space-y-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <BasicProfileSection form={form} />
@@ -187,6 +186,6 @@ export function ProfileForm() {
           />
         </div>
       </div>
-    </ScrollArea>
+    </div>
   );
 }

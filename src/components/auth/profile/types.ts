@@ -11,6 +11,7 @@ export type ProfileFormData = z.infer<typeof profileSchema>;
 
 export interface PriceAlert {
   id: string;
+  plan_id: string;
   plan_name: string;
   company_name: string;
   kwh_usage: string;
