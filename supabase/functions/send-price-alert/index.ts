@@ -101,12 +101,14 @@ const generateEmailHTML = (plans: Plan[], kwh_usage: string, price_threshold: nu
 };
 
 const handler = async (req: Request): Promise<Response> => {
+  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     const emailRequest: EmailRequest = await req.json();
+    console.log("[send-price-alert] Received request:", emailRequest);
     
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -128,18 +130,21 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (res.ok) {
       const data = await res.json();
+      console.log("[send-price-alert] Email sent successfully:", data);
       return new Response(JSON.stringify(data), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     } else {
       const error = await res.text();
+      console.error("[send-price-alert] Error sending email:", error);
       return new Response(JSON.stringify({ error }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
   } catch (error: any) {
+    console.error("[send-price-alert] Unexpected error:", error);
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
