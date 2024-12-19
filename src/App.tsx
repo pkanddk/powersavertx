@@ -38,21 +38,22 @@ function App() {
         <BrowserRouter>
           <AuthProvider>
             <Routes>
+              {/* Redirect root to auth page */}
+              <Route path="/" element={<Navigate to="/auth" replace />} />
+              <Route path="/auth" element={<AuthPage />} />
               <Route 
-                path="/" 
+                path="/search" 
                 element={
-                  <Index 
-                    comparedPlans={comparedPlans} 
-                    onCompare={handleCompare}
-                    search={search}
-                    onSearch={handleSearch}
-                    estimatedUse={search?.estimatedUse || "1000"}
-                  />
+                  <RequireAuth>
+                    <Index 
+                      comparedPlans={comparedPlans} 
+                      onCompare={handleCompare}
+                      search={search}
+                      onSearch={handleSearch}
+                      estimatedUse={search?.estimatedUse || "1000"}
+                    />
+                  </RequireAuth>
                 } 
-              />
-              <Route 
-                path="/auth" 
-                element={<AuthPage />} 
               />
               <Route 
                 path="/compare" 
@@ -65,7 +66,8 @@ function App() {
                   </RequireAuth>
                 } 
               />
-              <Route path="*" element={<Navigate to="/" replace />} />
+              {/* Catch all other routes and redirect to auth */}
+              <Route path="*" element={<Navigate to="/auth" replace />} />
             </Routes>
             <Toaster />
           </AuthProvider>
