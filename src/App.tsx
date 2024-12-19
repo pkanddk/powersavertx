@@ -3,6 +3,9 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import Index from "@/pages/Index";
 import { ComparePage } from "@/pages/Compare";
+import { AuthPage } from "@/pages/Auth";
+import { AuthProvider } from "@/components/auth/AuthProvider";
+import { RequireAuth } from "@/components/auth/RequireAuth";
 import { useState } from "react";
 import { Plan } from "./lib/api";
 
@@ -31,31 +34,38 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <Routes>
-          <Route 
-            path="/" 
-            element={
-              <Index 
-                comparedPlans={comparedPlans} 
-                onCompare={handleCompare}
-                search={search}
-                onSearch={handleSearch}
-                estimatedUse={search?.estimatedUse || "1000"}
-              />
-            } 
-          />
-          <Route 
-            path="/compare" 
-            element={
-              <ComparePage 
-                plans={comparedPlans} 
-                onRemove={handleCompare} 
-              />
-            } 
-          />
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            <Route path="/auth" element={<AuthPage />} />
+            <Route 
+              path="/" 
+              element={
+                <RequireAuth>
+                  <Index 
+                    comparedPlans={comparedPlans} 
+                    onCompare={handleCompare}
+                    search={search}
+                    onSearch={handleSearch}
+                    estimatedUse={search?.estimatedUse || "1000"}
+                  />
+                </RequireAuth>
+              } 
+            />
+            <Route 
+              path="/compare" 
+              element={
+                <RequireAuth>
+                  <ComparePage 
+                    plans={comparedPlans} 
+                    onRemove={handleCompare} 
+                  />
+                </RequireAuth>
+              } 
+            />
+          </Routes>
+          <Toaster />
+        </AuthProvider>
       </BrowserRouter>
-      <Toaster />
     </QueryClientProvider>
   );
 }
