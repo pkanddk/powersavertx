@@ -1,7 +1,11 @@
 import { Plan } from "@/lib/api";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Phone, Check } from "lucide-react";
+import { ExternalLink, Phone } from "lucide-react";
+import { useState } from "react";
+import { PlanFeatures } from "./plan/PlanFeatures";
+import { PlanPricing } from "./plan/PlanPricing";
+import { PlanDetails } from "./plan/PlanDetails";
 
 interface PlanGridProps {
   plans: Plan[];
@@ -11,46 +15,7 @@ interface PlanGridProps {
 }
 
 export function PlanGrid({ plans, onCompare, comparedPlans, estimatedUse }: PlanGridProps) {
-  console.log('PlanGrid - Full plan data:', plans.map(plan => ({
-    id: plan.id,
-    company_name: plan.company_name,
-    plan_name: plan.plan_name,
-    plan_details: plan.plan_details,
-    plan_type_name: plan.plan_type_name,
-    prices: {
-      base: plan.price_kwh,
-      kwh500: plan.price_kwh500,
-      kwh1000: plan.price_kwh1000,
-      kwh2000: plan.price_kwh2000,
-      base_charge: plan.base_charge
-    },
-    contract: {
-      length: plan.contract_length,
-      terms: plan.terms_of_service
-    },
-    features: {
-      renewable: plan.renewable_percentage,
-      prepaid: plan.prepaid,
-      timeofuse: plan.timeofuse,
-      minimum_usage: plan.minimum_usage,
-      new_customer: plan.new_customer
-    },
-    details: {
-      kwh500: plan.detail_kwh500,
-      kwh1000: plan.detail_kwh1000,
-      kwh2000: plan.detail_kwh2000,
-      pricing: plan.pricing_details
-    },
-    contact: {
-      phone: plan.enroll_phone,
-      website: plan.website,
-      enroll_url: plan.go_to_plan
-    },
-    documents: {
-      fact_sheet: plan.fact_sheet,
-      yrac_url: plan.yrac_url
-    }
-  })));
+  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
 
   const getPriceForUsage = (plan: Plan) => {
     let price;
@@ -74,10 +39,6 @@ export function PlanGrid({ plans, onCompare, comparedPlans, estimatedUse }: Plan
     return price;
   };
 
-  const formatPlanType = (planType: string) => {
-    return planType.replace(/[0-9]/g, '').trim() || 'Fixed Rate';
-  };
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {plans.map((plan) => (
@@ -97,7 +58,13 @@ export function PlanGrid({ plans, onCompare, comparedPlans, estimatedUse }: Plan
               {/* Plan Details Section */}
               <div className="space-y-2">
                 <h4 className="text-lg font-semibold text-gray-900">{plan.plan_name}</h4>
-                <p className="text-sm text-muted-foreground">{plan.plan_details}</p>
+                <Button 
+                  variant="link" 
+                  className="p-0 h-auto text-sm text-muted-foreground hover:text-primary"
+                  onClick={() => setSelectedPlan(plan)}
+                >
+                  View Plan Details
+                </Button>
                 {plan.contract_length && (
                   <p className="text-sm text-primary font-medium">
                     {plan.contract_length} {plan.contract_length === 1 ? 'month' : 'months'} contract
@@ -106,95 +73,14 @@ export function PlanGrid({ plans, onCompare, comparedPlans, estimatedUse }: Plan
               </div>
 
               {/* Price Section */}
-              <div className="space-y-4">
-                {/* Highlighted Price based on selection */}
-                <div className="bg-primary/5 p-4 rounded-lg">
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-3xl font-bold text-gray-900">{getPriceForUsage(plan).toFixed(1)}</span>
-                    <span className="text-lg text-gray-900">¢</span>
-                    <span className="text-sm text-muted-foreground ml-2">
-                      at {estimatedUse === "any" ? "1,000" : estimatedUse} kWh
-                    </span>
-                  </div>
-                </div>
-
-                {/* All Available Prices */}
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">500 kWh Usage:</span>
-                    <span className="font-medium">{plan.price_kwh500.toFixed(1)}¢</span>
-                    {plan.detail_kwh500 && (
-                      <p className="text-xs text-muted-foreground mt-1">{plan.detail_kwh500}</p>
-                    )}
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">1,000 kWh Usage:</span>
-                    <span className="font-medium">{plan.price_kwh1000.toFixed(1)}¢</span>
-                    {plan.detail_kwh1000 && (
-                      <p className="text-xs text-muted-foreground mt-1">{plan.detail_kwh1000}</p>
-                    )}
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">2,000 kWh Usage:</span>
-                    <span className="font-medium">{plan.price_kwh2000.toFixed(1)}¢</span>
-                    {plan.detail_kwh2000 && (
-                      <p className="text-xs text-muted-foreground mt-1">{plan.detail_kwh2000}</p>
-                    )}
-                  </div>
-                  {plan.base_charge && (
-                    <div className="flex justify-between items-center pt-2 border-t">
-                      <span className="text-muted-foreground">Base Charge:</span>
-                      <span className="font-medium">${plan.base_charge}/month</span>
-                    </div>
-                  )}
-                  {plan.pricing_details && (
-                    <p className="text-xs text-muted-foreground mt-2 pt-2 border-t">
-                      {plan.pricing_details}
-                    </p>
-                  )}
-                </div>
-              </div>
+              <PlanPricing
+                plan={plan}
+                estimatedUse={estimatedUse}
+                getPriceForUsage={getPriceForUsage}
+              />
 
               {/* Features Section */}
-              <div className="space-y-2">
-                {plan.plan_type_name && (
-                  <div className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
-                    {formatPlanType(plan.plan_type_name)}
-                  </div>
-                )}
-                <div className="space-y-1">
-                  {plan.renewable_percentage > 0 && (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Check className="h-4 w-4 text-primary" />
-                      <span>{plan.renewable_percentage}% Renewable</span>
-                    </div>
-                  )}
-                  {plan.prepaid && (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Check className="h-4 w-4 text-primary" />
-                      <span>Prepaid Plan</span>
-                    </div>
-                  )}
-                  {plan.timeofuse && (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Check className="h-4 w-4 text-primary" />
-                      <span>Time of Use</span>
-                    </div>
-                  )}
-                  {plan.minimum_usage && (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Check className="h-4 w-4 text-primary" />
-                      <span>Minimum Usage Required</span>
-                    </div>
-                  )}
-                  {plan.new_customer && (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Check className="h-4 w-4 text-primary" />
-                      <span>New Customers Only</span>
-                    </div>
-                  )}
-                </div>
-              </div>
+              <PlanFeatures plan={plan} />
 
               {/* Actions Section */}
               <div className="space-y-3 pt-2">
@@ -233,6 +119,15 @@ export function PlanGrid({ plans, onCompare, comparedPlans, estimatedUse }: Plan
           </CardContent>
         </Card>
       ))}
+
+      {/* Plan Details Drawer */}
+      {selectedPlan && (
+        <PlanDetails
+          plan={selectedPlan}
+          isOpen={!!selectedPlan}
+          onClose={() => setSelectedPlan(null)}
+        />
+      )}
     </div>
   );
 }
