@@ -19,6 +19,7 @@ export default function Index() {
   const [prepaidFilter, setPrepaidFilter] = useState("all");
   const [timeOfUseFilter, setTimeOfUseFilter] = useState("all");
   const [companyFilter, setCompanyFilter] = useState("all");
+  const [renewableFilter, setRenewableFilter] = useState("all");
   const { toast } = useToast();
   const estimatedUse = searchParams.get("estimatedUse") || "1000"; // Default to 1000 kWh
 
@@ -62,6 +63,7 @@ export default function Index() {
     timeOfUseFilter,
     companyFilter,
     sortOrder,
+    renewableFilter,
     estimatedUse: search?.estimatedUse || estimatedUse,
   }) : [];
 
@@ -90,12 +92,14 @@ export default function Index() {
               onPrepaidChange={setPrepaidFilter}
               onTimeOfUseChange={setTimeOfUseFilter}
               onCompanyChange={setCompanyFilter}
+              onRenewableChange={setRenewableFilter}
               currentSort={sortOrder}
               currentContractLength={contractLength}
               currentPlanType={planType}
               currentPrepaid={prepaidFilter}
               currentTimeOfUse={timeOfUseFilter}
               currentCompany={companyFilter}
+              currentRenewable={renewableFilter}
               plans={plans}
             />
 

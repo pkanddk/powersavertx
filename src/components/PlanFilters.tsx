@@ -14,12 +14,14 @@ interface PlanFiltersProps {
   onPrepaidChange: (value: string) => void;
   onTimeOfUseChange: (value: string) => void;
   onCompanyChange: (value: string) => void;
+  onRenewableChange: (value: string) => void;
   currentSort: string;
   currentContractLength: string;
   currentPlanType: string;
   currentPrepaid: string;
   currentTimeOfUse: string;
   currentCompany: string;
+  currentRenewable: string;
   plans?: Plan[];
 }
 
@@ -30,12 +32,14 @@ export function PlanFilters({
   onPrepaidChange,
   onTimeOfUseChange,
   onCompanyChange,
+  onRenewableChange,
   currentSort,
   currentContractLength,
   currentPlanType,
   currentPrepaid,
   currentTimeOfUse,
   currentCompany,
+  currentRenewable,
   plans = [],
 }: PlanFiltersProps) {
   const companies = Array.from(new Set(plans.map(plan => plan.company_id))).map(id => {
@@ -134,6 +138,22 @@ export function PlanFilters({
             <SelectItem value="all">Show All</SelectItem>
             <SelectItem value="tou-only">Time of Use Only</SelectItem>
             <SelectItem value="no-tou">No Time of Use</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-medium">Renewable Energy</label>
+        <Select value={currentRenewable || "all"} onValueChange={onRenewableChange}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue defaultValue="all">Show All</SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Show All</SelectItem>
+            <SelectItem value="100">100% Renewable</SelectItem>
+            <SelectItem value="50">50%+ Renewable</SelectItem>
+            <SelectItem value="25">25%+ Renewable</SelectItem>
+            <SelectItem value="0">No Renewable</SelectItem>
           </SelectContent>
         </Select>
       </div>

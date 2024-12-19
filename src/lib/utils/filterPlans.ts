@@ -9,6 +9,7 @@ export function filterPlans(
     timeOfUseFilter = "all",
     companyFilter = "all",
     sortOrder = "price-asc",
+    renewableFilter = "all",
     estimatedUse,
   }: {
     planType?: string;
@@ -17,6 +18,7 @@ export function filterPlans(
     timeOfUseFilter?: string;
     companyFilter?: string;
     sortOrder?: string;
+    renewableFilter?: string;
     estimatedUse?: string;
   }
 ) {
@@ -27,6 +29,7 @@ export function filterPlans(
     timeOfUseFilter,
     companyFilter,
     sortOrder,
+    renewableFilter,
     estimatedUse
   });
 
@@ -82,6 +85,21 @@ export function filterPlans(
   if (companyFilter !== "all") {
     console.log('[filterPlans] Filtering by company:', companyFilter);
     filteredPlans = filteredPlans.filter(plan => plan.company_id === companyFilter);
+  }
+
+  // Filter by renewable percentage
+  if (renewableFilter !== "all") {
+    console.log('[filterPlans] Filtering by renewable percentage:', renewableFilter);
+    const percentage = parseInt(renewableFilter, 10);
+    if (percentage === 0) {
+      filteredPlans = filteredPlans.filter(plan => 
+        !plan.renewable_percentage || plan.renewable_percentage === 0
+      );
+    } else {
+      filteredPlans = filteredPlans.filter(plan => 
+        plan.renewable_percentage && plan.renewable_percentage >= percentage
+      );
+    }
   }
 
   // Get the price for the selected kWh usage
