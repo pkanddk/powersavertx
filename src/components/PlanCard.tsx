@@ -34,9 +34,6 @@ export function PlanCard({ plan, onCompare, isCompared, estimatedUse }: PlanCard
             priceKwh2000={plan.price_kwh2000}
             baseCharge={plan.base_charge}
             estimatedUse={estimatedUse}
-            detailKwh500={plan.detail_kwh500}
-            detailKwh1000={plan.detail_kwh1000}
-            detailKwh2000={plan.detail_kwh2000}
           />
           
           <PlanBadges 
@@ -44,16 +41,11 @@ export function PlanCard({ plan, onCompare, isCompared, estimatedUse }: PlanCard
             contractLength={plan.contract_length}
             minimumUsage={plan.minimum_usage}
             newCustomer={plan.new_customer}
-            renewablePercentage={plan.renewable_percentage}
-            timeofuse={plan.timeofuse}
           />
           
-          <PlanDetails 
-            details={plan.plan_details}
-            timeofuse={plan.timeofuse}
-            pricingDetails={plan.pricing_details}
-            tduProvider={plan.company_tdu_name}
-          />
+          {plan.plan_details && (
+            <PlanDetails details={plan.plan_details} />
+          )}
         </div>
       </CardContent>
       <CardFooter className="flex-none p-6 pt-0">

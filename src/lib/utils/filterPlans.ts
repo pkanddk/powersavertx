@@ -3,123 +3,17 @@ import { Plan } from "@/lib/api";
 export function filterPlans(
   plans: Plan[],
   {
-    planType,
-    contractLength,
-    timeOfUseFilter,
-    companyFilter,
-    sortOrder,
     estimatedUse,
-    minUsageFilter,
-    renewableFilter,
   }: {
     planType?: string;
     contractLength?: string;
+    prepaidFilter?: string;
     timeOfUseFilter?: string;
     companyFilter?: string;
     sortOrder?: string;
     estimatedUse?: string;
-    minUsageFilter?: string;
-    renewableFilter?: string;
   }
 ) {
-  let filteredPlans = [...plans];
-
-  // Filter by time of use
-  if (timeOfUseFilter && timeOfUseFilter !== "all") {
-    console.log("[filterPlans] Filtering by Time of Use:", timeOfUseFilter);
-    console.log("[filterPlans] Plans before TOU filter:", filteredPlans.length);
-    console.log("[filterPlans] Plans with their timeofuse values:", 
-      filteredPlans.map(p => ({ 
-        name: p.plan_name, 
-        timeofuse: p.timeofuse,
-        company: p.company_name 
-      }))
-    );
-    
-    filteredPlans = filteredPlans.filter(plan => {
-      if (timeOfUseFilter === "tou-only") {
-        return plan.timeofuse === true;
-      } else if (timeOfUseFilter === "no-tou") {
-        return plan.timeofuse === false;
-      }
-      return true;
-    });
-
-    console.log("[filterPlans] Plans after TOU filter:", filteredPlans.length);
-    console.log("[filterPlans] Filtered plans:", 
-      filteredPlans.map(p => ({ 
-        name: p.plan_name, 
-        timeofuse: p.timeofuse,
-        company: p.company_name 
-      }))
-    );
-  }
-
-  // Filter by contract length
-  if (contractLength && contractLength !== "all") {
-    filteredPlans = filteredPlans.filter(plan => {
-      const length = plan.contract_length || 0;
-      switch (contractLength) {
-        case "0-6":
-          return length >= 0 && length <= 6;
-        case "6-12":
-          return length > 6 && length <= 12;
-        case "12-24":
-          return length > 12 && length <= 24;
-        case "24+":
-          return length > 24;
-        default:
-          return true;
-      }
-    });
-  }
-
-  // Filter by plan type
-  if (planType && planType !== "all") {
-    filteredPlans = filteredPlans.filter(plan => {
-      const type = plan.plan_type_name.toLowerCase();
-      return type.includes(planType.toLowerCase());
-    });
-  }
-
-  // Filter by minimum usage
-  if (minUsageFilter && minUsageFilter !== "all") {
-    filteredPlans = filteredPlans.filter(plan => {
-      switch (minUsageFilter) {
-        case "no-minimum":
-          return !plan.minimum_usage;
-        default:
-          return true;
-      }
-    });
-  }
-
-  // Filter by renewable percentage
-  if (renewableFilter && renewableFilter !== "all") {
-    filteredPlans = filteredPlans.filter(plan => {
-      const renewablePercentage = plan.renewable_percentage || 0;
-      switch (renewableFilter) {
-        case "0-25":
-          return renewablePercentage >= 0 && renewablePercentage <= 25;
-        case "25-50":
-          return renewablePercentage > 25 && renewablePercentage <= 50;
-        case "50-75":
-          return renewablePercentage > 50 && renewablePercentage <= 75;
-        case "75-99":
-          return renewablePercentage > 75 && renewablePercentage < 100;
-        case "100":
-          return renewablePercentage === 100;
-        default:
-          return true;
-      }
-    });
-  }
-
-  // Filter by company
-  if (companyFilter && companyFilter !== "all") {
-    filteredPlans = filteredPlans.filter(plan => plan.company_id === companyFilter);
-  }
-
   // Get the price for the selected kWh usage
   const getPriceForUsage = (plan: Plan): number => {
     switch (estimatedUse) {
@@ -134,23 +28,10 @@ export function filterPlans(
     }
   };
 
-  // Sort plans
-  if (sortOrder) {
-    filteredPlans.sort((a, b) => {
-      switch (sortOrder) {
-        case "price-asc":
-          return getPriceForUsage(a) - getPriceForUsage(b);
-        case "price-desc":
-          return getPriceForUsage(b) - getPriceForUsage(a);
-        case "length-asc":
-          return (a.contract_length || 0) - (b.contract_length || 0);
-        case "length-desc":
-          return (b.contract_length || 0) - (a.contract_length || 0);
-        default:
-          return 0;
-      }
-    });
-  }
-
-  return filteredPlans;
+  // Sort plans based solely on price (lowest to highest)
+  return [...plans].sort((a, b) => {
+    const priceA = getPriceForUsage(a);
+    const priceB = getPriceForUsage(b);
+    return priceA - priceB;
+  });
 }

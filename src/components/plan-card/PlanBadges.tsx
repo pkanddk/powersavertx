@@ -1,62 +1,24 @@
 import { Badge } from "@/components/ui/badge";
-import { Clock, Leaf, Users } from "lucide-react";
 
 interface PlanBadgesProps {
   planType: string;
-  contractLength?: number;
+  contractLength: number;
   minimumUsage?: boolean;
   newCustomer?: boolean;
-  renewablePercentage?: number;
-  timeofuse?: boolean;
 }
 
-export function PlanBadges({
-  planType,
-  contractLength,
-  minimumUsage,
-  newCustomer,
-  renewablePercentage,
-  timeofuse,
-}: PlanBadgesProps) {
+export function PlanBadges({ planType, contractLength, minimumUsage, newCustomer }: PlanBadgesProps) {
   return (
     <div className="flex flex-wrap gap-2">
-      {planType && planType !== "1" && (
-        <Badge variant="secondary">
-          {planType}
-        </Badge>
-      )}
-      
-      {contractLength && contractLength > 0 && (
-        <Badge variant="outline">
-          {contractLength} {contractLength === 1 ? 'month' : 'months'}
-        </Badge>
-      )}
-
-      {timeofuse && (
-        <Badge variant="secondary" className="flex items-center gap-1">
-          <Clock size={14} />
-          Time of Use
-        </Badge>
-      )}
-      
+      <Badge variant="secondary">{planType}</Badge>
+      <Badge variant="outline">
+        {contractLength} {contractLength === 1 ? 'month' : 'months'}
+      </Badge>
       {minimumUsage && (
-        <Badge variant="destructive">
-          Minimum Usage Required
-        </Badge>
+        <Badge variant="secondary">Min. Usage Required</Badge>
       )}
-      
       {newCustomer && (
-        <Badge variant="secondary" className="flex items-center gap-1">
-          <Users size={14} />
-          New Customers Only
-        </Badge>
-      )}
-      
-      {renewablePercentage !== undefined && renewablePercentage > 0 && (
-        <Badge variant="secondary" className="flex items-center gap-1">
-          <Leaf size={14} />
-          {renewablePercentage}% Renewable
-        </Badge>
+        <Badge variant="secondary">New Customers Only</Badge>
       )}
     </div>
   );

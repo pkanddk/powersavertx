@@ -15,13 +15,8 @@ export type Database = {
           company_id: string
           company_logo: string | null
           company_name: string
-          company_tdu_name: string | null
           contract_length: number | null
           created_at: string | null
-          detail_kwh1000: string | null
-          detail_kwh2000: string | null
-          detail_kwh500: string | null
-          enroll_phone: string | null
           fact_sheet: string | null
           go_to_plan: string | null
           id: string
@@ -32,33 +27,16 @@ export type Database = {
           plan_details: string | null
           plan_name: string
           plan_type_name: string
-          prepaid: boolean | null
           price_kwh: number
-          price_kwh1000: number
-          price_kwh2000: number
-          price_kwh500: number
-          pricing_details: string | null
-          promotions: string | null
-          renewable_percentage: number | null
-          terms_of_service: string | null
-          timeofuse: boolean | null
           updated_at: string | null
-          website: string | null
-          yrac_url: string | null
-          zip_code: string
         }
         Insert: {
           base_charge?: number | null
           company_id: string
           company_logo?: string | null
           company_name: string
-          company_tdu_name?: string | null
           contract_length?: number | null
           created_at?: string | null
-          detail_kwh1000?: string | null
-          detail_kwh2000?: string | null
-          detail_kwh500?: string | null
-          enroll_phone?: string | null
           fact_sheet?: string | null
           go_to_plan?: string | null
           id?: string
@@ -69,33 +47,16 @@ export type Database = {
           plan_details?: string | null
           plan_name: string
           plan_type_name: string
-          prepaid?: boolean | null
           price_kwh: number
-          price_kwh1000: number
-          price_kwh2000: number
-          price_kwh500: number
-          pricing_details?: string | null
-          promotions?: string | null
-          renewable_percentage?: number | null
-          terms_of_service?: string | null
-          timeofuse?: boolean | null
           updated_at?: string | null
-          website?: string | null
-          yrac_url?: string | null
-          zip_code: string
         }
         Update: {
           base_charge?: number | null
           company_id?: string
           company_logo?: string | null
           company_name?: string
-          company_tdu_name?: string | null
           contract_length?: number | null
           created_at?: string | null
-          detail_kwh1000?: string | null
-          detail_kwh2000?: string | null
-          detail_kwh500?: string | null
-          enroll_phone?: string | null
           fact_sheet?: string | null
           go_to_plan?: string | null
           id?: string
@@ -106,20 +67,8 @@ export type Database = {
           plan_details?: string | null
           plan_name?: string
           plan_type_name?: string
-          prepaid?: boolean | null
           price_kwh?: number
-          price_kwh1000?: number
-          price_kwh2000?: number
-          price_kwh500?: number
-          pricing_details?: string | null
-          promotions?: string | null
-          renewable_percentage?: number | null
-          terms_of_service?: string | null
-          timeofuse?: boolean | null
           updated_at?: string | null
-          website?: string | null
-          yrac_url?: string | null
-          zip_code?: string
         }
         Relationships: []
       }

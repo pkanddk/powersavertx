@@ -1,73 +1,69 @@
-import { formatPrice } from "@/lib/utils/formatPrice";
-
 interface PlanPricingProps {
   priceKwh500: number;
   priceKwh1000: number;
   priceKwh2000: number;
-  baseCharge: number | null;
+  baseCharge?: number;
   estimatedUse: string;
-  detailKwh500?: string | null;
-  detailKwh1000?: string | null;
-  detailKwh2000?: string | null;
 }
+
+const formatPrice = (price: number) => {
+  return (price * 100).toFixed(1);
+};
 
 export function PlanPricing({ 
   priceKwh500, 
   priceKwh1000, 
   priceKwh2000, 
   baseCharge,
-  estimatedUse,
-  detailKwh500,
-  detailKwh1000,
-  detailKwh2000
+  estimatedUse
 }: PlanPricingProps) {
-  const getHighlightedPrice = () => {
-    switch (estimatedUse) {
-      case "500":
-        return { price: priceKwh500, detail: detailKwh500 };
-      case "1000":
-        return { price: priceKwh1000, detail: detailKwh1000 };
-      case "2000":
-        return { price: priceKwh2000, detail: detailKwh2000 };
-      default:
-        return { price: priceKwh1000, detail: detailKwh1000 };
-    }
-  };
-
-  const highlightedPrice = getHighlightedPrice();
+  console.log("Current estimated use:", estimatedUse);
+  
+  // Simple array of prices in kWh order
+  const prices = [
+    { id: "500", kwh: "500 kWh", price: priceKwh500 },
+    { id: "1000", kwh: "1,000 kWh", price: priceKwh1000 },
+    { id: "2000", kwh: "2,000 kWh", price: priceKwh2000 }
+  ];
 
   return (
-    <div className="space-y-2">
-      <div className="text-3xl font-bold">
-        {formatPrice(highlightedPrice.price)}<span className="text-base font-normal">/kWh</span>
+    <div className="space-y-4">
+      <div className="text-sm font-medium text-gray-700 mb-2">Price per kWh</div>
+      <div className="space-y-2">
+        {prices.map((item) => {
+          // Compare the estimatedUse directly with the item.id
+          const isSelected = estimatedUse === item.id;
+          console.log(`Checking ${item.id} against ${estimatedUse}: ${isSelected}`);
+          
+          return (
+            <div 
+              key={item.id}
+              className={`
+                flex items-center justify-between p-3 rounded-lg
+                ${isSelected ? 'bg-primary/10 border border-primary' : 'bg-white'}
+              `}
+            >
+              <span className={`text-sm ${isSelected ? 'text-primary font-medium' : 'text-gray-600'}`}>
+                {item.kwh}
+              </span>
+              <div className="flex items-baseline gap-1">
+                <span className={`text-lg font-medium ${isSelected ? 'text-primary' : 'text-gray-700'}`}>
+                  {formatPrice(item.price)}¢
+                </span>
+                <span className={`text-xs ${isSelected ? 'text-primary' : 'text-gray-500'}`}>
+                  per kWh
+                </span>
+              </div>
+            </div>
+          );
+        })}
       </div>
       
-      {highlightedPrice.detail && (
-        <p className="text-sm text-muted-foreground">
-          {highlightedPrice.detail}
-        </p>
+      {baseCharge && (
+        <div className="text-xs text-gray-500 border-t pt-2 mt-4">
+          Base Charge: ${baseCharge}/month
+        </div>
       )}
-
-      <div className="text-sm space-y-1">
-        <div className="flex justify-between">
-          <span>500 kWh</span>
-          <span>{formatPrice(priceKwh500)}/kWh</span>
-        </div>
-        <div className="flex justify-between">
-          <span>1000 kWh</span>
-          <span>{formatPrice(priceKwh1000)}/kWh</span>
-        </div>
-        <div className="flex justify-between">
-          <span>2000 kWh</span>
-          <span>{formatPrice(priceKwh2000)}/kWh</span>
-        </div>
-        {baseCharge && (
-          <div className="flex justify-between text-muted-foreground">
-            <span>Base Charge</span>
-            <span>${baseCharge}/month</span>
-          </div>
-        )}
-      </div>
     </div>
   );
 }

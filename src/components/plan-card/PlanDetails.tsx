@@ -1,42 +1,31 @@
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 
 interface PlanDetailsProps {
-  details?: string;
-  timeofuse?: boolean;
-  pricingDetails?: string;
-  tduProvider?: string;
+  details: string;
 }
 
-export function PlanDetails({ details, timeofuse, pricingDetails, tduProvider }: PlanDetailsProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
-
-  if (!details && !timeofuse && !pricingDetails && !tduProvider) {
-    return null;
-  }
+export function PlanDetails({ details }: PlanDetailsProps) {
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="space-y-2">
-      <Button 
-        variant="ghost" 
-        className="w-full flex justify-between items-center p-0 h-auto hover:bg-transparent"
-        onClick={() => setIsExpanded(!isExpanded)}
-      >
-        <span className="font-medium">Plan Details</span>
-        {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-      </Button>
-      
-      {isExpanded && (
-        <div className="text-sm space-y-2 text-muted-foreground">
-          {details && <p>{details}</p>}
-          {timeofuse && (
-            <p>This is a time-of-use plan. Rates vary based on the time of day electricity is used.</p>
-          )}
-          {pricingDetails && <p>{pricingDetails}</p>}
-          {tduProvider && <p>TDU Provider: {tduProvider}</p>}
+    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+      <CollapsibleTrigger asChild>
+        <Button 
+          variant="ghost" 
+          className="w-full flex items-center justify-center gap-2 hover:bg-secondary/50"
+        >
+          Plan Details
+          <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+        </Button>
+      </CollapsibleTrigger>
+      <CollapsibleContent className="text-sm text-muted-foreground mt-2 space-y-2 animate-accordion-down">
+        <div className="bg-secondary/20 p-4 rounded-md">
+          {details}
         </div>
-      )}
-    </div>
+      </CollapsibleContent>
+    </Collapsible>
   );
 }

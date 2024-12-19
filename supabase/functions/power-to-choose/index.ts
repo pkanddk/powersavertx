@@ -1,7 +1,4 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { logger } from './logger.ts';
-import { transformPlan } from './transformer.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -10,200 +7,150 @@ const corsHeaders = {
 
 async function makeRequest(url: string, method: string, headers: Record<string, string>) {
   try {
-    logger.info("🌐 Making request to URL:", url);
-    
-    const requestHeaders = {
-      ...headers,
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-    };
-    
-    logger.info("📤 Request headers:", requestHeaders);
+    console.log("[Edge Function] Making request to:", url);
+    console.log("[Edge Function] Request Method:", method);
+    console.log("[Edge Function] Request Headers:", headers);
 
     const response = await fetch(url, {
       method,
-      headers: requestHeaders,
+      headers,
     });
 
-    logger.info("📡 API Response Status:", response.status);
-    logger.info("📡 API Response Headers:", Object.fromEntries(response.headers.entries()));
-
+    console.log("[Edge Function] Response Status:", response.status);
+    
     if (!response.ok) {
       const errorText = await response.text();
-      logger.error(`❌ API Error Response for ZIP ${url.split('zip_code=')[1]}:`, errorText);
+      console.error("[Edge Function] Error Response:", errorText);
       throw new Error(`HTTP Error ${response.status}: ${errorText}`);
     }
 
     const responseText = await response.text();
-    logger.info(`📝 Raw API Response Text for ZIP ${url.split('zip_code=')[1]}:`, responseText);
-    
+    console.log("[Edge Function] Raw response:", responseText);
+
     let data;
     try {
       data = JSON.parse(responseText);
-      logger.info(`🔄 Parsed API Response for ZIP ${url.split('zip_code=')[1]}:`, data);
+      console.log("[Edge Function] Parsed response:", data);
     } catch (parseError) {
-      logger.error(`❌ JSON parse error for ZIP ${url.split('zip_code=')[1]}:`, parseError);
+      console.error("[Edge Function] JSON parse error:", parseError);
       throw new Error("Failed to parse API response as JSON");
     }
 
-    if (!data) {
-      logger.error(`❌ No data in API response for ZIP ${url.split('zip_code=')[1]}`);
-      return [];
-    }
-
-    if (Array.isArray(data) && data.length === 0) {
-      logger.info(`ℹ️ API returned empty array for ZIP ${url.split('zip_code=')[1]}`);
-      return [];
+    if (data.error || (data.success === false)) {
+      console.error("[Edge Function] API returned error:", data);
+      throw new Error(data.message || "API returned an error");
     }
 
     let plans = [];
     if (Array.isArray(data)) {
       plans = data;
-      logger.info(`📊 Found ${plans.length} plans in array format for ZIP ${url.split('zip_code=')[1]}`);
     } else if (data.data && Array.isArray(data.data)) {
       plans = data.data;
-      logger.info(`📊 Found ${plans.length} plans in data.data format for ZIP ${url.split('zip_code=')[1]}`);
+    } else if (data.plans && Array.isArray(data.plans)) {
+      plans = data.plans;
     } else if (data.Results && Array.isArray(data.Results)) {
       plans = data.Results;
-      logger.info(`📊 Found ${plans.length} plans in Results format for ZIP ${url.split('zip_code=')[1]}`);
     } else {
-      logger.error(`❌ Unexpected response structure for ZIP ${url.split('zip_code=')[1]}:`, data);
+      console.error("[Edge Function] Unexpected response structure:", data);
       throw new Error("Unexpected response structure from API");
     }
 
-    logger.info(`🔍 Processing ${plans.length} plans for ZIP ${url.split('zip_code=')[1]}`);
-    plans.forEach((plan, index) => {
-      logger.info(`📋 Plan ${index + 1} details:`, {
-        plan_id: plan.plan_id,
-        plan_name: plan.plan_name,
-        zip_code: plan.zip_code,
-        timeofuse: plan.timeofuse
+    console.log(`[Edge Function] Found ${plans.length} plans`);
+
+    const transformedPlans = plans.map(plan => {
+      console.log(`[Edge Function] Processing plan: ${plan.plan_name}`);
+
+      const parseRate = (rate: string | number | null | undefined): number => {
+        if (!rate) return 0;
+        const cleanRate = String(rate).replace(/[^\d.]/g, '');
+        const parsed = parseFloat(cleanRate);
+        const result = isNaN(parsed) ? 0 : parsed / 100;
+        console.log(`[Edge Function] Parsing rate: ${rate} -> ${cleanRate} -> ${parsed} -> ${result}`);
+        return result;
+      };
+
+      // Parse all three rate tiers
+      const price_kwh500 = parseRate(plan.price_kwh500 || plan.rate500);
+      const price_kwh1000 = parseRate(plan.price_kwh1000 || plan.rate1000);
+      const price_kwh2000 = parseRate(plan.price_kwh2000 || plan.rate2000);
+
+      // Default to 500 kWh rate if no usage specified
+      const price_kwh = price_kwh500;
+
+      console.log(`[Edge Function] Final rates for plan ${plan.plan_name}:`, {
+        price_kwh500,
+        price_kwh1000,
+        price_kwh2000,
+        selected_price: price_kwh
       });
+
+      return {
+        company_id: String(plan.company_id || ""),
+        company_name: String(plan.company_name || ""),
+        company_logo: plan.company_logo || null,
+        plan_name: String(plan.plan_name || ""),
+        plan_type_name: String(plan.plan_type || ""),
+        fact_sheet: plan.fact_sheet || null,
+        go_to_plan: plan.enroll_plan_url || plan.go_to_plan || plan.enroll_now || null,
+        minimum_usage: Boolean(plan.minimum_usage),
+        new_customer: Boolean(plan.new_customer),
+        plan_details: String(plan.special_terms || ""),
+        price_kwh,
+        price_kwh500,
+        price_kwh1000,
+        price_kwh2000,
+        base_charge: plan.base_charge ? parseFloat(plan.base_charge) : null,
+        contract_length: plan.term_value ? parseInt(plan.term_value) : null
+      };
     });
 
-    const transformedPlans = plans.map(transformPlan);
-    logger.info(`✨ Transformed ${transformedPlans.length} plans for ZIP ${url.split('zip_code=')[1]}:`, 
-      transformedPlans.map(p => ({
-        plan_name: p.plan_name,
-        timeofuse: p.timeofuse,
-        zip_code: p.zip_code
-      }))
-    );
-
+    console.log(`[Edge Function] Successfully transformed ${transformedPlans.length} plans`);
     return transformedPlans;
 
   } catch (error) {
-    logger.error(`❌ Request failed for URL ${url}:`, error);
+    console.error(`[Edge Function] Request failed:`, error);
     throw error;
   }
 }
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
+  if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     const { zipCode, estimatedUse } = await req.json();
-    logger.info("🔍 Starting search for:", { zipCode, estimatedUse });
+    console.log(`[Edge Function] Received request with ZIP: ${zipCode}, Usage: ${estimatedUse}`);
 
     if (!zipCode) {
       throw new Error("ZIP code is required");
     }
 
-    if (!/^\d{5}$/.test(zipCode)) {
-      throw new Error("Invalid ZIP code format. Please enter a 5-digit ZIP code.");
-    }
-
-    // Validate that the ZIP code is in Texas
-    const validTexasZipRanges = [
-      [75001, 75999], // Dallas area
-      [76001, 76999], // Fort Worth area
-      [77001, 77999], // Houston area
-      [78001, 78999], // San Antonio area
-      [79001, 79999], // El Paso and West Texas
-      [73301, 73399], // Austin area
-      [88510, 88589], // El Paso additional ranges
-    ];
-
-    const zipNumeric = parseInt(zipCode, 10);
-    const isTexasZip = validTexasZipRanges.some(([min, max]) => 
-      zipNumeric >= min && zipNumeric <= max
-    );
-
-    if (!isTexasZip) {
-      logger.error(`❌ Invalid Texas ZIP code: ${zipCode}`);
-      return new Response(
-        JSON.stringify({ error: "This ZIP code is not in Texas. Please enter a valid Texas ZIP code." }),
-        {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-          status: 400
-        }
-      );
-    }
-
     let apiUrl = `http://api.powertochoose.org/api/PowerToChoose/plans?zip_code=${zipCode}`;
-    if (estimatedUse && estimatedUse !== "any") {
-      apiUrl += `&kWh=${estimatedUse}`;
+    
+    if (estimatedUse && estimatedUse !== "Any Range") {
+      const usageParam = estimatedUse === "between 500 and 1,000" ? "500-1000" :
+                        estimatedUse === "between 1,001 and 2,000" ? "1001-2000" :
+                        estimatedUse === "more than 2,000" ? "2001+" : null;
+      if (usageParam) {
+        apiUrl += `&kwh=${usageParam}`;
+      }
     }
 
-    logger.info("🔗 Constructed API URL:", apiUrl);
+    console.log("[Edge Function] Making request to URL:", apiUrl);
 
     const plans = await makeRequest(apiUrl, "GET", {
       "Accept": "application/json",
-      "Content-Type": "application/json",
+      "Content-Type": "application/json"
     });
     
-    if (!plans || plans.length === 0) {
-      logger.info("⚠️ No plans found for ZIP code:", zipCode);
-      return new Response(
-        JSON.stringify({ error: "No plans found for this ZIP code" }),
-        {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-          status: 404
-        }
-      );
-    }
-
-    logger.success(`✅ Found ${plans.length} plans for ZIP code ${zipCode}`);
-
-    // Create Supabase client
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
-
-    // Delete existing plans for this ZIP code
-    const { error: deleteError } = await supabaseClient
-      .from('plans')
-      .delete()
-      .eq('zip_code', zipCode);
-
-    if (deleteError) {
-      logger.error(`❌ Error deleting existing plans for ZIP ${zipCode}:`, deleteError);
-      throw new Error("Failed to update plans in database");
-    }
-
-    logger.info(`🗑️ Successfully deleted existing plans for ZIP code ${zipCode}`);
-
-    // Insert new plans
-    const { error: insertError } = await supabaseClient
-      .from('plans')
-      .insert(plans);
-
-    if (insertError) {
-      logger.error(`❌ Error inserting plans for ZIP ${zipCode}:`, insertError);
-      throw new Error("Failed to store plans in database");
-    }
-
-    logger.success(`✅ Successfully stored ${plans.length} plans in database for ZIP ${zipCode}`);
-
     return new Response(JSON.stringify(plans), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200
     });
 
   } catch (error) {
-    logger.error("❌ Error in request handler:", error);
+    console.error("[Edge Function] Error:", error);
     
     return new Response(
       JSON.stringify({
