@@ -45,7 +45,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 md:space-y-0 md:flex md:gap-4 max-w-2xl mx-auto">
+    <form onSubmit={handleSubmit} className="flex flex-col md:flex-row items-center justify-center gap-4 max-w-2xl mx-auto">
       <Input
         type="text"
         placeholder="Enter ZIP Code"
@@ -55,12 +55,12 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
           console.log("[SearchForm] ZIP code changed:", value);
           setZipCode(value);
         }}
-        className="md:flex-1"
+        className="w-full md:w-auto md:flex-1"
         pattern="[0-9]{5}"
         maxLength={5}
         required
       />
-      <div className="flex gap-2">
+      <div className="flex w-full md:w-auto gap-2">
         <Select 
           value={estimatedUse} 
           onValueChange={(value) => {
@@ -68,7 +68,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
             setEstimatedUse(value);
           }}
         >
-          <SelectTrigger className="w-[180px] md:w-[140px]">
+          <SelectTrigger className="w-full md:w-[140px]">
             <SelectValue placeholder="Estimated Usage" />
           </SelectTrigger>
           <SelectContent>
