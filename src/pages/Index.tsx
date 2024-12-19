@@ -5,10 +5,9 @@ import { SearchForm } from "@/components/SearchForm";
 import { PlanGrid } from "@/components/PlanGrid";
 import { PlanComparisonTable } from "@/components/PlanComparisonTable";
 import { PlanFilters } from "@/components/PlanFilters";
-import { type Plan } from "@/lib/api";
+import { type Plan, searchPlans } from "@/lib/api";
 import { useToast } from "@/components/ui/use-toast";
 import { filterPlans } from "@/lib/utils/filterPlans";
-import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/PageHeader";
 import { ErrorDisplay } from "@/components/ErrorDisplay";
 import { LoadingState, EmptyState } from "@/components/LoadingAndEmptyStates";
@@ -27,72 +26,17 @@ export default function Index() {
   const { toast } = useToast();
   const estimatedUse = searchParams.get("estimatedUse") || "any";
 
-  const { data: plansData, isLoading, error } = useQuery({
+  const { data: plans, isLoading, error } = useQuery({
     queryKey: ["plans", search?.zipCode, search?.estimatedUse],
     queryFn: async () => {
       console.log("[Index] Starting plan fetch with search state:", search);
       
       if (!search?.zipCode) {
         console.log("[Index] No ZIP code provided, returning empty result");
-        return { plans: [], lastUpdated: null };
+        return [];
       }
 
-      try {
-        console.log("[Index] Fetching plans from Supabase for ZIP:", search.zipCode);
-        const { data: plans, error } = await supabase
-          .from('plans')
-          .select('*')
-          .eq('zip_code', search.zipCode);
-
-        if (error) {
-          console.error('[Index] Error fetching plans from Supabase:', error);
-          throw error;
-        }
-
-        if (!plans || plans.length === 0) {
-          console.log('[Index] No plans found in Supabase, invoking Edge Function');
-          console.log('[Index] Edge Function params:', { zipCode: search.zipCode, estimatedUse: search.estimatedUse });
-          
-          const { data: responseData, error: functionError } = await supabase.functions.invoke('power-to-choose', {
-            body: { 
-              zipCode: search.zipCode, 
-              estimatedUse: search.estimatedUse 
-            },
-          });
-
-          console.log('[Index] Edge Function raw response:', responseData);
-
-          if (functionError) {
-            console.error('[Index] Edge Function error:', functionError);
-            throw functionError;
-          }
-
-          if (!responseData) {
-            console.error('[Index] No data received from Edge Function');
-            throw new Error('No data received from Edge Function');
-          }
-
-          if ('error' in responseData) {
-            console.error('[Index] Error from Edge Function:', responseData.error);
-            throw new Error(responseData.error);
-          }
-
-          console.log('[Index] Edge Function success, plans received:', Array.isArray(responseData) ? responseData.length : 'non-array response');
-          return {
-            plans: Array.isArray(responseData) ? responseData : [],
-            lastUpdated: new Date().toISOString()
-          };
-        }
-
-        console.log("[Index] Found plans in Supabase:", plans.length, "results");
-        return {
-          plans: plans || [],
-          lastUpdated: plans?.[0]?.updated_at
-        };
-      } catch (error) {
-        console.error("[Index] Error in queryFn:", error);
-        throw error;
-      }
+      return searchPlans(search.zipCode, search.estimatedUse);
     },
     meta: {
       onError: (error: Error) => {
@@ -125,7 +69,7 @@ export default function Index() {
     }
   };
 
-  const filteredPlans = plansData?.plans ? filterPlans(plansData.plans, {
+  const filteredPlans = plans ? filterPlans(plans, {
     planType: currentPlanType,
     contractLength: currentContractLength,
     timeOfUseFilter: currentTimeOfUse,
@@ -139,7 +83,7 @@ export default function Index() {
   return (
     <div className="min-h-screen bg-background">
       <main className="container mx-auto px-4 py-8 md:py-12">
-        <PageHeader lastUpdated={plansData?.lastUpdated} />
+        <PageHeader />
 
         <div className="mb-12">
           <SearchForm onSearch={handleSearch} isLoading={isLoading} />
@@ -162,7 +106,7 @@ export default function Index() {
               currentCompany={currentCompany}
               currentMinUsage={currentMinUsage}
               currentRenewable={currentRenewable}
-              plans={plansData?.plans}
+              plans={plans}
             />
           </div>
         )}

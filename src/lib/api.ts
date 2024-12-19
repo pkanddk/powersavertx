@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { supabase } from "@/integrations/supabase/client";
 
 export const PlanSchema = z.object({
   company_id: z.string(),
@@ -40,36 +39,80 @@ export const searchPlans = async (zipCode: string, estimatedUse?: string) => {
   try {
     console.log(`[Frontend] Searching plans for ZIP: ${zipCode}, Usage: ${estimatedUse}`);
     
-    // Call the Edge Function
-    console.log('[Frontend] Calling Edge Function with params:', { zipCode, estimatedUse });
-    const { data: responseData, error: functionError } = await supabase.functions.invoke('power-to-choose', {
-      body: { zipCode, estimatedUse },
+    // Construct API URL
+    let apiUrl = `http://api.powertochoose.org/api/PowerToChoose/plans?zip_code=${zipCode}`;
+    if (estimatedUse && estimatedUse !== "any") {
+      apiUrl += `&kWh=${estimatedUse}`;
+    }
+
+    console.log('[Frontend] Calling API with URL:', apiUrl);
+    
+    const response = await fetch(apiUrl, {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      }
     });
 
-    console.log('[Frontend] Edge Function raw response:', responseData);
-
-    if (functionError) {
-      console.error('[Frontend] Error calling Edge Function:', functionError);
-      throw functionError;
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('[Frontend] API Error:', errorText);
+      throw new Error(`API Error: ${response.status} - ${errorText}`);
     }
 
-    if (!responseData) {
-      console.error('[Frontend] No data received from Edge Function');
-      throw new Error('No data received from Edge Function');
+    const data = await response.json();
+    console.log('[Frontend] Raw API response:', data);
+
+    // Handle different response formats
+    let plans = [];
+    if (Array.isArray(data)) {
+      plans = data;
+    } else if (data.data && Array.isArray(data.data)) {
+      plans = data.data;
+    } else if (data.Results && Array.isArray(data.Results)) {
+      plans = data.Results;
+    } else {
+      console.error('[Frontend] Unexpected response structure:', data);
+      throw new Error("Unexpected response structure from API");
     }
 
-    // If responseData is an error object, throw it
-    if ('error' in responseData) {
-      console.error('[Frontend] Error from Edge Function:', responseData.error);
-      throw new Error(responseData.error);
-    }
+    // Transform the data to match our schema
+    const transformedPlans = plans.map(plan => ({
+      company_id: String(plan.company_id || ""),
+      company_name: String(plan.company_name || ""),
+      company_logo: plan.company_logo || null,
+      company_tdu_name: plan.company_tdu_name || null,
+      plan_name: String(plan.plan_name || ""),
+      plan_type_name: String(plan.rate_type || ""),
+      fact_sheet: plan.fact_sheet || null,
+      go_to_plan: plan.go_to_plan || plan.enroll_now || null,
+      minimum_usage: Boolean(plan.minimum_usage),
+      new_customer: Boolean(plan.new_customer),
+      plan_details: String(plan.special_terms || ""),
+      price_kwh: parseFloat(plan.price_kwh1000 || plan.rate1000 || 0),
+      price_kwh500: parseFloat(plan.price_kwh500 || plan.rate500 || 0),
+      price_kwh1000: parseFloat(plan.price_kwh1000 || plan.rate1000 || 0),
+      price_kwh2000: parseFloat(plan.price_kwh2000 || plan.rate2000 || 0),
+      detail_kwh500: plan.detail_kwh500 || null,
+      detail_kwh1000: plan.detail_kwh1000 || null,
+      detail_kwh2000: plan.detail_kwh2000 || null,
+      base_charge: null, // We'll update this if we find it in pricing_details
+      contract_length: plan.term_value ? parseInt(plan.term_value) : null,
+      jdp_rating: plan.jdp_rating ? parseFloat(plan.jdp_rating) : null,
+      jdp_rating_year: plan.jdp_rating_year || null,
+      prepaid: Boolean(plan.prepaid_plan || plan.is_prepaid || plan.prepaid || false),
+      renewable_percentage: plan.renewable_energy_description ? 
+        parseInt(plan.renewable_energy_description.match(/(\d+)%/)?.[1] || "0") : 0,
+      timeofuse: Boolean(plan.timeofuse),
+      pricing_details: plan.pricing_details || null,
+      terms_of_service: plan.terms_of_service || null,
+      yrac_url: plan.yrac_url || null,
+      enroll_phone: plan.enroll_phone || null,
+      website: plan.website || null
+    }));
 
-    // Ensure we have an array to work with
-    const plansArray = Array.isArray(responseData) ? responseData : [responseData];
-    console.log('[Frontend] Plans array before validation:', plansArray);
-
-    // Parse and validate each plan individually to identify specific validation issues
-    const validatedPlans = plansArray.map((plan, index) => {
+    // Parse and validate each plan
+    const validatedPlans = transformedPlans.map((plan, index) => {
       try {
         return PlanSchema.parse(plan);
       } catch (error) {
@@ -80,8 +123,8 @@ export const searchPlans = async (zipCode: string, estimatedUse?: string) => {
     });
 
     console.log('[Frontend] Validated plans:', validatedPlans);
-    
     return validatedPlans;
+
   } catch (error) {
     console.error("[Frontend] Error fetching plans:", error);
     throw error;
@@ -89,11 +132,9 @@ export const searchPlans = async (zipCode: string, estimatedUse?: string) => {
 };
 
 export const getPlanTypes = async () => {
-  // Mock response for plan types
   return ["Fixed Rate", "Variable Rate", "Indexed Rate"];
 };
 
 export const getRenewableOptions = async () => {
-  // Mock response for renewable options
   return ["0%", "6%", "15%", "100%"];
 };
