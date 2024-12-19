@@ -8,6 +8,11 @@ interface PlanPricingProps {
 
 export function PlanPricing({ plan, estimatedUse }: PlanPricingProps) {
   const cancellationFee = parseCancellationFee(plan.pricing_details);
+  
+  // Add debug logging
+  console.log('Plan:', plan.plan_name);
+  console.log('Raw pricing details:', plan.pricing_details);
+  console.log('Parsed cancellation fee:', cancellationFee);
 
   return (
     <div className="space-y-4">
