@@ -17,11 +17,10 @@ const USAGE_OPTIONS = [
 
 export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
   const [zipCode, setZipCode] = useState("");
-  const [estimatedUse, setEstimatedUse] = useState(USAGE_OPTIONS[0]); // Default to 500 kWh
+  const [estimatedUse, setEstimatedUse] = useState(USAGE_OPTIONS[0]);
 
-  // Effect to trigger search when values change
   useEffect(() => {
-    if (zipCode.length === 5) {  // Only search when ZIP code is complete
+    if (zipCode.length === 5) {
       try {
         const usageValue = estimatedUse === USAGE_OPTIONS[3] ? "any" :
                           estimatedUse.split(" ")[0].replace(",", "");
@@ -36,7 +35,6 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // Extract just the number from the usage string
       const usageValue = estimatedUse === USAGE_OPTIONS[3] ? "any" :
                         estimatedUse.split(" ")[0].replace(",", "");
       console.log("[SearchForm] Manual submit with:", { zipCode, usageValue });
@@ -62,27 +60,29 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
         maxLength={5}
         required
       />
-      <Select 
-        value={estimatedUse} 
-        onValueChange={(value) => {
-          console.log("[SearchForm] Usage changed:", value);
-          setEstimatedUse(value);
-        }}
-      >
-        <SelectTrigger className="md:w-64">
-          <SelectValue placeholder="Estimated Usage" />
-        </SelectTrigger>
-        <SelectContent>
-          {USAGE_OPTIONS.map((option) => (
-            <SelectItem key={option} value={option}>
-              {option}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      <Button type="submit" disabled={isLoading || zipCode.length !== 5}>
-        {isLoading ? "Searching..." : "Search Plans"}
-      </Button>
+      <div className="flex gap-2">
+        <Select 
+          value={estimatedUse} 
+          onValueChange={(value) => {
+            console.log("[SearchForm] Usage changed:", value);
+            setEstimatedUse(value);
+          }}
+        >
+          <SelectTrigger className="w-[140px]">
+            <SelectValue placeholder="Estimated Usage" />
+          </SelectTrigger>
+          <SelectContent>
+            {USAGE_OPTIONS.map((option) => (
+              <SelectItem key={option} value={option}>
+                {option}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Button type="submit" disabled={isLoading || zipCode.length !== 5} className="bg-primary hover:bg-primary/90">
+          {isLoading ? "Searching..." : "Search Plans"}
+        </Button>
+      </div>
     </form>
   );
 }

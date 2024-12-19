@@ -7,7 +7,7 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import { Button } from "./ui/button";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, Sparkles } from "lucide-react";
 
 export function DevMessageDialog() {
   return (
@@ -20,12 +20,15 @@ export function DevMessageDialog() {
       </DialogTrigger>
       <DialogContent className="bg-gradient-to-b from-blue-50 to-white">
         <DialogHeader>
-          <DialogTitle className="text-xl">Welcome to Power Saver TX!</DialogTitle>
+          <DialogTitle className="text-xl flex items-center gap-2">
+            Welcome to Power Saver TX! 
+            <Sparkles className="h-5 w-5 text-yellow-500 animate-pulse" />
+          </DialogTitle>
           <DialogDescription className="text-base leading-relaxed space-y-4 pt-4">
-            <p>
+            <p className="bg-gradient-to-r from-purple-50 to-blue-50 p-4 rounded-lg border border-blue-100 shadow-sm">
               You&apos;ve discovered us a bit early, but we&apos;re excited to have you here. We&apos;re currently in the process of building and testing our app to ensure the best possible experience for our users.
             </p>
-            <p>
+            <p className="bg-gradient-to-r from-blue-50 to-green-50 p-4 rounded-lg border border-green-100 shadow-sm">
               As an early visitor, you have the unique opportunity to explore our app and provide valuable feedback. While you may encounter some bugs or quirks, your contributions will help shape the future while saving you money!
             </p>
             <p>
