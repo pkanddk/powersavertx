@@ -48,9 +48,10 @@ export function PriceAlertDialog({ plan, isOpen, onClose }: PriceAlertDialogProp
         .from("user_profiles")
         .select("id")
         .eq("user_id", user.id)
-        .single();
+        .maybeSingle();
 
       if (profileError) throw profileError;
+      if (!profile) throw new Error("User profile not found");
 
       // First, ensure the plan exists in energy_plans
       const { data: existingPlan, error: planError } = await supabase
@@ -58,7 +59,9 @@ export function PriceAlertDialog({ plan, isOpen, onClose }: PriceAlertDialogProp
         .select("id")
         .eq("company_id", plan.company_id)
         .eq("plan_name", plan.plan_name)
-        .single();
+        .maybeSingle();
+
+      if (planError) throw planError;
 
       let planId;
       if (!existingPlan) {
@@ -80,9 +83,10 @@ export function PriceAlertDialog({ plan, isOpen, onClose }: PriceAlertDialogProp
             contract_length: plan.contract_length,
           })
           .select("id")
-          .single();
+          .maybeSingle();
 
         if (insertError) throw insertError;
+        if (!newPlan) throw new Error("Failed to create plan record");
         planId = newPlan.id;
       } else {
         planId = existingPlan.id;
