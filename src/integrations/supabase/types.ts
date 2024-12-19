@@ -9,6 +9,50 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      alert_history: {
+        Row: {
+          created_at: string
+          email_sent: boolean | null
+          email_sent_at: string | null
+          id: string
+          kwh_usage: string
+          plans: Json
+          price_threshold: number
+          user_id: string
+          zip_code: string
+        }
+        Insert: {
+          created_at?: string
+          email_sent?: boolean | null
+          email_sent_at?: string | null
+          id?: string
+          kwh_usage: string
+          plans: Json
+          price_threshold: number
+          user_id: string
+          zip_code: string
+        }
+        Update: {
+          created_at?: string
+          email_sent?: boolean | null
+          email_sent_at?: string | null
+          id?: string
+          kwh_usage?: string
+          plans?: Json
+          price_threshold?: number
+          user_id?: string
+          zip_code?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alert_history_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       api_history: {
         Row: {
           company_id: string
@@ -317,6 +361,8 @@ export type Database = {
           id: string
           preferred_usage: string | null
           renewable_preference: boolean | null
+          universal_kwh_usage: string | null
+          universal_price_threshold: number | null
           updated_at: string
           user_id: string
           zip_code: string | null
@@ -327,6 +373,8 @@ export type Database = {
           id?: string
           preferred_usage?: string | null
           renewable_preference?: boolean | null
+          universal_kwh_usage?: string | null
+          universal_price_threshold?: number | null
           updated_at?: string
           user_id: string
           zip_code?: string | null
@@ -337,6 +385,8 @@ export type Database = {
           id?: string
           preferred_usage?: string | null
           renewable_preference?: boolean | null
+          universal_kwh_usage?: string | null
+          universal_price_threshold?: number | null
           updated_at?: string
           user_id?: string
           zip_code?: string | null
@@ -372,7 +422,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_email_time: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
