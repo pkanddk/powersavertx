@@ -20,13 +20,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     console.log("[AuthProvider] Setting up auth listener");
     
-    // Check current session
+    // Check current session without forcing redirects
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       setLoading(false);
     });
 
-    // Listen for auth changes
+    // Listen for auth changes without forcing redirects
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("[AuthProvider] Auth state changed:", event);
       setUser(session?.user ?? null);
@@ -40,7 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider value={{ user, loading }}>
-      {children}
+      {!loading && children}
     </AuthContext.Provider>
   );
 }

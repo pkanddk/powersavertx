@@ -8,8 +8,21 @@ import { AuthPage } from "@/pages/Auth";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { RequireAuth } from "@/components/auth/RequireAuth";
 import { Plan } from "./lib/api";
+import { useAuth } from "./components/auth/AuthProvider";
 
 const queryClient = new QueryClient();
+
+// Separate component for auth page to handle redirects
+const AuthRoute = () => {
+  const { user } = useAuth();
+  
+  // If user is already logged in, redirect to home
+  if (user) {
+    return <Navigate to="/" replace />;
+  }
+  
+  return <AuthPage />;
+};
 
 function App() {
   console.log("[App] Component rendering");
@@ -38,7 +51,7 @@ function App() {
         <BrowserRouter>
           <AuthProvider>
             <Routes>
-              {/* Make Index the default landing page */}
+              {/* Index is the default landing page */}
               <Route 
                 path="/" 
                 element={
@@ -51,7 +64,9 @@ function App() {
                   />
                 } 
               />
-              <Route path="/auth" element={<AuthPage />} />
+              {/* Auth page with redirect logic */}
+              <Route path="/auth" element={<AuthRoute />} />
+              {/* Protected compare route */}
               <Route 
                 path="/compare" 
                 element={
