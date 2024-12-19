@@ -9,6 +9,7 @@ import { PlanFilters } from "@/components/PlanFilters";
 import { ComparisonBar } from "@/components/plan/ComparisonBar";
 import { WelcomeDialog } from "@/components/WelcomeDialog";
 import { BugReportDialog } from "@/components/BugReportDialog";
+import { DevMessageDialog } from "@/components/DevMessageDialog";
 import { searchPlans } from "@/lib/api";
 
 interface IndexProps {
@@ -74,6 +75,7 @@ export default function Index({ comparedPlans, onCompare, search, onSearch, esti
             <p className="text-xl md:text-2xl font-semibold text-primary">
               Simple. Savings.
             </p>
+            <DevMessageDialog />
             <BugReportDialog />
           </div>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
