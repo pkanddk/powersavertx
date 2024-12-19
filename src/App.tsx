@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
@@ -6,7 +7,6 @@ import { ComparePage } from "@/pages/Compare";
 import { AuthPage } from "@/pages/Auth";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { RequireAuth } from "@/components/auth/RequireAuth";
-import { useState } from "react";
 import { Plan } from "./lib/api";
 
 const queryClient = new QueryClient();
@@ -32,41 +32,43 @@ function App() {
   };
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <AuthProvider>
-          <Routes>
-            <Route path="/auth" element={<AuthPage />} />
-            <Route 
-              path="/" 
-              element={
-                <RequireAuth>
-                  <Index 
-                    comparedPlans={comparedPlans} 
-                    onCompare={handleCompare}
-                    search={search}
-                    onSearch={handleSearch}
-                    estimatedUse={search?.estimatedUse || "1000"}
-                  />
-                </RequireAuth>
-              } 
-            />
-            <Route 
-              path="/compare" 
-              element={
-                <RequireAuth>
-                  <ComparePage 
-                    plans={comparedPlans} 
-                    onRemove={handleCompare} 
-                  />
-                </RequireAuth>
-              } 
-            />
-          </Routes>
-          <Toaster />
-        </AuthProvider>
-      </BrowserRouter>
-    </QueryClientProvider>
+    <React.StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <AuthProvider>
+            <Routes>
+              <Route path="/auth" element={<AuthPage />} />
+              <Route 
+                path="/" 
+                element={
+                  <RequireAuth>
+                    <Index 
+                      comparedPlans={comparedPlans} 
+                      onCompare={handleCompare}
+                      search={search}
+                      onSearch={handleSearch}
+                      estimatedUse={search?.estimatedUse || "1000"}
+                    />
+                  </RequireAuth>
+                } 
+              />
+              <Route 
+                path="/compare" 
+                element={
+                  <RequireAuth>
+                    <ComparePage 
+                      plans={comparedPlans} 
+                      onRemove={handleCompare} 
+                    />
+                  </RequireAuth>
+                } 
+              />
+            </Routes>
+            <Toaster />
+          </AuthProvider>
+        </BrowserRouter>
+      </QueryClientProvider>
+    </React.StrictMode>
   );
 }
 
