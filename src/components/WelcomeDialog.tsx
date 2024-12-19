@@ -11,10 +11,17 @@ export function WelcomeDialog({ zipCode }: { zipCode?: string }) {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    // Show dialog when ZIP code is entered and dialog hasn't been shown before
+    // For debugging
+    console.log("[WelcomeDialog] ZIP code changed:", zipCode);
+    
+    // Show dialog when ZIP code is entered
     if (zipCode && zipCode.length === 5) {
+      console.log("[WelcomeDialog] Valid ZIP code entered, checking if dialog should show");
       const hasSeenWelcome = localStorage.getItem("hasSeenWelcome");
+      console.log("[WelcomeDialog] Has seen welcome:", hasSeenWelcome);
+      
       if (!hasSeenWelcome) {
+        console.log("[WelcomeDialog] Showing dialog");
         setIsOpen(true);
         localStorage.setItem("hasSeenWelcome", "true");
       }
@@ -23,7 +30,7 @@ export function WelcomeDialog({ zipCode }: { zipCode?: string }) {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent>
+      <DialogContent className="bg-red-50">
         <DialogHeader>
           <DialogTitle>Welcome to Power Saver TX! 👋</DialogTitle>
           <DialogDescription className="text-base leading-relaxed">
