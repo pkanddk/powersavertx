@@ -8,7 +8,8 @@ interface PlanPricingProps {
 }
 
 const formatPrice = (price: number) => {
-  return (price * 100).toFixed(1);
+  // Remove the multiplication by 100 since the price is already in cents
+  return price.toFixed(1);
 };
 
 export function PlanPricing({ 
