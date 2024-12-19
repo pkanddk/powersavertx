@@ -7,13 +7,12 @@ import { searchPlans, type Plan } from "@/lib/api";
 import { useToast } from "@/components/ui/use-toast";
 import { filterPlans } from "@/lib/utils/filterPlans";
 import { PlanFilters } from "@/components/PlanFilters";
-import { PlanComparisonDialog } from "@/components/plan/PlanComparisonDialog";
+import { ComparisonBar } from "@/components/plan/ComparisonBar";
 
 export default function Index() {
   const [searchParams] = useSearchParams();
   const [search, setSearch] = useState<{ zipCode: string; estimatedUse: string } | null>(null);
   const [comparedPlans, setComparedPlans] = useState<Plan[]>([]);
-  const [isComparisonOpen, setIsComparisonOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState("price-asc");
   const [contractLength, setContractLength] = useState("all");
   const [planType, setPlanType] = useState("all");
@@ -50,14 +49,10 @@ export default function Index() {
       const isPlanCompared = prevPlans.some(p => p.company_id === plan.company_id);
       
       if (isPlanCompared) {
-        // Remove the plan if it's already being compared
         return prevPlans.filter(p => p.company_id !== plan.company_id);
       } else if (prevPlans.length < 3) {
-        // Add the plan if we haven't reached the limit and open the comparison dialog
-        setIsComparisonOpen(true);
         return [...prevPlans, plan];
       } else {
-        // Show toast if we've reached the limit
         toast({
           title: "Compare Limit Reached",
           description: "You can compare up to 3 plans at a time. Remove a plan to add another.",
@@ -129,14 +124,13 @@ export default function Index() {
                 estimatedUse={estimatedUse}
               />
             )}
-
-            <PlanComparisonDialog
-              isOpen={isComparisonOpen && comparedPlans.length > 0}
-              onClose={() => setIsComparisonOpen(false)}
-              plans={comparedPlans}
-            />
           </div>
         )}
+
+        <ComparisonBar
+          plans={comparedPlans}
+          onRemove={handleCompare}
+        />
       </main>
     </div>
   );
