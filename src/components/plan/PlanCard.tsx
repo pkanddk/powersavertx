@@ -24,19 +24,17 @@ export function PlanCard({
     <Card 
       className="group overflow-hidden hover:shadow-lg transition-all duration-300 border-border/40 hover:border-primary/40 bg-gradient-to-b from-white to-gray-50/30"
     >
-      <CardContent className="p-6">
-        <div className="space-y-8">
+      <CardContent className="p-4">
+        <div className="space-y-4">
           <PlanCardHeader plan={plan} />
           
           {/* Plan Name */}
-          <div>
-            <h4 className="text-xl font-semibold text-foreground/90 tracking-tight group-hover:text-foreground transition-colors">
-              {plan.plan_name}
-            </h4>
-          </div>
+          <h4 className="text-lg font-semibold text-foreground/90 tracking-tight group-hover:text-foreground transition-colors -mt-1">
+            {plan.plan_name}
+          </h4>
 
           {/* Price Section */}
-          <div className="bg-muted/20 backdrop-blur-sm rounded-xl p-4 group-hover:bg-muted/30 transition-colors">
+          <div className="bg-muted/20 backdrop-blur-sm rounded-lg p-3">
             <PlanPricing
               plan={plan}
               estimatedUse={estimatedUse}
