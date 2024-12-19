@@ -18,13 +18,68 @@ Deno.serve(async (req) => {
 
   try {
     console.log('[check-price-alerts] Starting price alert check');
-    console.log('[check-price-alerts] RESEND_API_KEY present:', !!RESEND_API_KEY);
     
-    if (!RESEND_API_KEY) {
-      throw new Error('RESEND_API_KEY is not set');
+    // Check if it's email time (7 AM to 9 PM Central)
+    const { data: isEmailTime } = await supabase.rpc('is_email_time');
+    if (!isEmailTime) {
+      console.log('[check-price-alerts] Outside email hours, skipping checks');
+      return new Response(JSON.stringify({ message: 'Outside email hours' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
-    
-    // Get all active price alerts with user and plan information
+
+    // Get all active price alerts and universal alerts
+    const { data: profiles, error: profilesError } = await supabase
+      .from('user_profiles')
+      .select(`
+        id,
+        user_id,
+        zip_code,
+        universal_kwh_usage,
+        universal_price_threshold
+      `)
+      .not('universal_kwh_usage', 'is', null)
+      .not('universal_price_threshold', 'is', null);
+
+    if (profilesError) {
+      console.error('[check-price-alerts] Error fetching profiles:', profilesError);
+      throw profilesError;
+    }
+
+    console.log(`[check-price-alerts] Found ${profiles?.length || 0} profiles with universal alerts`);
+
+    // Process universal alerts
+    for (const profile of profiles || []) {
+      if (!profile.zip_code || !profile.universal_kwh_usage || !profile.universal_price_threshold) {
+        continue;
+      }
+
+      console.log(`[check-price-alerts] Checking universal alert for profile: ${profile.id}`);
+
+      // Get current plans for the zip code
+      const { data: currentPlans, error: plansError } = await supabase
+        .from('plans')
+        .select('*')
+        .eq('zip_code', profile.zip_code)
+        .order('price_kwh' + profile.universal_kwh_usage);
+
+      if (plansError) {
+        console.error('[check-price-alerts] Error fetching plans:', plansError);
+        continue;
+      }
+
+      // Filter plans below threshold
+      const matchingPlans = currentPlans?.filter(plan => {
+        const price = plan[`price_kwh${profile.universal_kwh_usage}`];
+        return price && price <= profile.universal_price_threshold;
+      });
+
+      if (matchingPlans && matchingPlans.length > 0) {
+        await sendUniversalAlert(profile, matchingPlans);
+      }
+    }
+
+    // Get all active specific plan alerts
     const { data: alerts, error: alertsError } = await supabase
       .from('user_plan_tracking')
       .select(`
@@ -47,10 +102,10 @@ Deno.serve(async (req) => {
       throw alertsError;
     }
     
-    console.log(`[check-price-alerts] Found ${alerts?.length || 0} active alerts`);
+    console.log(`[check-price-alerts] Found ${alerts?.length || 0} active plan-specific alerts`);
 
-    // Process each alert
-    for (const alert of alerts) {
+    // Process each specific plan alert
+    for (const alert of alerts || []) {
       console.log(`[check-price-alerts] Processing alert for plan: ${alert.energy_plans.plan_name}`);
       
       // First try to get latest price from api_history
@@ -64,11 +119,10 @@ Deno.serve(async (req) => {
         .maybeSingle();
 
       if (pricesError) {
-        console.error('[check-price-alerts] Error fetching prices from api_history:', pricesError);
+        console.error('[check-price-alerts] Error fetching prices:', pricesError);
         continue;
       }
 
-      // If no price found in api_history, try plans table
       if (!latestPrices) {
         console.log('[check-price-alerts] No prices found in api_history, checking plans table');
         const { data: currentPlan, error: planError } = await supabase
@@ -90,17 +144,15 @@ Deno.serve(async (req) => {
 
         console.log('[check-price-alerts] Found current plan prices:', currentPlan);
         
-        // Use the current plan's prices
         const currentPrice = currentPlan[`price_kwh${alert.kwh_usage}`];
         if (currentPrice && currentPrice <= alert.price_threshold) {
-          await sendPriceAlert(alert, currentPrice);
+          await sendPlanAlert(alert, currentPrice);
         }
       } else {
-        // Use the historical price from api_history
         console.log('[check-price-alerts] Using prices from api_history:', latestPrices);
         const currentPrice = latestPrices[`price_kwh${alert.kwh_usage}`];
         if (currentPrice && currentPrice <= alert.price_threshold) {
-          await sendPriceAlert(alert, currentPrice);
+          await sendPlanAlert(alert, currentPrice);
         }
       }
     }
@@ -117,10 +169,9 @@ Deno.serve(async (req) => {
   }
 });
 
-async function sendPriceAlert(alert: any, currentPrice: number) {
-  console.log(`[check-price-alerts] Alert triggered! Price ${currentPrice}¢ is below threshold ${alert.price_threshold}¢`);
+async function sendPlanAlert(alert: any, currentPrice: number) {
+  console.log(`[check-price-alerts] Plan alert triggered! Price ${currentPrice}¢ is below threshold ${alert.price_threshold}¢`);
   
-  // Get user's email
   const { data: userData, error: userError } = await supabase.auth.admin.getUserById(
     alert.user_profiles.user_id
   );
@@ -135,9 +186,8 @@ async function sendPriceAlert(alert: any, currentPrice: number) {
     return;
   }
 
-  console.log('[check-price-alerts] Sending email to:', userData.user.email);
+  console.log('[check-price-alerts] Sending plan alert email to:', userData.user.email);
 
-  // Send email via Resend
   const emailResponse = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
@@ -157,15 +207,13 @@ async function sendPriceAlert(alert: any, currentPrice: number) {
           `<p><a href="${alert.energy_plans.go_to_plan}">View the plan</a></p>` : 
           ''
         }
+        <p><a href="https://powersavertx.com/alerts">Manage your alerts</a></p>
       `,
     }),
   });
 
-  const emailResponseText = await emailResponse.text();
-  console.log('[check-price-alerts] Email API response:', emailResponseText);
-
   if (!emailResponse.ok) {
-    console.error('[check-price-alerts] Error sending email:', emailResponseText);
+    console.error('[check-price-alerts] Error sending email:', await emailResponse.text());
     return;
   }
 
@@ -181,5 +229,85 @@ async function sendPriceAlert(alert: any, currentPrice: number) {
     console.error('[check-price-alerts] Error deactivating alert:', updateError);
   } else {
     console.log('[check-price-alerts] Alert deactivated successfully');
+  }
+}
+
+async function sendUniversalAlert(profile: any, matchingPlans: any[]) {
+  console.log(`[check-price-alerts] Universal alert triggered for profile ${profile.id} with ${matchingPlans.length} matching plans`);
+  
+  const { data: userData, error: userError } = await supabase.auth.admin.getUserById(
+    profile.user_id
+  );
+
+  if (userError) {
+    console.error('[check-price-alerts] Error fetching user:', userError);
+    return;
+  }
+
+  if (!userData?.user?.email) {
+    console.error('[check-price-alerts] No email found for user:', profile.user_id);
+    return;
+  }
+
+  console.log('[check-price-alerts] Sending universal alert email to:', userData.user.email);
+
+  const plansHtml = matchingPlans
+    .map(plan => `
+      <div style="margin-bottom: 20px;">
+        <h3>${plan.plan_name} by ${plan.company_name}</h3>
+        <p>Price: ${plan[`price_kwh${profile.universal_kwh_usage}`]}¢/kWh at ${profile.universal_kwh_usage}kWh usage</p>
+        ${plan.go_to_plan ? `<p><a href="${plan.go_to_plan}">View plan details</a></p>` : ''}
+      </div>
+    `)
+    .join('');
+
+  const emailResponse = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${RESEND_API_KEY}`,
+    },
+    body: JSON.stringify({
+      from: 'Power Saver TX <alerts@powersavertx.com>',
+      to: [userData.user.email],
+      subject: `Price Alert: Found ${matchingPlans.length} plans matching your criteria!`,
+      html: `
+        <h2>Good news! We found plans matching your criteria.</h2>
+        <p>Your criteria:</p>
+        <ul>
+          <li>Usage level: ${profile.universal_kwh_usage}kWh</li>
+          <li>Price threshold: ${profile.universal_price_threshold}¢/kWh</li>
+        </ul>
+        <h3>Matching Plans:</h3>
+        ${plansHtml}
+        <p><a href="https://powersavertx.com/alerts">Manage your alerts</a></p>
+      `,
+    }),
+  });
+
+  if (!emailResponse.ok) {
+    console.error('[check-price-alerts] Error sending universal alert email:', await emailResponse.text());
+    return;
+  }
+
+  console.log(`[check-price-alerts] Universal alert email sent to ${userData.user.email}`);
+
+  // Create alert history record
+  const { error: historyError } = await supabase
+    .from('alert_history')
+    .insert({
+      user_id: profile.id,
+      zip_code: profile.zip_code,
+      kwh_usage: profile.universal_kwh_usage,
+      price_threshold: profile.universal_price_threshold,
+      plans: matchingPlans,
+      email_sent: true,
+      email_sent_at: new Date().toISOString(),
+    });
+
+  if (historyError) {
+    console.error('[check-price-alerts] Error creating alert history:', historyError);
+  } else {
+    console.log('[check-price-alerts] Alert history created successfully');
   }
 }
