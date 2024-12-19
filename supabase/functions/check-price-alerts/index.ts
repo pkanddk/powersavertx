@@ -19,6 +19,7 @@ Deno.serve(async (req) => {
 
   try {
     console.log('[check-price-alerts] Starting price alert check');
+    console.log('[check-price-alerts] RESEND_API_KEY present:', !!RESEND_API_KEY);
     
     // Get all active price alerts with user and plan information
     const { data: alerts, error: alertsError } = await supabase
@@ -38,12 +39,21 @@ Deno.serve(async (req) => {
       `)
       .eq('active', true);
 
-    if (alertsError) throw alertsError;
+    if (alertsError) {
+      console.error('[check-price-alerts] Error fetching alerts:', alertsError);
+      throw alertsError;
+    }
+    
     console.log(`[check-price-alerts] Found ${alerts?.length || 0} active alerts`);
 
     // Process each alert
     for (const alert of alerts) {
       console.log(`[check-price-alerts] Processing alert for plan: ${alert.energy_plans.plan_name}`);
+      console.log('[check-price-alerts] Alert details:', {
+        kwh_usage: alert.kwh_usage,
+        price_threshold: alert.price_threshold,
+        company_id: alert.energy_plans.company_id
+      });
       
       const { data: latestPrices, error: pricesError } = await supabase
         .from('api_history')
@@ -54,14 +64,15 @@ Deno.serve(async (req) => {
         .limit(1)
         .maybeSingle();
 
-      if (pricesError) throw pricesError;
+      if (pricesError) {
+        console.error('[check-price-alerts] Error fetching prices:', pricesError);
+        throw pricesError;
+      }
 
       if (latestPrices) {
         const currentPrice = latestPrices[`price_kwh${alert.kwh_usage}`];
         console.log(`[check-price-alerts] Current price: ${currentPrice}¢, Threshold: ${alert.price_threshold}¢`);
         
-        // Check if price is already below threshold (immediate notification)
-        // or if it has dropped below threshold since last check
         if (currentPrice && currentPrice <= alert.price_threshold) {
           console.log(`[check-price-alerts] Alert triggered! Price is below threshold`);
           
@@ -75,50 +86,63 @@ Deno.serve(async (req) => {
             continue;
           }
 
-          if (userData?.user?.email) {
-            // Send email via Resend with verified domain
-            const emailResponse = await fetch('https://api.resend.com/emails', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${RESEND_API_KEY}`,
-              },
-              body: JSON.stringify({
-                from: 'Power Saver TX <alerts@powersavertx.com>',
-                to: [userData.user.email],
-                subject: `Price Alert: ${alert.energy_plans.plan_name} price matches your target!`,
-                html: `
-                  <h2>Good news! The price matches your criteria.</h2>
-                  <p>The ${alert.energy_plans.plan_name} plan from ${alert.energy_plans.company_name} 
-                  is currently ${currentPrice}¢/kWh for ${alert.kwh_usage}kWh usage.</p>
-                  <p>Your target price was: ${alert.price_threshold}¢/kWh</p>
-                  ${alert.energy_plans.go_to_plan ? 
-                    `<p><a href="${alert.energy_plans.go_to_plan}">View the plan</a></p>` : 
-                    ''
-                  }
-                `,
-              }),
-            });
-
-            if (!emailResponse.ok) {
-              const errorData = await emailResponse.text();
-              console.error('[check-price-alerts] Error sending email:', errorData);
-              continue;
-            }
-
-            console.log(`[check-price-alerts] Email notification sent to ${userData.user.email}`);
-
-            // Deactivate the alert after successful notification
-            const { error: updateError } = await supabase
-              .from('user_plan_tracking')
-              .update({ active: false })
-              .eq('id', alert.id);
-
-            if (updateError) {
-              console.error('[check-price-alerts] Error deactivating alert:', updateError);
-            }
+          if (!userData?.user?.email) {
+            console.error('[check-price-alerts] No email found for user:', alert.user_profiles.user_id);
+            continue;
           }
+
+          console.log('[check-price-alerts] Sending email to:', userData.user.email);
+
+          // Send email via Resend
+          const emailResponse = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${RESEND_API_KEY}`,
+            },
+            body: JSON.stringify({
+              from: 'Power Saver TX <alerts@powersavertx.com>',
+              to: [userData.user.email],
+              subject: `Price Alert: ${alert.energy_plans.plan_name} price matches your target!`,
+              html: `
+                <h2>Good news! The price matches your criteria.</h2>
+                <p>The ${alert.energy_plans.plan_name} plan from ${alert.energy_plans.company_name} 
+                is currently ${currentPrice}¢/kWh for ${alert.kwh_usage}kWh usage.</p>
+                <p>Your target price was: ${alert.price_threshold}¢/kWh</p>
+                ${alert.energy_plans.go_to_plan ? 
+                  `<p><a href="${alert.energy_plans.go_to_plan}">View the plan</a></p>` : 
+                  ''
+                }
+              `,
+            }),
+          });
+
+          const emailResponseData = await emailResponse.text();
+          console.log('[check-price-alerts] Email API response:', emailResponseData);
+
+          if (!emailResponse.ok) {
+            console.error('[check-price-alerts] Error sending email:', emailResponseData);
+            continue;
+          }
+
+          console.log(`[check-price-alerts] Email notification sent to ${userData.user.email}`);
+
+          // Deactivate the alert after successful notification
+          const { error: updateError } = await supabase
+            .from('user_plan_tracking')
+            .update({ active: false })
+            .eq('id', alert.id);
+
+          if (updateError) {
+            console.error('[check-price-alerts] Error deactivating alert:', updateError);
+          } else {
+            console.log('[check-price-alerts] Alert deactivated successfully');
+          }
+        } else {
+          console.log('[check-price-alerts] Price is still above threshold, no action needed');
         }
+      } else {
+        console.log('[check-price-alerts] No latest prices found for plan');
       }
     }
 
