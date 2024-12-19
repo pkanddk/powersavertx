@@ -21,10 +21,14 @@ export function ActiveAlertsSection({
   // Sort alerts based on renewable preference
   const sortedAlerts = [...alerts].sort((a, b) => {
     if (renewablePreference) {
+      // Sort by renewable percentage in descending order when renewable preference is enabled
       return (b.renewable_percentage || 0) - (a.renewable_percentage || 0);
     }
     return 0; // Keep original order if renewable preference is off
   });
+
+  console.log("[ActiveAlertsSection] Renewable preference:", renewablePreference);
+  console.log("[ActiveAlertsSection] Sorted alerts:", sortedAlerts);
 
   return (
     <div className="space-y-4">
@@ -71,10 +75,10 @@ export function ActiveAlertsSection({
             </Card>
           ))}
           
-          <Alert className="mt-6">
+          <Alert className="mt-6 bg-[#D6BCFA] border-[#D6BCFA]/50">
             <Info className="h-4 w-4" />
             <AlertDescription className="text-sm ml-2">
-              Price alerts are automatically removed after 30 days to ensure you receive the most current pricing information.
+              Price alerts are automatically removed after 30 days.
             </AlertDescription>
           </Alert>
         </div>
