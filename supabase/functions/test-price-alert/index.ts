@@ -37,9 +37,13 @@ Deno.serve(async (req) => {
       .limit(1)
       .maybeSingle();
 
-    if (alertsError) throw alertsError;
+    if (alertsError) {
+      console.error('[test-price-alert] Error fetching alerts:', alertsError);
+      throw alertsError;
+    }
     
     if (!alerts) {
+      console.log('[test-price-alert] No active alerts found');
       return new Response(
         JSON.stringify({ error: 'No active price alerts found. Please create one first.' }), 
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -48,15 +52,35 @@ Deno.serve(async (req) => {
 
     console.log(`[test-price-alert] Found alert for plan: ${alerts.energy_plans.plan_name}`);
 
+    // Get user email
+    const { data: { user }, error: userError } = await supabase.auth.admin.getUserById(
+      alerts.user_profiles.user_id
+    );
+
+    if (userError) {
+      console.error('[test-price-alert] Error fetching user:', userError);
+      throw userError;
+    }
+
+    if (!user?.email) {
+      console.error('[test-price-alert] No email found for user:', alerts.user_profiles.user_id);
+      throw new Error('User email not found');
+    }
+
+    console.log('[test-price-alert] Found user email:', user.email);
+
     // Get or create zip code record
-    const zipCode = alerts.user_profiles.zip_code || '75001'; // Default to 75001 if no zip code
+    const zipCode = alerts.user_profiles.zip_code || '75001';
     const { data: existingZipCode, error: zipError } = await supabase
       .from('zip_codes')
       .select('id')
       .eq('zip_code', zipCode)
       .maybeSingle();
 
-    if (zipError) throw zipError;
+    if (zipError) {
+      console.error('[test-price-alert] Error fetching zip code:', zipError);
+      throw zipError;
+    }
 
     let zipCodeId;
     if (existingZipCode) {
@@ -68,9 +92,14 @@ Deno.serve(async (req) => {
         .select('id')
         .single();
 
-      if (insertZipError) throw insertZipError;
+      if (insertZipError) {
+        console.error('[test-price-alert] Error inserting zip code:', insertZipError);
+        throw insertZipError;
+      }
       zipCodeId = newZipCode.id;
     }
+
+    console.log('[test-price-alert] Using zip code ID:', zipCodeId);
 
     // Insert a new record in api_history with a lower price
     const { error: insertError } = await supabase
@@ -80,19 +109,32 @@ Deno.serve(async (req) => {
         company_id: alerts.energy_plans.company_id,
         company_name: 'Test Company',
         plan_name: alerts.energy_plans.plan_name,
-        [`price_kwh${alerts.kwh_usage}`]: alerts.price_threshold - 0.1 // Set price just below threshold
+        [`price_kwh${alerts.kwh_usage}`]: Number(alerts.price_threshold) - 0.1
       });
 
-    if (insertError) throw insertError;
+    if (insertError) {
+      console.error('[test-price-alert] Error inserting test price:', insertError);
+      throw insertError;
+    }
+
+    console.log('[test-price-alert] Inserted test price record');
 
     // Manually trigger the check-price-alerts function
+    console.log('[test-price-alert] Triggering check-price-alerts function');
     const { data: checkResult, error: checkError } = await supabase.functions.invoke('check-price-alerts');
-    if (checkError) throw checkError;
+    
+    if (checkError) {
+      console.error('[test-price-alert] Error invoking check-price-alerts:', checkError);
+      throw checkError;
+    }
+
+    console.log('[test-price-alert] check-price-alerts response:', checkResult);
 
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: 'Test completed. Check your email for the price alert notification.' 
+        message: 'Test completed. Check your email for the price alert notification.',
+        email: user.email // Include the email in the response for debugging
       }), 
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

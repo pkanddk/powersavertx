@@ -12,7 +12,6 @@ const corsHeaders = {
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 Deno.serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -20,6 +19,7 @@ Deno.serve(async (req) => {
   try {
     console.log('[check-price-alerts] Starting price alert check');
     console.log('[check-price-alerts] RESEND_API_KEY present:', !!RESEND_API_KEY);
+    
     if (!RESEND_API_KEY) {
       throw new Error('RESEND_API_KEY is not set');
     }
@@ -69,7 +69,7 @@ Deno.serve(async (req) => {
 
       if (pricesError) {
         console.error('[check-price-alerts] Error fetching prices:', pricesError);
-        throw pricesError;
+        continue;
       }
 
       if (latestPrices) {
@@ -120,11 +120,11 @@ Deno.serve(async (req) => {
             }),
           });
 
-          const emailResponseData = await emailResponse.text();
-          console.log('[check-price-alerts] Email API response:', emailResponseData);
+          const emailResponseText = await emailResponse.text();
+          console.log('[check-price-alerts] Email API response:', emailResponseText);
 
           if (!emailResponse.ok) {
-            console.error('[check-price-alerts] Error sending email:', emailResponseData);
+            console.error('[check-price-alerts] Error sending email:', emailResponseText);
             continue;
           }
 
