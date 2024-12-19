@@ -5,7 +5,7 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
@@ -20,18 +20,29 @@ export function PlanDetails({ plan, isOpen, onClose }: PlanDetailsProps) {
     <Drawer open={isOpen} onOpenChange={onClose}>
       <DrawerContent className="max-h-[95vh] overflow-y-auto">
         <DrawerHeader className="space-y-4 pb-6">
-          <div className="flex items-center gap-4">
-            <img
-              src={plan.company_logo || "/placeholder.svg"}
-              alt={plan.company_name}
-              className="h-12 w-12 object-contain"
-            />
-            <div className="space-y-1">
-              <DrawerTitle className="text-xl font-semibold text-foreground">
-                {plan.plan_name}
-              </DrawerTitle>
-              <p className="text-sm text-muted-foreground">{plan.company_name}</p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <img
+                src={plan.company_logo || "/placeholder.svg"}
+                alt={plan.company_name}
+                className="h-12 w-12 object-contain"
+              />
+              <div className="space-y-1">
+                <DrawerTitle className="text-xl font-semibold text-foreground">
+                  {plan.plan_name}
+                </DrawerTitle>
+                <p className="text-sm text-muted-foreground">{plan.company_name}</p>
+              </div>
             </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              className="rounded-full hover:bg-muted"
+            >
+              <X className="h-5 w-5" />
+              <span className="sr-only">Close</span>
+            </Button>
           </div>
         </DrawerHeader>
 
