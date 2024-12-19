@@ -6,7 +6,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Plan } from "@/lib/api";
-import { CancellationFeeSlider } from "./filters/CancellationFeeSlider";
 
 interface PlanFiltersProps {
   onSortChange: (value: string) => void;
@@ -54,6 +53,39 @@ export function PlanFilters({
       name: plan?.company_name || ''
     };
   }).sort((a, b) => a.name.localeCompare(b.name));
+
+  const handleCancellationFeeChange = (value: string) => {
+    switch (value) {
+      case "not-specified":
+        onCancellationFeeChange([-1, -1]); // Special case for not specified
+        break;
+      case "under-50":
+        onCancellationFeeChange([0, 49]);
+        break;
+      case "50-100":
+        onCancellationFeeChange([50, 100]);
+        break;
+      case "100-200":
+        onCancellationFeeChange([100, 200]);
+        break;
+      case "over-200":
+        onCancellationFeeChange([201, 99999]);
+        break;
+      default:
+        onCancellationFeeChange([0, 99999]); // All ranges
+    }
+  };
+
+  // Convert current range to dropdown value
+  const getCurrentCancellationFeeValue = () => {
+    const [min, max] = currentCancellationFee;
+    if (min === -1 && max === -1) return "not-specified";
+    if (min === 0 && max === 49) return "under-50";
+    if (min === 50 && max === 100) return "50-100";
+    if (min === 100 && max === 200) return "100-200";
+    if (min === 201) return "over-200";
+    return "all";
+  };
 
   return (
     <div className="flex flex-wrap gap-4 mb-6">
@@ -163,11 +195,25 @@ export function PlanFilters({
         </Select>
       </div>
 
-      <CancellationFeeSlider
-        plans={plans}
-        onCancellationFeeChange={onCancellationFeeChange}
-        currentCancellationFee={currentCancellationFee}
-      />
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-medium">Cancellation Fee</label>
+        <Select 
+          value={getCurrentCancellationFeeValue()} 
+          onValueChange={handleCancellationFeeChange}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue defaultValue="all">All Fees</SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Fees</SelectItem>
+            <SelectItem value="not-specified">Not Specified</SelectItem>
+            <SelectItem value="under-50">Under $50</SelectItem>
+            <SelectItem value="50-100">$50 - $100</SelectItem>
+            <SelectItem value="100-200">$100 - $200</SelectItem>
+            <SelectItem value="over-200">Over $200</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
     </div>
   );
 }
