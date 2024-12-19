@@ -32,42 +32,38 @@ function App() {
   };
 
   return (
-    <React.StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <AuthProvider>
-            <Routes>
-              {/* Index is the default landing page */}
-              <Route 
-                path="/" 
-                element={
-                  <Index 
-                    comparedPlans={comparedPlans} 
-                    onCompare={handleCompare}
-                    search={search}
-                    onSearch={handleSearch}
-                    estimatedUse={search?.estimatedUse || "1000"}
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <AuthProvider>
+          <Routes>
+            <Route 
+              path="/" 
+              element={
+                <Index 
+                  comparedPlans={comparedPlans} 
+                  onCompare={handleCompare}
+                  search={search}
+                  onSearch={handleSearch}
+                  estimatedUse={search?.estimatedUse || "1000"}
+                />
+              } 
+            />
+            <Route 
+              path="/compare" 
+              element={
+                <RequireAuth>
+                  <ComparePage 
+                    plans={comparedPlans} 
+                    onRemove={handleCompare} 
                   />
-                } 
-              />
-              {/* Protected compare route - shows auth UI inline when needed */}
-              <Route 
-                path="/compare" 
-                element={
-                  <RequireAuth>
-                    <ComparePage 
-                      plans={comparedPlans} 
-                      onRemove={handleCompare} 
-                    />
-                  </RequireAuth>
-                } 
-              />
-            </Routes>
-            <Toaster />
-          </AuthProvider>
-        </BrowserRouter>
-      </QueryClientProvider>
-    </React.StrictMode>
+                </RequireAuth>
+              } 
+            />
+          </Routes>
+          <Toaster />
+        </AuthProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 }
 
