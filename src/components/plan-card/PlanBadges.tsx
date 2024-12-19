@@ -19,42 +19,52 @@ export function PlanBadges({
   timeOfUse,
   renewablePercentage
 }: PlanBadgesProps) {
+  console.log('PlanBadges props:', {
+    planType,
+    contractLength,
+    minimumUsage,
+    newCustomer,
+    prepaid,
+    timeOfUse,
+    renewablePercentage
+  });
+
   return (
     <div className="flex flex-wrap gap-2">
-      <Badge key="plan-type" variant="secondary" className="whitespace-nowrap">
+      <Badge key="plan-type" variant="secondary">
         {planType}
       </Badge>
       
-      <Badge key="contract-length" variant="outline" className="bg-white whitespace-nowrap">
+      <Badge key="contract-length" variant="outline" className="bg-white">
         {`${contractLength} ${contractLength === 1 ? 'month' : 'months'}`}
       </Badge>
       
       {minimumUsage && (
-        <Badge key="min-usage" variant="secondary" className="whitespace-nowrap">
+        <Badge key="min-usage" variant="secondary">
           Min. Usage Required
         </Badge>
       )}
       
       {newCustomer && (
-        <Badge key="new-customer" variant="secondary" className="whitespace-nowrap">
+        <Badge key="new-customer" variant="secondary">
           New Customers Only
         </Badge>
       )}
       
       {prepaid && (
-        <Badge key="prepaid" variant="secondary" className="whitespace-nowrap">
+        <Badge key="prepaid" variant="secondary">
           Prepaid Plan
         </Badge>
       )}
       
       {timeOfUse && (
-        <Badge key="time-of-use" variant="secondary" className="whitespace-nowrap">
+        <Badge key="time-of-use" variant="secondary">
           Time of Use
         </Badge>
       )}
       
       {renewablePercentage !== undefined && renewablePercentage > 0 && (
-        <Badge key="renewable" variant="secondary" className="whitespace-nowrap">
+        <Badge key="renewable" variant="secondary">
           {`${renewablePercentage}% Renewable`}
         </Badge>
       )}
