@@ -48,6 +48,7 @@ Deno.serve(async (req) => {
     }
     
     console.log(`[check-price-alerts] Found ${alerts?.length || 0} active alerts`);
+    console.log('[check-price-alerts] Alerts:', JSON.stringify(alerts, null, 2));
 
     // Process each alert
     for (const alert of alerts) {
@@ -71,6 +72,8 @@ Deno.serve(async (req) => {
         console.error('[check-price-alerts] Error fetching prices:', pricesError);
         continue;
       }
+
+      console.log('[check-price-alerts] Latest prices:', JSON.stringify(latestPrices, null, 2));
 
       if (latestPrices) {
         const currentPrice = latestPrices[`price_kwh${alert.kwh_usage}`];
