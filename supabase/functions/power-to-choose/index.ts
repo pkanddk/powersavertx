@@ -1,5 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { logger } from './logger.ts';
+import { transformPlan } from './transformer.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -8,7 +10,7 @@ const corsHeaders = {
 
 async function makeRequest(url: string, method: string, headers: Record<string, string>) {
   try {
-    console.log("🔍 [Edge Function] Making request to:", url);
+    logger.info("Making request to", url);
     
     const response = await fetch(url, {
       method,
@@ -17,7 +19,7 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("❌ [Edge Function] Error Response:", errorText);
+      logger.error("Error Response", errorText);
       throw new Error(`HTTP Error ${response.status}: ${errorText}`);
     }
 
@@ -26,18 +28,14 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
     let data;
     try {
       data = JSON.parse(responseText);
-      console.log("\n📦 [Edge Function] RAW API RESPONSE:");
-      console.log("=================================");
-      console.log(JSON.stringify(data, null, 2));
-      console.log("=================================\n");
-      
+      logger.raw(data);
     } catch (parseError) {
-      console.error("❌ [Edge Function] JSON parse error:", parseError);
+      logger.error("JSON parse error", parseError);
       throw new Error("Failed to parse API response as JSON");
     }
 
     if (!data || (Array.isArray(data) && data.length === 0)) {
-      console.log("⚠️ [Edge Function] No plans found in API response");
+      logger.info("No plans found in API response");
       return [];
     }
 
@@ -49,76 +47,20 @@ async function makeRequest(url: string, method: string, headers: Record<string, 
     } else if (data.Results && Array.isArray(data.Results)) {
       plans = data.Results;
     } else {
-      console.error("❌ [Edge Function] Unexpected response structure:", data);
+      logger.error("Unexpected response structure", data);
       throw new Error("Unexpected response structure from API");
     }
 
-    console.log(`✅ [Edge Function] Found ${plans.length} plans`);
-
-    const transformedPlans = plans.map(plan => {
-      const isPrepaid = Boolean(plan.prepaid_plan || plan.is_prepaid || plan.prepaid || false);
-      
-      let renewablePercentage = 0;
-      if (plan.plan_details) {
-        const details = plan.plan_details.toLowerCase();
-        if (details.includes('100% clean renewable energy') || details.includes('100% renewable')) {
-          renewablePercentage = 100;
-        } else if (details.includes('renewable')) {
-          renewablePercentage = 50;
-        }
-      }
-
-      const rawTimeOfUse = plan.timeofuse || plan.time_of_use || plan.tou || false;
-      let isTimeOfUse = Boolean(rawTimeOfUse);
-
-      const planDetailsLower = (plan.plan_details || '').toLowerCase();
-      const planNameLower = (plan.plan_name || '').toLowerCase();
-      
-      if (!isTimeOfUse) {
-        isTimeOfUse = planDetailsLower.includes('time of use') || 
-                      planDetailsLower.includes('time-of-use') ||
-                      planDetailsLower.includes('tou') ||
-                      planNameLower.includes('time of use') ||
-                      planNameLower.includes('time-of-use') ||
-                      planNameLower.includes('tou');
-      }
-
-      return {
-        company_id: String(plan.company_id || ""),
-        company_name: String(plan.company_name || ""),
-        company_logo: plan.company_logo || null,
-        plan_name: String(plan.plan_name || ""),
-        plan_type_name: String(plan.plan_type || ""),
-        fact_sheet: plan.fact_sheet || null,
-        go_to_plan: plan.enroll_plan_url || plan.go_to_plan || plan.enroll_now || null,
-        minimum_usage: Boolean(plan.minimum_usage),
-        new_customer: Boolean(plan.new_customer),
-        plan_details: String(plan.special_terms || ""),
-        price_kwh: parseFloat(plan.price_kwh || plan.rate500 || 0),
-        price_kwh500: parseFloat(plan.price_kwh500 || plan.rate500 || 0),
-        price_kwh1000: parseFloat(plan.price_kwh1000 || plan.rate1000 || 0),
-        price_kwh2000: parseFloat(plan.price_kwh2000 || plan.rate2000 || 0),
-        base_charge: plan.base_charge ? parseFloat(plan.base_charge) : null,
-        contract_length: plan.term_value ? parseInt(plan.term_value) : null,
-        prepaid: isPrepaid,
-        zip_code: String(plan.zip_code || ""),
-        renewable_percentage: renewablePercentage,
-        timeofuse: isTimeOfUse,
-        jdp_rating: plan.jdp_rating ? parseFloat(plan.jdp_rating) : null,
-        jdp_rating_year: plan.jdp_rating_year || null
-      };
-    });
-
-    return transformedPlans;
+    logger.success(`Found ${plans.length} plans`);
+    return plans.map(transformPlan);
 
   } catch (error) {
-    console.error(`❌ [Edge Function] Request failed:`, error);
+    logger.error("Request failed", error);
     throw error;
   }
 }
 
 serve(async (req) => {
-  // Initialize Supabase client
   const supabaseClient = createClient(
     Deno.env.get('SUPABASE_URL') ?? '',
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
@@ -130,7 +72,7 @@ serve(async (req) => {
 
   try {
     const { zipCode, estimatedUse } = await req.json();
-    console.log(`🏁 [Edge Function] Starting search for ZIP: ${zipCode}, Usage: ${estimatedUse}`);
+    logger.info("Starting search", { zipCode, estimatedUse });
 
     if (!zipCode) {
       throw new Error("ZIP code is required");
@@ -141,7 +83,6 @@ serve(async (req) => {
     }
 
     let apiUrl = `http://api.powertochoose.org/api/PowerToChoose/plans?zip_code=${zipCode}`;
-    
     if (estimatedUse && estimatedUse !== "any") {
       apiUrl += `&kWh=${estimatedUse}`;
     }
@@ -168,7 +109,7 @@ serve(async (req) => {
       .eq('zip_code', zipCode);
 
     if (deleteError) {
-      console.error("❌ [Edge Function] Error deleting existing plans:", deleteError);
+      logger.error("Error deleting existing plans", deleteError);
       throw new Error("Failed to update plans in database");
     }
 
@@ -178,11 +119,11 @@ serve(async (req) => {
       .insert(plans);
 
     if (insertError) {
-      console.error("❌ [Edge Function] Error inserting plans:", insertError);
+      logger.error("Error inserting plans", insertError);
       throw new Error("Failed to store plans in database");
     }
 
-    console.log(`✅ [Edge Function] Successfully stored ${plans.length} plans in database`);
+    logger.success(`Successfully stored ${plans.length} plans in database`);
 
     return new Response(JSON.stringify(plans), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -190,7 +131,7 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error("❌ [Edge Function] Error:", error);
+    logger.error("Error in request handler", error);
     
     return new Response(
       JSON.stringify({
