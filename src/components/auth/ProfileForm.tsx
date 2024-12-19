@@ -7,11 +7,11 @@ import { Form } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/components/ui/use-toast";
 import { BasicProfileSection } from "./profile/BasicProfileSection";
-import { RenewablePreferenceSection } from "./profile/RenewablePreferenceSection";
 import { UniversalAlertSection } from "./profile/UniversalAlertSection";
 import { ActiveAlertsSection } from "./profile/ActiveAlertsSection";
-import { profileSchema, type ProfileFormData, type PriceAlert } from "./profile/types";
+import { profileSchema, type ProfileFormData, type PriceAlert } from "./types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { RenewablePreferenceSection } from "./profile/RenewablePreferenceSection";
 
 export function ProfileForm() {
   const { toast } = useToast();
@@ -165,42 +165,41 @@ export function ProfileForm() {
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-6xl h-[calc(100vh-4rem)] overflow-y-auto">
-      <Tabs defaultValue="settings" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="settings">Settings</TabsTrigger>
-          <TabsTrigger value="alerts">Price Alerts</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="settings" className="space-y-6">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <Tabs defaultValue="settings" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="settings">Settings</TabsTrigger>
+              <TabsTrigger value="alerts">Price Alerts</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="settings" className="space-y-6">
               <BasicProfileSection form={form} />
               <UniversalAlertSection form={form} />
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? "Updating..." : "Save Changes"}
               </Button>
-            </form>
-          </Form>
-        </TabsContent>
+            </TabsContent>
 
-        <TabsContent value="alerts" className="space-y-4">
-          <div className="space-y-4">
-            <RenewablePreferenceSection form={form} />
-            <Separator className="my-6" />
-            <h3 className="text-lg font-medium">Active Price Alerts</h3>
-            <ActiveAlertsSection 
-              alerts={priceAlerts} 
-              onDeleteAlert={handleDeleteAlert}
-              renewablePreference={form.watch("renewable_preference")}
-              onCompare={(planId) => {
-                // Handle plan comparison
-                console.log("Compare plan:", planId);
-                // You might want to implement the comparison logic here
-              }}
-            />
-          </div>
-        </TabsContent>
-      </Tabs>
+            <TabsContent value="alerts" className="space-y-4">
+              <div className="space-y-4">
+                <RenewablePreferenceSection form={form} />
+                <Separator className="my-6" />
+                <h3 className="text-lg font-medium">Active Price Alerts</h3>
+                <ActiveAlertsSection 
+                  alerts={priceAlerts} 
+                  onDeleteAlert={handleDeleteAlert}
+                  renewablePreference={form.watch("renewable_preference")}
+                  onCompare={(planId) => {
+                    // Handle plan comparison
+                    console.log("Compare plan:", planId);
+                  }}
+                />
+              </div>
+            </TabsContent>
+          </Tabs>
+        </form>
+      </Form>
     </div>
   );
 }
