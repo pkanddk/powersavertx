@@ -63,7 +63,7 @@ export function ProfileForm() {
             energy_plans (
               plan_name,
               company_name,
-              renewable_percentage
+              go_to_plan
             )
           `)
           .eq("user_id", profile.id)
@@ -80,7 +80,7 @@ export function ProfileForm() {
             company_name: alert.energy_plans.company_name,
             kwh_usage: alert.kwh_usage,
             price_threshold: alert.price_threshold,
-            renewable_percentage: alert.energy_plans.renewable_percentage,
+            go_to_plan: alert.energy_plans.go_to_plan,
             alert_type: 'specific'
           })));
         }
@@ -183,13 +183,11 @@ export function ProfileForm() {
 
             <TabsContent value="alerts" className="space-y-4">
               <div className="space-y-4">
-                <RenewablePreferenceSection form={form} />
                 <Separator className="my-6" />
                 <h3 className="text-lg font-medium">Active Price Alerts</h3>
                 <ActiveAlertsSection 
                   alerts={priceAlerts} 
                   onDeleteAlert={handleDeleteAlert}
-                  renewablePreference={form.watch("renewable_preference")}
                   onCompare={(planId) => {
                     // Handle plan comparison
                     console.log("Compare plan:", planId);
