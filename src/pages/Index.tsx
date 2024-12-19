@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useSearchParams } from "react-router-dom";
 import { SearchForm } from "@/components/SearchForm";
 import { PlanGrid } from "@/components/PlanGrid";
 import { searchPlans, type Plan } from "@/lib/api";
@@ -8,6 +7,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { filterPlans } from "@/lib/utils/filterPlans";
 import { PlanFilters } from "@/components/PlanFilters";
 import { ComparisonBar } from "@/components/plan/ComparisonBar";
+import { Zap } from "lucide-react";
 
 interface IndexProps {
   comparedPlans: Plan[];
@@ -59,11 +59,18 @@ export default function Index({ comparedPlans, onCompare, search, onSearch, esti
     <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white">
       <main className="container mx-auto px-4 py-8 md:py-12">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold tracking-tight text-gray-900 mb-4">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <Zap className="h-12 w-12 text-primary" />
+            <h1 className="text-4xl font-bold tracking-tight text-gray-900">
+              Power Saver TX
+            </h1>
+          </div>
+          <h2 className="text-3xl font-bold tracking-tight text-gray-900 mb-4">
             Find the Best Energy Plan in Texas
-          </h1>
-          <p className="text-xl text-muted-foreground">
-            Compare energy plans and save money with Power Saver TX
+          </h2>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Compare electricity rates from trusted providers and save up to 30% on your energy bills. 
+            Join thousands of Texans who've found better rates with Power Saver TX.
           </p>
         </div>
 
@@ -112,6 +119,11 @@ export default function Index({ comparedPlans, onCompare, search, onSearch, esti
           plans={comparedPlans}
           onRemove={onCompare}
         />
+
+        <footer className="text-center text-sm text-muted-foreground mt-12">
+          <p>© {new Date().getFullYear()} Power Saver TX. All rights reserved.</p>
+          <p className="mt-1">Helping Texans find the best electricity rates since 2024.</p>
+        </footer>
       </main>
     </div>
   );

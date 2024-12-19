@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { PriceAlert } from "../types";
 import { formatPrice } from "@/lib/utils/formatPrice";
 import { Info, Trash2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface ActiveAlertsSectionProps {
   alerts: PriceAlert[];
@@ -16,6 +17,13 @@ export function ActiveAlertsSection({
   onDeleteAlert,
   onCompare,
 }: ActiveAlertsSectionProps) {
+  const navigate = useNavigate();
+
+  const handleCompare = (planId: string) => {
+    onCompare(planId);
+    navigate('/compare');
+  };
+
   return (
     <div className="space-y-4">
       {alerts.length === 0 ? (
@@ -66,7 +74,7 @@ export function ActiveAlertsSection({
                     variant="outline"
                     size="sm"
                     className="flex-1"
-                    onClick={() => onCompare(alert.plan_id)}
+                    onClick={() => handleCompare(alert.plan_id)}
                   >
                     Compare
                   </Button>
