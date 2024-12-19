@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Plan } from "./lib/api";
 import { Toaster } from "./components/ui/toaster";
 import { AuthSidebar } from "./components/auth/AuthSidebar";
+import { Footer } from "./components/Footer";
 
 function App() {
   const [comparedPlans, setComparedPlans] = useState<Plan[]>([]);
@@ -37,33 +38,38 @@ function App() {
 
   return (
     <Router>
-      <AuthSidebar />
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <Index
-              comparedPlans={comparedPlans}
-              onCompare={handleCompare}
-              search={search}
-              onSearch={handleSearch}
-              estimatedUse={estimatedUse}
+      <div className="min-h-screen flex flex-col">
+        <AuthSidebar />
+        <div className="flex-grow">
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <Index
+                  comparedPlans={comparedPlans}
+                  onCompare={handleCompare}
+                  search={search}
+                  onSearch={handleSearch}
+                  estimatedUse={estimatedUse}
+                />
+              }
             />
-          }
-        />
-        <Route
-          path="/compare"
-          element={
-            <Compare
-              plans={comparedPlans}
-              onRemove={handleCompare}
-              estimatedUse={estimatedUse}
+            <Route
+              path="/compare"
+              element={
+                <Compare
+                  plans={comparedPlans}
+                  onRemove={handleCompare}
+                  estimatedUse={estimatedUse}
+                />
+              }
             />
-          }
-        />
-        <Route path="/alerts" element={<Alerts />} />
-      </Routes>
-      <Toaster />
+            <Route path="/alerts" element={<Alerts />} />
+          </Routes>
+        </div>
+        <Footer />
+        <Toaster />
+      </div>
     </Router>
   );
 }
