@@ -1,14 +1,9 @@
 import { Plan } from "@/lib/api";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
-import { ExternalLink, X, Leaf, Clock, Sparkles } from "lucide-react";
+import { Drawer, DrawerContent } from "@/components/ui/drawer";
+import { ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
+import { PlanDetailsHeader } from "./PlanDetailsHeader";
 
 interface PlanDetailsProps {
   plan: Plan;
@@ -20,61 +15,7 @@ export function PlanDetails({ plan, isOpen, onClose }: PlanDetailsProps) {
   return (
     <Drawer open={isOpen} onOpenChange={onClose}>
       <DrawerContent className="max-h-[95vh] overflow-y-auto">
-        <DrawerHeader className="space-y-4 pb-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <img
-                src={plan.company_logo || "/placeholder.svg"}
-                alt={plan.company_name}
-                className="h-12 w-12 object-contain"
-              />
-              <div className="space-y-1">
-                <DrawerTitle className="text-xl font-semibold text-foreground">
-                  {plan.plan_name}
-                </DrawerTitle>
-                <p className="text-sm text-muted-foreground">{plan.company_name}</p>
-              </div>
-            </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onClose}
-              className="rounded-full hover:bg-muted"
-            >
-              <X className="h-5 w-5" />
-              <span className="sr-only">Close</span>
-            </Button>
-          </div>
-
-          {/* Key Features Section - Added here */}
-          <div className="flex flex-wrap gap-3 pt-4">
-            <Badge variant="outline" className="flex items-center gap-2 px-3 py-1">
-              <Clock className="h-4 w-4" />
-              Fixed Rate
-            </Badge>
-            
-            {plan.renewable_percentage > 0 && (
-              <Badge variant="outline" className="flex items-center gap-2 px-3 py-1 bg-emerald-50 text-emerald-600 border-emerald-200">
-                <Leaf className="h-4 w-4" />
-                {plan.renewable_percentage}% Renewable
-              </Badge>
-            )}
-            
-            {plan.new_customer && (
-              <Badge variant="outline" className="flex items-center gap-2 px-3 py-1 bg-purple-50 text-purple-600 border-purple-200">
-                <Sparkles className="h-4 w-4" />
-                New Customer
-              </Badge>
-            )}
-            
-            {plan.timeofuse && (
-              <Badge variant="outline" className="flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-600 border-blue-200">
-                <Clock className="h-4 w-4" />
-                Time of Use
-              </Badge>
-            )}
-          </div>
-        </DrawerHeader>
+        <PlanDetailsHeader plan={plan} onClose={onClose} />
 
         <div className="px-4 pb-8 space-y-6">
           {/* Plan Details Section */}
