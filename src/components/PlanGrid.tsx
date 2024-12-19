@@ -86,22 +86,24 @@ export function PlanGrid({ plans, onCompare, comparedPlans, estimatedUse }: Plan
                       : "Compare"}
                   </Button>
                 </div>
-                <Button 
-                  variant="ghost" 
-                  onClick={() => setSelectedPlan(plan)}
-                  className="w-full flex items-center justify-center gap-2 text-muted-foreground hover:text-primary"
-                >
-                  <Info className="h-4 w-4" />
-                  Plan Details
-                </Button>
-                {plan.enroll_phone && (
-                  <a
-                    href={`tel:${plan.enroll_phone}`}
-                    className="flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
+                <div className="flex items-center justify-between gap-2">
+                  <Button 
+                    variant="ghost" 
+                    onClick={() => setSelectedPlan(plan)}
+                    className="flex items-center justify-center gap-2 text-muted-foreground hover:text-primary"
                   >
-                    <Phone className="h-4 w-4" /> {plan.enroll_phone}
-                  </a>
-                )}
+                    <Info className="h-4 w-4" />
+                    Plan Details
+                  </Button>
+                  {plan.enroll_phone && (
+                    <a
+                      href={`tel:${plan.enroll_phone}`}
+                      className="flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      <Phone className="h-4 w-4" /> {plan.enroll_phone}
+                    </a>
+                  )}
+                </div>
               </div>
             </div>
           </CardContent>
