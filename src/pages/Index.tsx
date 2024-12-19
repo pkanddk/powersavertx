@@ -7,7 +7,6 @@ import { useToast } from "@/components/ui/use-toast";
 import { filterPlans } from "@/lib/utils/filterPlans";
 import { PlanFilters } from "@/components/PlanFilters";
 import { ComparisonBar } from "@/components/plan/ComparisonBar";
-import { Zap } from "lucide-react";
 
 interface IndexProps {
   comparedPlans: Plan[];
@@ -60,10 +59,7 @@ export default function Index({ comparedPlans, onCompare, search, onSearch, esti
       <main className="container mx-auto px-4 py-8 md:py-12">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold tracking-tight text-gray-900 mb-4">
-            Power <span className="relative inline-block">
-              <Zap className="absolute -left-[1px] top-[1px] h-6 w-6 text-primary transform -rotate-12" />
-              aver
-            </span> TX
+            Power Saver TX
           </h1>
           <p className="text-2xl font-semibold text-primary mb-6">
             Simple. Savings.
@@ -79,12 +75,6 @@ export default function Index({ comparedPlans, onCompare, search, onSearch, esti
 
         {!plans && !isLoading && (
           <div className="text-center max-w-2xl mx-auto space-y-8 my-16">
-            <p className="text-lg text-muted-foreground">
-              Set your price alert once, and we'll notify you when it's time to save.
-            </p>
-            <p className="text-lg text-muted-foreground">
-              Relax. We're constantly watching the market to make sure you are getting the best deal.
-            </p>
           </div>
         )}
 
