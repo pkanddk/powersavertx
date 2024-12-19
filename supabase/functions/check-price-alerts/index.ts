@@ -20,6 +20,9 @@ Deno.serve(async (req) => {
   try {
     console.log('[check-price-alerts] Starting price alert check');
     console.log('[check-price-alerts] RESEND_API_KEY present:', !!RESEND_API_KEY);
+    if (!RESEND_API_KEY) {
+      throw new Error('RESEND_API_KEY is not set');
+    }
     
     // Get all active price alerts with user and plan information
     const { data: alerts, error: alertsError } = await supabase
