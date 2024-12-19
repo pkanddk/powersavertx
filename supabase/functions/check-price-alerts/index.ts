@@ -1,14 +1,25 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
-const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 Deno.serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
   try {
-    // Get all active price alerts
+    console.log('[check-price-alerts] Starting price alert check');
+    
+    // Get all active price alerts with user and plan information
     const { data: alerts, error: alertsError } = await supabase
       .from('user_plan_tracking')
       .select(`
@@ -19,15 +30,20 @@ Deno.serve(async (req) => {
         ),
         energy_plans:plan_id (
           company_id,
-          plan_name
+          company_name,
+          plan_name,
+          go_to_plan
         )
       `)
       .eq('active', true);
 
     if (alertsError) throw alertsError;
+    console.log(`[check-price-alerts] Found ${alerts?.length || 0} active alerts`);
 
     // Process each alert
     for (const alert of alerts) {
+      console.log(`[check-price-alerts] Processing alert for plan: ${alert.energy_plans.plan_name}`);
+      
       const { data: latestPrices, error: pricesError } = await supabase
         .from('api_history')
         .select('*')
@@ -40,29 +56,65 @@ Deno.serve(async (req) => {
 
       if (latestPrices?.[0]) {
         const currentPrice = latestPrices[0][`price_kwh${alert.kwh_usage}`];
+        console.log(`[check-price-alerts] Current price: ${currentPrice}¢, Threshold: ${alert.price_threshold}¢`);
         
         if (currentPrice && currentPrice <= alert.price_threshold) {
-          // Price has dropped below threshold - notify user
-          // For now, we'll just log it
-          console.log(`Alert triggered for user ${alert.user_id}: ${alert.energy_plans.plan_name} price (${currentPrice}¢) is below threshold (${alert.price_threshold}¢)`);
+          console.log(`[check-price-alerts] Alert triggered! Price dropped below threshold`);
           
-          // Deactivate the alert
-          await supabase
+          // Get user's email
+          const { data: userData, error: userError } = await supabase.auth.admin.getUserById(
+            alert.user_profiles.user_id
+          );
+
+          if (userError) {
+            console.error('[check-price-alerts] Error fetching user:', userError);
+            continue;
+          }
+
+          if (userData?.user?.email) {
+            // Send email notification
+            const { error: emailError } = await supabase.auth.admin.createUser({
+              email: userData.user.email,
+              email_confirm: true,
+              user_metadata: {
+                price_alert: {
+                  plan_name: alert.energy_plans.plan_name,
+                  company_name: alert.energy_plans.company_name,
+                  current_price: currentPrice,
+                  threshold_price: alert.price_threshold,
+                  go_to_plan: alert.energy_plans.go_to_plan,
+                },
+              },
+            });
+
+            if (emailError) {
+              console.error('[check-price-alerts] Error sending email:', emailError);
+            } else {
+              console.log(`[check-price-alerts] Email notification sent to ${userData.user.email}`);
+            }
+          }
+
+          // Deactivate the alert after notification
+          const { error: updateError } = await supabase
             .from('user_plan_tracking')
             .update({ active: false })
             .eq('id', alert.id);
+
+          if (updateError) {
+            console.error('[check-price-alerts] Error deactivating alert:', updateError);
+          }
         }
       }
     }
 
     return new Response(JSON.stringify({ success: true }), {
-      headers: { 'Content-Type': 'application/json' },
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    console.error('Error processing price alerts:', error);
+    console.error('[check-price-alerts] Error:', error);
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
 });
