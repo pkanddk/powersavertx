@@ -38,23 +38,20 @@ function App() {
         <BrowserRouter>
           <AuthProvider>
             <Routes>
-              {/* Redirect root to auth page */}
-              <Route path="/" element={<Navigate to="/auth" replace />} />
-              <Route path="/auth" element={<AuthPage />} />
+              {/* Make Index the default landing page */}
               <Route 
-                path="/search" 
+                path="/" 
                 element={
-                  <RequireAuth>
-                    <Index 
-                      comparedPlans={comparedPlans} 
-                      onCompare={handleCompare}
-                      search={search}
-                      onSearch={handleSearch}
-                      estimatedUse={search?.estimatedUse || "1000"}
-                    />
-                  </RequireAuth>
+                  <Index 
+                    comparedPlans={comparedPlans} 
+                    onCompare={handleCompare}
+                    search={search}
+                    onSearch={handleSearch}
+                    estimatedUse={search?.estimatedUse || "1000"}
+                  />
                 } 
               />
+              <Route path="/auth" element={<AuthPage />} />
               <Route 
                 path="/compare" 
                 element={
@@ -66,8 +63,8 @@ function App() {
                   </RequireAuth>
                 } 
               />
-              {/* Catch all other routes and redirect to auth */}
-              <Route path="*" element={<Navigate to="/auth" replace />} />
+              {/* Redirect all unknown routes to home */}
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
             <Toaster />
           </AuthProvider>
