@@ -14,7 +14,8 @@ interface PlanGridProps {
 export function PlanGrid({ plans, onCompare, comparedPlans, estimatedUse }: PlanGridProps) {
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const plansPerPage = 25;
+  // Adjust plans per page to be divisible by 3 (our grid columns)
+  const plansPerPage = 24;
 
   const indexOfLastPlan = currentPage * plansPerPage;
   const indexOfFirstPlan = indexOfLastPlan - plansPerPage;
