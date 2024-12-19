@@ -12,11 +12,18 @@ export function PlanFeatures({ plan }: PlanFeaturesProps) {
 
   return (
     <div className="space-y-2">
-      {plan.plan_type_name && (
-        <div className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
-          {formatPlanType(plan.plan_type_name)}
-        </div>
-      )}
+      <div className="flex items-center gap-2">
+        {plan.plan_type_name && (
+          <div className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
+            {formatPlanType(plan.plan_type_name)}
+          </div>
+        )}
+        {plan.new_customer && (
+          <div className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
+            New Customers Only
+          </div>
+        )}
+      </div>
       <div className="space-y-1">
         {plan.renewable_percentage > 0 && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -40,12 +47,6 @@ export function PlanFeatures({ plan }: PlanFeaturesProps) {
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Check className="h-4 w-4 text-primary" />
             <span>Minimum Usage Required</span>
-          </div>
-        )}
-        {plan.new_customer && (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Check className="h-4 w-4 text-primary" />
-            <span>New Customers Only</span>
           </div>
         )}
       </div>
