@@ -1,7 +1,7 @@
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,11 +9,15 @@ import { ArrowLeft } from "lucide-react";
 
 export function AuthPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  console.log("[Auth] Rendering AuthPage, current location:", location);
 
   useEffect(() => {
     // Check if user is already logged in
     const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
+      console.log("[Auth] Current session:", session);
       if (session) {
         console.log("[Auth] User already logged in, redirecting to home");
         navigate("/");
@@ -24,7 +28,7 @@ export function AuthPage() {
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("[Auth] Auth state changed:", event);
+      console.log("[Auth] Auth state changed:", event, "Session:", session);
       if (session) {
         navigate("/");
       }

@@ -12,6 +12,7 @@ import { Plan } from "./lib/api";
 const queryClient = new QueryClient();
 
 function App() {
+  console.log("[App] Component rendering");
   const [comparedPlans, setComparedPlans] = useState<Plan[]>([]);
   const [search, setSearch] = useState<{ zipCode: string; estimatedUse: string } | null>(null);
 
