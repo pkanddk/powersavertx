@@ -8,37 +8,23 @@ import { Info, Trash2 } from "lucide-react";
 interface ActiveAlertsSectionProps {
   alerts: PriceAlert[];
   onDeleteAlert: (id: string) => void;
-  renewablePreference: boolean;
   onCompare: (planId: string) => void;
 }
 
 export function ActiveAlertsSection({
   alerts,
   onDeleteAlert,
-  renewablePreference,
   onCompare,
 }: ActiveAlertsSectionProps) {
-  // Sort alerts based on renewable preference
-  const sortedAlerts = [...alerts].sort((a, b) => {
-    if (renewablePreference) {
-      // Sort by renewable percentage in descending order when renewable preference is enabled
-      return (b.renewable_percentage || 0) - (a.renewable_percentage || 0);
-    }
-    return 0; // Keep original order if renewable preference is off
-  });
-
-  console.log("[ActiveAlertsSection] Renewable preference:", renewablePreference);
-  console.log("[ActiveAlertsSection] Sorted alerts:", sortedAlerts);
-
   return (
     <div className="space-y-4">
-      {sortedAlerts.length === 0 ? (
+      {alerts.length === 0 ? (
         <p className="text-center text-muted-foreground py-4">
           No active price alerts. Set up alerts for specific plans to get notified when prices drop.
         </p>
       ) : (
         <div className="space-y-4">
-          {sortedAlerts.map((alert) => (
+          {alerts.map((alert) => (
             <Card key={alert.id} className="p-4">
               <div className="flex flex-col space-y-2">
                 <div className="flex justify-between items-start">
@@ -65,11 +51,25 @@ export function ActiveAlertsSection({
                   <p className="text-sm">
                     For usage: <span className="font-medium">{alert.kwh_usage} kWh</span>
                   </p>
-                  {alert.renewable_percentage !== undefined && (
-                    <p className="text-sm">
-                      Renewable: <span className="font-medium">{alert.renewable_percentage}%</span>
-                    </p>
-                  )}
+                </div>
+
+                <div className="flex gap-2 mt-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => window.open(alert.go_to_plan, '_blank')}
+                  >
+                    View Plan
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => onCompare(alert.plan_id)}
+                  >
+                    Compare
+                  </Button>
                 </div>
               </div>
             </Card>

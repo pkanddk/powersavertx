@@ -16,6 +16,6 @@ export interface PriceAlert {
   company_name: string;
   kwh_usage: string;
   price_threshold: number;
-  renewable_percentage?: number;
+  go_to_plan?: string;
   alert_type: 'universal' | 'specific';
 }
