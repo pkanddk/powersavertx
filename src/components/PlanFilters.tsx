@@ -1,11 +1,6 @@
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Plan } from "@/lib/api";
+import { FilterSelect } from "./filters/FilterSelect";
+import { MobileFiltersDialog } from "./filters/MobileFiltersDialog";
 
 interface PlanFiltersProps {
   onSortChange: (value: string) => void;
@@ -27,27 +22,9 @@ interface PlanFiltersProps {
   plans?: Plan[];
 }
 
-export function PlanFilters({
-  onSortChange,
-  onContractLengthChange,
-  onPlanTypeChange,
-  onPrepaidChange,
-  onTimeOfUseChange,
-  onCompanyChange,
-  onRenewableChange,
-  onCancellationFeeChange,
-  currentSort,
-  currentContractLength,
-  currentPlanType,
-  currentPrepaid,
-  currentTimeOfUse,
-  currentCompany,
-  currentRenewable,
-  currentCancellationFee,
-  plans = [],
-}: PlanFiltersProps) {
-  const companies = Array.from(new Set(plans.map(plan => plan.company_id))).map(id => {
-    const plan = plans.find(p => p.company_id === id);
+export function PlanFilters(props: PlanFiltersProps) {
+  const companies = Array.from(new Set(props.plans?.map(plan => plan.company_id))).map(id => {
+    const plan = props.plans?.find(p => p.company_id === id);
     return {
       id: plan?.company_id || '',
       name: plan?.company_name || ''
@@ -57,25 +34,24 @@ export function PlanFilters({
   const handleCancellationFeeChange = (value: string) => {
     switch (value) {
       case "under-50":
-        onCancellationFeeChange([0, 49]);
+        props.onCancellationFeeChange([0, 49]);
         break;
       case "50-100":
-        onCancellationFeeChange([50, 100]);
+        props.onCancellationFeeChange([50, 100]);
         break;
       case "100-200":
-        onCancellationFeeChange([100, 200]);
+        props.onCancellationFeeChange([100, 200]);
         break;
       case "over-200":
-        onCancellationFeeChange([201, 99999]);
+        props.onCancellationFeeChange([201, 99999]);
         break;
       default:
-        onCancellationFeeChange([0, 99999]); // All ranges
+        props.onCancellationFeeChange([0, 99999]);
     }
   };
 
-  // Convert current range to dropdown value
   const getCurrentCancellationFeeValue = () => {
-    const [min, max] = currentCancellationFee;
+    const [min, max] = props.currentCancellationFee;
     if (min === 0 && max === 49) return "under-50";
     if (min === 50 && max === 100) return "50-100";
     if (min === 100 && max === 200) return "100-200";
@@ -84,130 +60,103 @@ export function PlanFilters({
   };
 
   return (
-    <div className="flex flex-wrap gap-4 mb-6">
-      <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium">Sort by Price</label>
-        <Select value={currentSort || "price-asc"} onValueChange={onSortChange}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue defaultValue="price-asc">Price: Low to High</SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="price-asc">Price: Low to High</SelectItem>
-            <SelectItem value="price-desc">Price: High to Low</SelectItem>
-          </SelectContent>
-        </Select>
+    <div className="mb-6">
+      {/* Mobile Filters Dialog */}
+      <div className="md:hidden">
+        <MobileFiltersDialog {...props} />
       </div>
 
-      <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium">Contract Length</label>
-        <Select value={currentContractLength || "all"} onValueChange={onContractLengthChange}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue defaultValue="all">Show All</SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Lengths</SelectItem>
-            <SelectItem value="length-asc">Length: Short to Long</SelectItem>
-            <SelectItem value="length-desc">Length: Long to Short</SelectItem>
-            <SelectItem value="0-6">0-6 Months</SelectItem>
-            <SelectItem value="7-12">7-12 Months</SelectItem>
-            <SelectItem value="13+">13+ Months</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium">Plan Type</label>
-        <Select value={currentPlanType || "all"} onValueChange={onPlanTypeChange}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue defaultValue="all">All Plan Types</SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Plan Types</SelectItem>
-            <SelectItem value="fixed">Fixed Rate Only</SelectItem>
-            <SelectItem value="variable">Variable Rate Only</SelectItem>
-            <SelectItem value="indexed">Indexed Rate Only</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium">Company</label>
-        <Select value={currentCompany || "all"} onValueChange={onCompanyChange}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue defaultValue="all">All Companies</SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Companies</SelectItem>
-            {companies.map(company => (
-              <SelectItem key={`company-${company.id}`} value={company.id}>
-                {company.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium">Prepaid Plans</label>
-        <Select value={currentPrepaid || "all"} onValueChange={onPrepaidChange}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue defaultValue="all">Show All</SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Show All</SelectItem>
-            <SelectItem value="prepaid-only">Prepaid Only</SelectItem>
-            <SelectItem value="no-prepaid">No Prepaid</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium">Time of Use</label>
-        <Select value={currentTimeOfUse || "all"} onValueChange={onTimeOfUseChange}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue defaultValue="all">Show All</SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Show All</SelectItem>
-            <SelectItem value="tou-only">Time of Use Only</SelectItem>
-            <SelectItem value="no-tou">No Time of Use</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium">Renewable Energy</label>
-        <Select value={currentRenewable || "all"} onValueChange={onRenewableChange}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue defaultValue="all">Show All</SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Show All</SelectItem>
-            <SelectItem value="100">100% Renewable</SelectItem>
-            <SelectItem value="50">50%+ Renewable</SelectItem>
-            <SelectItem value="25">25%+ Renewable</SelectItem>
-            <SelectItem value="0-25">0-25% Renewable</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium">Cancellation Fee</label>
-        <Select 
-          value={getCurrentCancellationFeeValue()} 
+      {/* Desktop Filters */}
+      <div className="hidden md:flex flex-wrap gap-4">
+        <FilterSelect
+          label="Sort by Price"
+          value={props.currentSort}
+          onValueChange={props.onSortChange}
+          options={[
+            { value: "price-asc", label: "Price: Low to High" },
+            { value: "price-desc", label: "Price: High to Low" },
+          ]}
+        />
+        <FilterSelect
+          label="Contract Length"
+          value={props.currentContractLength}
+          onValueChange={props.onContractLengthChange}
+          options={[
+            { value: "all", label: "All Lengths" },
+            { value: "length-asc", label: "Length: Short to Long" },
+            { value: "length-desc", label: "Length: Long to Short" },
+            { value: "0-6", label: "0-6 Months" },
+            { value: "7-12", label: "7-12 Months" },
+            { value: "13+", label: "13+ Months" },
+          ]}
+        />
+        <FilterSelect
+          label="Plan Type"
+          value={props.currentPlanType}
+          onValueChange={props.onPlanTypeChange}
+          options={[
+            { value: "all", label: "All Plan Types" },
+            { value: "fixed", label: "Fixed Rate Only" },
+            { value: "variable", label: "Variable Rate Only" },
+            { value: "indexed", label: "Indexed Rate Only" },
+          ]}
+        />
+        <FilterSelect
+          label="Company"
+          value={props.currentCompany}
+          onValueChange={props.onCompanyChange}
+          options={[
+            { value: "all", label: "All Companies" },
+            ...companies.map(company => ({
+              value: company.id,
+              label: company.name,
+            })),
+          ]}
+        />
+        <FilterSelect
+          label="Prepaid Plans"
+          value={props.currentPrepaid}
+          onValueChange={props.onPrepaidChange}
+          options={[
+            { value: "all", label: "Show All" },
+            { value: "prepaid-only", label: "Prepaid Only" },
+            { value: "no-prepaid", label: "No Prepaid" },
+          ]}
+        />
+        <FilterSelect
+          label="Time of Use"
+          value={props.currentTimeOfUse}
+          onValueChange={props.onTimeOfUseChange}
+          options={[
+            { value: "all", label: "Show All" },
+            { value: "tou-only", label: "Time of Use Only" },
+            { value: "no-tou", label: "No Time of Use" },
+          ]}
+        />
+        <FilterSelect
+          label="Renewable Energy"
+          value={props.currentRenewable}
+          onValueChange={props.onRenewableChange}
+          options={[
+            { value: "all", label: "Show All" },
+            { value: "100", label: "100% Renewable" },
+            { value: "50", label: "50%+ Renewable" },
+            { value: "25", label: "25%+ Renewable" },
+            { value: "0-25", label: "0-25% Renewable" },
+          ]}
+        />
+        <FilterSelect
+          label="Cancellation Fee"
+          value={getCurrentCancellationFeeValue()}
           onValueChange={handleCancellationFeeChange}
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue defaultValue="all">All Fees</SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Fees</SelectItem>
-            <SelectItem value="under-50">Under $50</SelectItem>
-            <SelectItem value="50-100">$50 - $100</SelectItem>
-            <SelectItem value="100-200">$100 - $200</SelectItem>
-            <SelectItem value="over-200">Over $200</SelectItem>
-          </SelectContent>
-        </Select>
+          options={[
+            { value: "all", label: "All Fees" },
+            { value: "under-50", label: "Under $50" },
+            { value: "50-100", label: "$50 - $100" },
+            { value: "100-200", label: "$100 - $200" },
+            { value: "over-200", label: "Over $200" },
+          ]}
+        />
       </div>
     </div>
   );
