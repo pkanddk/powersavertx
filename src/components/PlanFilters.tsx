@@ -6,6 +6,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Plan } from "@/lib/api";
+import { BaseChargeSlider } from "./filters/BaseChargeSlider";
 
 interface PlanFiltersProps {
   onSortChange: (value: string) => void;
@@ -15,6 +16,7 @@ interface PlanFiltersProps {
   onTimeOfUseChange: (value: string) => void;
   onCompanyChange: (value: string) => void;
   onRenewableChange: (value: string) => void;
+  onBaseChargeChange: (value: [number, number]) => void;
   currentSort: string;
   currentContractLength: string;
   currentPlanType: string;
@@ -22,6 +24,7 @@ interface PlanFiltersProps {
   currentTimeOfUse: string;
   currentCompany: string;
   currentRenewable: string;
+  currentBaseCharge: [number, number];
   plans?: Plan[];
 }
 
@@ -33,6 +36,7 @@ export function PlanFilters({
   onTimeOfUseChange,
   onCompanyChange,
   onRenewableChange,
+  onBaseChargeChange,
   currentSort,
   currentContractLength,
   currentPlanType,
@@ -40,6 +44,7 @@ export function PlanFilters({
   currentTimeOfUse,
   currentCompany,
   currentRenewable,
+  currentBaseCharge,
   plans = [],
 }: PlanFiltersProps) {
   const companies = Array.from(new Set(plans.map(plan => plan.company_id))).map(id => {
@@ -157,6 +162,12 @@ export function PlanFilters({
           </SelectContent>
         </Select>
       </div>
+
+      <BaseChargeSlider
+        plans={plans}
+        onBaseChargeChange={onBaseChargeChange}
+        currentBaseCharge={currentBaseCharge}
+      />
     </div>
   );
 }

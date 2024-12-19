@@ -20,8 +20,9 @@ export default function Index() {
   const [timeOfUseFilter, setTimeOfUseFilter] = useState("all");
   const [companyFilter, setCompanyFilter] = useState("all");
   const [renewableFilter, setRenewableFilter] = useState("all");
+  const [baseChargeRange, setBaseChargeRange] = useState<[number, number]>([0, 1000]);
   const { toast } = useToast();
-  const estimatedUse = searchParams.get("estimatedUse") || "1000"; // Default to 1000 kWh
+  const estimatedUse = searchParams.get("estimatedUse") || "1000";
 
   const { data: plans, isLoading } = useQuery({
     queryKey: ["plans", search?.zipCode, search?.estimatedUse],
@@ -64,6 +65,7 @@ export default function Index() {
     companyFilter,
     sortOrder,
     renewableFilter,
+    baseChargeRange,
     estimatedUse: search?.estimatedUse || estimatedUse,
   }) : [];
 
@@ -93,6 +95,7 @@ export default function Index() {
               onTimeOfUseChange={setTimeOfUseFilter}
               onCompanyChange={setCompanyFilter}
               onRenewableChange={setRenewableFilter}
+              onBaseChargeChange={setBaseChargeRange}
               currentSort={sortOrder}
               currentContractLength={contractLength}
               currentPlanType={planType}
@@ -100,6 +103,7 @@ export default function Index() {
               currentTimeOfUse={timeOfUseFilter}
               currentCompany={companyFilter}
               currentRenewable={renewableFilter}
+              currentBaseCharge={baseChargeRange}
               plans={plans}
             />
 

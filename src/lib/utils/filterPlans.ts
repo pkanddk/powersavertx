@@ -10,6 +10,7 @@ export function filterPlans(
     companyFilter = "all",
     sortOrder = "price-asc",
     renewableFilter = "all",
+    baseChargeRange = [0, 1000],
     estimatedUse,
   }: {
     planType?: string;
@@ -19,6 +20,7 @@ export function filterPlans(
     companyFilter?: string;
     sortOrder?: string;
     renewableFilter?: string;
+    baseChargeRange?: [number, number];
     estimatedUse?: string;
   }
 ) {
@@ -30,6 +32,7 @@ export function filterPlans(
     companyFilter,
     sortOrder,
     renewableFilter,
+    baseChargeRange,
     estimatedUse
   });
 
@@ -123,6 +126,15 @@ export function filterPlans(
         renewable_percentage: plan.renewable_percentage
       }))
     );
+  }
+
+  // Filter by base charge range
+  if (baseChargeRange) {
+    console.log('[filterPlans] Filtering by base charge range:', baseChargeRange);
+    filteredPlans = filteredPlans.filter(plan => {
+      const charge = plan.base_charge || 0;
+      return charge >= baseChargeRange[0] && charge <= baseChargeRange[1];
+    });
   }
 
   // Get the price for the selected kWh usage
