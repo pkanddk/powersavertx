@@ -123,6 +123,36 @@ export type Database = {
         }
         Relationships: []
       }
+      user_profiles: {
+        Row: {
+          created_at: string
+          current_kwh_usage: string | null
+          id: string
+          renewable_preference: boolean | null
+          updated_at: string
+          user_id: string
+          zip_code: string
+        }
+        Insert: {
+          created_at?: string
+          current_kwh_usage?: string | null
+          id?: string
+          renewable_preference?: boolean | null
+          updated_at?: string
+          user_id: string
+          zip_code: string
+        }
+        Update: {
+          created_at?: string
+          current_kwh_usage?: string | null
+          id?: string
+          renewable_preference?: boolean | null
+          updated_at?: string
+          user_id?: string
+          zip_code?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
