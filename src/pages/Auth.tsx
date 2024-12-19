@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 export function AuthPage() {
   const navigate = useNavigate();
@@ -34,11 +36,35 @@ export function AuthPage() {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
       <Card className="w-full max-w-md p-6 space-y-6 bg-white shadow-lg">
-        <div className="text-center space-y-2">
-          <h1 className="text-2xl font-bold tracking-tight">Welcome</h1>
-          <p className="text-muted-foreground">Sign in to access premium features</p>
+        <div className="flex items-center justify-between mb-4">
+          <Button
+            variant="ghost"
+            className="p-0"
+            onClick={() => navigate("/")}
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Search
+          </Button>
+        </div>
+
+        <div className="text-center space-y-4 mb-8">
+          <h1 className="text-2xl font-bold tracking-tight">Premium Features</h1>
+          <p className="text-muted-foreground">
+            Sign up to unlock premium features:
+          </p>
+          <ul className="text-left space-y-2 text-sm">
+            <li className="flex items-center">
+              ✓ Compare up to 3 plans side by side
+            </li>
+            <li className="flex items-center">
+              ✓ Save your favorite plans
+            </li>
+            <li className="flex items-center">
+              ✓ Get price alerts
+            </li>
+          </ul>
         </div>
         
         <Auth
