@@ -7,11 +7,18 @@ import { PlanComparisonTable } from "@/components/PlanComparisonTable";
 import { searchPlans, type Plan } from "@/lib/api";
 import { useToast } from "@/components/ui/use-toast";
 import { filterPlans } from "@/lib/utils/filterPlans";
+import { PlanFilters } from "@/components/PlanFilters";
 
 export default function Index() {
   const [searchParams] = useSearchParams();
   const [search, setSearch] = useState<{ zipCode: string; estimatedUse: string } | null>(null);
   const [comparedPlans, setComparedPlans] = useState<Plan[]>([]);
+  const [sortOrder, setSortOrder] = useState("price-asc");
+  const [contractLength, setContractLength] = useState("all");
+  const [planType, setPlanType] = useState("all");
+  const [prepaidFilter, setPrepaidFilter] = useState("all");
+  const [timeOfUseFilter, setTimeOfUseFilter] = useState("all");
+  const [companyFilter, setCompanyFilter] = useState("all");
   const { toast } = useToast();
   const estimatedUse = searchParams.get("estimatedUse") || "any";
 
@@ -49,14 +56,22 @@ export default function Index() {
   };
 
   const filteredPlans = plans ? filterPlans(plans, {
+    planType,
+    contractLength,
+    prepaidFilter,
+    timeOfUseFilter,
+    companyFilter,
+    sortOrder,
     estimatedUse: search?.estimatedUse,
   }) : [];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-50">
       <main className="container mx-auto px-4 py-8 md:py-12">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">Find the Best Energy Plan</h1>
+          <h1 className="text-4xl font-bold tracking-tight text-gray-900 mb-4">
+            Find the Best Energy Plan
+          </h1>
           <p className="text-xl text-muted-foreground">
             Compare energy plans and prices in your area
           </p>
@@ -66,26 +81,44 @@ export default function Index() {
           <SearchForm onSearch={handleSearch} isLoading={isLoading} />
         </div>
 
-        {comparedPlans.length > 0 && (
-          <div className="mb-12 overflow-x-auto">
-            <h2 className="text-2xl font-semibold mb-4">Plan Comparison</h2>
-            <PlanComparisonTable plans={comparedPlans} />
-          </div>
-        )}
-
-        {isLoading && (
-          <div className="text-center py-12">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-primary border-r-transparent" />
-          </div>
-        )}
-
         {plans && (
-          <PlanGrid 
-            plans={filteredPlans}
-            onCompare={handleCompare}
-            comparedPlans={comparedPlans}
-            estimatedUse={estimatedUse}
-          />
+          <div className="space-y-6">
+            <PlanFilters
+              onSortChange={setSortOrder}
+              onContractLengthChange={setContractLength}
+              onPlanTypeChange={setPlanType}
+              onPrepaidChange={setPrepaidFilter}
+              onTimeOfUseChange={setTimeOfUseFilter}
+              onCompanyChange={setCompanyFilter}
+              currentSort={sortOrder}
+              currentContractLength={contractLength}
+              currentPlanType={planType}
+              currentPrepaid={prepaidFilter}
+              currentTimeOfUse={timeOfUseFilter}
+              currentCompany={companyFilter}
+              plans={plans}
+            />
+
+            {comparedPlans.length > 0 && (
+              <div className="rounded-lg border border-border bg-white p-6 shadow-sm">
+                <h2 className="text-2xl font-semibold text-gray-900 mb-4">Plan Comparison</h2>
+                <PlanComparisonTable plans={comparedPlans} />
+              </div>
+            )}
+
+            {isLoading ? (
+              <div className="text-center py-12">
+                <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-primary border-r-transparent" />
+              </div>
+            ) : (
+              <PlanGrid
+                plans={filteredPlans}
+                onCompare={handleCompare}
+                comparedPlans={comparedPlans}
+                estimatedUse={estimatedUse}
+              />
+            )}
+          </div>
         )}
       </main>
     </div>
