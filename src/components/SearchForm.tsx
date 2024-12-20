@@ -39,7 +39,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
 
   return (
     <div className="w-full max-w-2xl mx-auto">
-      <form onSubmit={handleSubmit} className="flex justify-center items-center gap-4">
+      <form onSubmit={handleSubmit} className="flex items-center justify-center gap-4 h-10">
         <Input
           type="text"
           placeholder="Enter ZIP Code"
