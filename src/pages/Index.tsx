@@ -164,10 +164,6 @@ export default function Index({ comparedPlans, onCompare, search, onSearch, esti
           plans={comparedPlans}
           onRemove={onCompare}
         />
-
-        <footer className="text-center text-sm text-muted-foreground mt-8 md:mt-12">
-          <p>© {new Date().getFullYear()} Power Saver TX. All rights reserved.</p>
-        </footer>
       </main>
     </div>
   );
