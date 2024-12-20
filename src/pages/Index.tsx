@@ -115,29 +115,31 @@ export default function Index({ comparedPlans, onCompare, search, onSearch, esti
               </div>
 
               <div className="hidden md:block">
-                <div className="space-y-2">
-                  <PlanFilters
-                    onSortChange={setSortOrder}
-                    onContractLengthChange={setContractLength}
-                    onPlanTypeChange={setPlanType}
-                    onPrepaidChange={setPrepaidFilter}
-                    onTimeOfUseChange={setTimeOfUseFilter}
-                    onCompanyChange={setCompanyFilter}
-                    onRenewableChange={setRenewableFilter}
-                    onCancellationFeeChange={setCancellationFeeRange}
-                    currentSort={sortOrder}
-                    currentContractLength={contractLength}
-                    currentPlanType={planType}
-                    currentPrepaid={prepaidFilter}
-                    currentTimeOfUse={timeOfUseFilter}
-                    currentCompany={companyFilter}
-                    currentRenewable={renewableFilter}
-                    currentCancellationFee={cancellationFeeRange}
-                    plans={plans}
-                  />
-                  <div className="flex justify-end gap-3 mb-2">
-                    <DevMessageDialog />
-                    <BugReportDialog />
+                <div className="flex flex-col gap-4">
+                  <div className="flex justify-between items-start">
+                    <PlanFilters
+                      onSortChange={setSortOrder}
+                      onContractLengthChange={setContractLength}
+                      onPlanTypeChange={setPlanType}
+                      onPrepaidChange={setPrepaidFilter}
+                      onTimeOfUseChange={setTimeOfUseFilter}
+                      onCompanyChange={setCompanyFilter}
+                      onRenewableChange={setRenewableFilter}
+                      onCancellationFeeChange={setCancellationFeeRange}
+                      currentSort={sortOrder}
+                      currentContractLength={contractLength}
+                      currentPlanType={planType}
+                      currentPrepaid={prepaidFilter}
+                      currentTimeOfUse={timeOfUseFilter}
+                      currentCompany={companyFilter}
+                      currentRenewable={renewableFilter}
+                      currentCancellationFee={cancellationFeeRange}
+                      plans={plans}
+                    />
+                    <div className="flex gap-3 mt-8">
+                      <DevMessageDialog />
+                      <BugReportDialog />
+                    </div>
                   </div>
                 </div>
               </div>
