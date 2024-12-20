@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Compare from "./pages/Compare";
 import Alerts from "./pages/Alerts";
+import FAQ from "./pages/FAQ";
 import { useState } from "react";
 import { Plan } from "./lib/api";
 import { Toaster } from "./components/ui/toaster";
@@ -65,6 +66,7 @@ function App() {
               }
             />
             <Route path="/alerts" element={<Alerts />} />
+            <Route path="/faq" element={<FAQ />} />
           </Routes>
         </div>
         <Footer />
