@@ -114,16 +114,6 @@ export function PlanFilters(props: PlanFiltersProps) {
           ]}
         />
         <FilterSelect
-          label="Prepaid Plans"
-          value={props.currentPrepaid}
-          onValueChange={props.onPrepaidChange}
-          options={[
-            { value: "all", label: "Show All" },
-            { value: "prepaid-only", label: "Prepaid Only" },
-            { value: "no-prepaid", label: "No Prepaid" },
-          ]}
-        />
-        <FilterSelect
           label="Time of Use"
           value={props.currentTimeOfUse}
           onValueChange={props.onTimeOfUseChange}
@@ -155,6 +145,16 @@ export function PlanFilters(props: PlanFiltersProps) {
             { value: "50-100", label: "$50 - $100" },
             { value: "100-200", label: "$100 - $200" },
             { value: "over-200", label: "Over $200" },
+          ]}
+        />
+        <FilterSelect
+          label="Prepaid Plans"
+          value={props.currentPrepaid}
+          onValueChange={props.onPrepaidChange}
+          options={[
+            { value: "all", label: "Show All" },
+            { value: "prepaid-only", label: "Prepaid Only" },
+            { value: "no-prepaid", label: "No Prepaid" },
           ]}
         />
       </div>
