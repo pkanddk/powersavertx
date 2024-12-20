@@ -76,7 +76,7 @@ export default function Index({ comparedPlans, onCompare, search, onSearch, esti
           <div className="absolute inset-0 bg-black/40" />
         </div>
         <div className="relative h-full flex flex-col items-center justify-center px-4 text-center z-10">
-          <div className="transform -translate-y-20 md:-translate-y-8 lg:-translate-y-6">
+          <div className="transform -translate-y-20 md:-translate-y-12 lg:-translate-y-16">
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 animate-fade-in">
               Power Saver TX
             </h1>
