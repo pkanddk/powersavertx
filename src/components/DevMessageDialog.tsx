@@ -18,7 +18,7 @@ export function DevMessageDialog() {
           Message from the Devs
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-gradient-to-b from-blue-50 to-white">
+      <DialogContent className="bg-gradient-to-b from-blue-50 to-white max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl flex items-center gap-2">
             Welcome to Power Saver TX! 

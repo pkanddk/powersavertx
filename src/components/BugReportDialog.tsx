@@ -49,7 +49,11 @@ export function BugReportDialog() {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="gap-2 bg-red-50 hover:bg-red-100 border-red-200 text-red-700"
+        >
           <Bug className="h-4 w-4" />
           Report Bug
         </Button>
