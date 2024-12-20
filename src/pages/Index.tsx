@@ -65,7 +65,7 @@ export default function Index({ comparedPlans, onCompare, search, onSearch, esti
       <WelcomeDialog zipCode={search?.zipCode} />
       
       {/* Hero Section */}
-      <div className="relative h-[50vh] md:h-[60vh] lg:h-[65vh] w-full overflow-hidden">
+      <div className="relative h-[85vh] md:h-[60vh] lg:h-[65vh] w-full overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-center"
           style={{
@@ -75,8 +75,8 @@ export default function Index({ comparedPlans, onCompare, search, onSearch, esti
         >
           <div className="absolute inset-0 bg-black/40" />
         </div>
-        <div className="relative h-full flex flex-col items-center justify-center px-4 text-center z-10 pt-0 md:pt-0 lg:pt-0">
-          <div className="transform -translate-y-8 md:-translate-y-12 lg:-translate-y-16">
+        <div className="relative h-full flex flex-col items-center justify-center px-4 text-center z-10">
+          <div className="transform -translate-y-12 md:-translate-y-12 lg:-translate-y-16">
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 animate-fade-in">
               Power Saver TX
             </h1>
