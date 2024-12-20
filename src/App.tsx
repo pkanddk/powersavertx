@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useNavigate, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import Compare from "./pages/Compare";
 import Alerts from "./pages/Alerts";
@@ -44,22 +44,21 @@ function App() {
         <AuthSidebar />
         <div className="flex-grow">
           <Routes>
-            <Route
-              path="/"
-              element={
-                <Index onSearch={handleSearch} />
-              }
-            />
+            <Route path="/" element={<Index onSearch={handleSearch} />} />
             <Route
               path="/pricing"
               element={
-                <Pricing
-                  comparedPlans={comparedPlans}
-                  onCompare={handleCompare}
-                  search={search}
-                  onSearch={handleSearch}
-                  estimatedUse={estimatedUse}
-                />
+                search ? (
+                  <Pricing
+                    comparedPlans={comparedPlans}
+                    onCompare={handleCompare}
+                    search={search}
+                    onSearch={handleSearch}
+                    estimatedUse={estimatedUse}
+                  />
+                ) : (
+                  <Navigate to="/" replace />
+                )
               }
             />
             <Route
