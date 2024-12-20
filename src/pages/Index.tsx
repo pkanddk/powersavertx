@@ -77,22 +77,22 @@ export default function Index({ comparedPlans, onCompare, search, onSearch, esti
         </div>
         <div className="relative h-full flex flex-col items-center justify-center px-4 text-center z-10">
           <div className="transform -translate-y-20 md:-translate-y-12 lg:-translate-y-16">
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 animate-fade-in">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-4 md:mb-6 animate-fade-in">
               Power Saver TX
             </h1>
-            <p className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto mb-8 animate-fade-in delay-100">
+            <p className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto mb-6 md:mb-8 animate-fade-in delay-100">
               Empowering Texans with smarter energy choices for a sustainable future
             </p>
-            <div className="w-full max-w-2xl mx-auto glass-effect rounded-2xl p-6 animate-fade-in delay-200">
+            <div className="w-full max-w-2xl mx-auto glass-effect rounded-2xl p-4 md:p-6 animate-fade-in delay-200">
               <SearchForm onSearch={onSearch} isLoading={isLoading} />
             </div>
           </div>
         </div>
       </div>
 
-      <main className="container mx-auto px-4 py-8 md:py-12">
+      <main className="container mx-auto px-4 py-4 md:py-8 md:py-12">
         {isMobile && (
-          <div className="flex items-center justify-center gap-3 md:gap-4 mt-4 mb-6">
+          <div className="flex items-center justify-center gap-2 md:gap-3 mt-2 mb-4 md:mb-6">
             <DevMessageDialog />
             <BugReportDialog />
           </div>
