@@ -45,7 +45,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col md:flex-row items-center justify-center gap-4 max-w-2xl mx-auto">
+    <form onSubmit={handleSubmit} className="flex items-center justify-center gap-4 max-w-2xl mx-auto">
       <Input
         type="text"
         placeholder="Enter ZIP Code"
@@ -55,34 +55,32 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
           console.log("[SearchForm] ZIP code changed:", value);
           setZipCode(value);
         }}
-        className="w-full md:w-auto md:flex-1"
+        className="flex-1 max-w-md"
         pattern="[0-9]{5}"
         maxLength={5}
         required
       />
-      <div className="flex w-full md:w-auto gap-2">
-        <Select 
-          value={estimatedUse} 
-          onValueChange={(value) => {
-            console.log("[SearchForm] Usage changed:", value);
-            setEstimatedUse(value);
-          }}
-        >
-          <SelectTrigger className="w-full md:w-[140px]">
-            <SelectValue placeholder="Estimated Usage" />
-          </SelectTrigger>
-          <SelectContent>
-            {USAGE_OPTIONS.map((option) => (
-              <SelectItem key={option} value={option}>
-                {option}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Button type="submit" disabled={isLoading || zipCode.length !== 5} className="bg-primary hover:bg-primary/90">
-          {isLoading ? "Searching..." : "Search Plans"}
-        </Button>
-      </div>
+      <Select 
+        value={estimatedUse} 
+        onValueChange={(value) => {
+          console.log("[SearchForm] Usage changed:", value);
+          setEstimatedUse(value);
+        }}
+      >
+        <SelectTrigger className="w-[140px]">
+          <SelectValue placeholder="Estimated Usage" />
+        </SelectTrigger>
+        <SelectContent>
+          {USAGE_OPTIONS.map((option) => (
+            <SelectItem key={option} value={option}>
+              {option}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <Button type="submit" disabled={isLoading || zipCode.length !== 5} className="bg-primary hover:bg-primary/90">
+        {isLoading ? "Searching..." : "Search Plans"}
+      </Button>
     </form>
   );
 }
