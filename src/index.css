@@ -32,7 +32,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-gradient-to-b from-sky-50/50 to-white text-foreground antialiased;
+    @apply bg-gradient-to-b from-sky-50/50 via-white to-white text-foreground antialiased;
   }
 }
 
@@ -74,4 +74,47 @@
 
 .hover-card-effect:hover {
   transform: translateY(-2px);
+}
+
+/* Glass morphism effects */
+.glass-effect {
+  @apply bg-white/70 backdrop-blur-lg border border-white/20 shadow-lg;
+}
+
+/* Gradient text effect */
+.gradient-text {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-purple-500 to-pink-500;
+}
+
+/* Smooth transitions */
+.smooth-transition {
+  @apply transition-all duration-300 ease-in-out;
+}
+
+/* Floating animation */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Pulse effect */
+@keyframes subtle-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.animate-subtle-pulse {
+  animation: subtle-pulse 2s ease-in-out infinite;
 }
