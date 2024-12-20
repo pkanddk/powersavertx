@@ -16,17 +16,16 @@ export function BugReportDialog() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(
-        `${(await supabase.functions.invoke("send-bug-report")).data?.url}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ description }),
-        }
-      );
+      console.log("[BugReport] Sending bug report with description:", description);
+      
+      const { data, error } = await supabase.functions.invoke("send-bug-report", {
+        body: { description }
+      });
 
-      if (!response.ok) {
-        throw new Error("Failed to send bug report");
+      console.log("[BugReport] Response:", { data, error });
+
+      if (error) {
+        throw error;
       }
 
       toast({
@@ -36,6 +35,7 @@ export function BugReportDialog() {
       
       setDescription("");
     } catch (error) {
+      console.error("[BugReport] Error:", error);
       toast({
         title: "Error",
         description: "Failed to send bug report. Please try again.",

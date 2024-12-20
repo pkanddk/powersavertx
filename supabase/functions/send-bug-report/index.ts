@@ -1,28 +1,45 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-interface BugReport {
-  description: string;
-}
-
-const handler = async (req: Request): Promise<Response> => {
-  if (req.method === "OPTIONS") {
+serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     console.log("[send-bug-report] Starting to process bug report");
-    const bugReport: BugReport = await req.json();
     
     if (!RESEND_API_KEY) {
       console.error("[send-bug-report] RESEND_API_KEY is not set");
       throw new Error("RESEND_API_KEY is not configured");
+    }
+
+    // Parse request body
+    let description: string;
+    try {
+      const body = await req.json();
+      description = body.description;
+      console.log("[send-bug-report] Received description:", description);
+      
+      if (!description) {
+        throw new Error("Description is required");
+      }
+    } catch (error) {
+      console.error("[send-bug-report] Error parsing request body:", error);
+      return new Response(
+        JSON.stringify({ error: "Invalid request body" }),
+        { 
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" }
+        }
+      );
     }
 
     console.log("[send-bug-report] Sending email to pkshow@me.com");
@@ -40,7 +57,7 @@ const handler = async (req: Request): Promise<Response> => {
           <div style="font-family: Arial, sans-serif; padding: 20px;">
             <h2 style="color: #333;">New Bug Report</h2>
             <div style="background: #f5f5f5; padding: 15px; border-radius: 5px; margin-top: 20px;">
-              <p style="margin: 0; line-height: 1.6;">${bugReport.description}</p>
+              <p style="margin: 0; line-height: 1.6;">${description}</p>
             </div>
           </div>
         `,
@@ -55,17 +72,21 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error(`Failed to send email: ${responseText}`);
     }
 
-    return new Response(JSON.stringify({ success: true }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 200,
-    });
-  } catch (error: any) {
+    return new Response(
+      JSON.stringify({ success: true }),
+      { 
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      }
+    );
+  } catch (error) {
     console.error("[send-bug-report] Error:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 500,
-    });
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { 
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500,
+      }
+    );
   }
-};
-
-serve(handler);
+});
