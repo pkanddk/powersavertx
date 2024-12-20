@@ -63,35 +63,40 @@ export default function Index({ comparedPlans, onCompare, search, onSearch, esti
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-50/50 via-white to-white">
       <WelcomeDialog zipCode={search?.zipCode} />
-      <main className="container mx-auto px-4 py-8 md:py-12">
-        <div className="text-center mb-8 md:mb-12 animate-fade-in">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-              Power Saver TX
-            </h1>
-            <span className="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-md border border-red-200">
-              BETA
-            </span>
-          </div>
-          <p className="text-xl md:text-2xl font-semibold text-primary mb-4">
-            Simple. Savings.
-          </p>
-          {isMobile && (
-            <div className="flex items-center justify-center gap-3 md:gap-4 mt-4 mb-6">
-              <DevMessageDialog />
-              <BugReportDialog />
-            </div>
-          )}
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
-            Compare energy plans and save money with Power Saver TX
-          </p>
+      
+      {/* Hero Section */}
+      <div className="relative h-[60vh] md:h-[70vh] lg:h-[80vh] w-full overflow-hidden">
+        <div 
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: "url('/lovable-uploads/a4379cad-194e-455b-abe8-bfe06c3cdf2a.png')",
+            backgroundPosition: "center 30%"
+          }}
+        >
+          <div className="absolute inset-0 bg-black/40" />
         </div>
-
-        <div className="space-y-6 md:space-y-8">
-          <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div className="relative h-full flex flex-col items-center justify-center px-4 text-center z-10">
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 animate-fade-in">
+            Power Saver TX
+          </h1>
+          <p className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto mb-8 animate-fade-in delay-100">
+            Empowering Texans with smarter energy choices for a sustainable future
+          </p>
+          <div className="w-full max-w-2xl mx-auto glass-effect rounded-2xl p-6 animate-fade-in delay-200">
             <SearchForm onSearch={onSearch} isLoading={isLoading} />
           </div>
-          
+        </div>
+      </div>
+
+      <main className="container mx-auto px-4 py-8 md:py-12">
+        {isMobile && (
+          <div className="flex items-center justify-center gap-3 md:gap-4 mt-4 mb-6">
+            <DevMessageDialog />
+            <BugReportDialog />
+          </div>
+        )}
+
+        <div className="space-y-6 md:space-y-8">
           {plans && (
             <>
               <div className="md:hidden">
