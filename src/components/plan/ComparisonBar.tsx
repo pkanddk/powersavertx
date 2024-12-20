@@ -14,27 +14,27 @@ export function ComparisonBar({ plans, onRemove }: ComparisonBarProps) {
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-border shadow-lg animate-slide-up z-50">
       <div className="container mx-auto px-4 py-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4">
             <div className="flex items-center gap-2">
               <GitCompare className="h-5 w-5 text-primary" />
               <span className="font-medium">
                 {plans.length} {plans.length === 1 ? 'Plan' : 'Plans'} Selected
               </span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               {plans.map((plan) => (
                 <div
                   key={plan.company_id}
                   className="flex items-center gap-1 bg-muted px-2 py-1 rounded-md"
                 >
-                  <span className="text-sm truncate max-w-[150px]">
+                  <span className="text-sm truncate max-w-[120px] md:max-w-[150px]">
                     {plan.plan_name}
                   </span>
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-5 w-5"
+                    className="h-5 w-5 shrink-0"
                     onClick={() => onRemove(plan)}
                   >
                     <X className="h-3 w-3" />
@@ -43,8 +43,8 @@ export function ComparisonBar({ plans, onRemove }: ComparisonBarProps) {
               ))}
             </div>
           </div>
-          <Link to="/compare">
-            <Button variant="default">
+          <Link to="/compare" className="shrink-0">
+            <Button variant="default" className="w-full md:w-auto">
               Compare Plans
             </Button>
           </Link>
