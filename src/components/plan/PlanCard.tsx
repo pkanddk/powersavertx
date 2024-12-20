@@ -22,19 +22,21 @@ export function PlanCard({
 }: PlanCardProps) {
   return (
     <Card 
-      className={`group overflow-hidden transition-all duration-300 border-border/40 hover:border-primary/40 bg-gradient-to-b from-white to-gray-50/30 ${
-        isCompared ? "ring-2 ring-primary shadow-lg" : "hover:shadow-lg"
-      }`}
+      className={`group overflow-hidden transition-all duration-300 hover-card-effect
+        ${isCompared 
+          ? "ring-2 ring-primary shadow-lg bg-gradient-to-b from-primary/5 to-transparent" 
+          : "hover:shadow-lg border-border/40 hover:border-primary/40 bg-gradient-to-b from-white to-gray-50/30"
+        }`}
     >
-      <CardContent className="p-3 md:p-4">
-        <div className="space-y-3 md:space-y-4">
+      <CardContent className="p-4 md:p-5">
+        <div className="space-y-4 md:space-y-5">
           <PlanCardHeader plan={plan} />
           
-          <h4 className="text-base md:text-lg font-semibold text-foreground/90 tracking-tight group-hover:text-foreground transition-colors -mt-1">
+          <h4 className="text-base md:text-lg font-semibold text-foreground/90 tracking-tight group-hover:text-foreground transition-colors">
             {plan.plan_name}
           </h4>
 
-          <div className="bg-muted/20 backdrop-blur-sm rounded-lg p-2.5 md:p-3">
+          <div className="bg-muted/20 backdrop-blur-sm rounded-xl p-3 md:p-4">
             <PlanPricing
               plan={plan}
               estimatedUse={estimatedUse}

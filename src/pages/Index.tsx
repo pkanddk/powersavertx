@@ -61,34 +61,36 @@ export default function Index({ comparedPlans, onCompare, search, onSearch, esti
   }) : [];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-sky-50/50 via-white to-white">
       <WelcomeDialog zipCode={search?.zipCode} />
-      <main className="container mx-auto px-4 py-6">
-        <div className="text-center mb-6">
-          <div className="flex items-center justify-center gap-2 mb-3">
-            <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900">
+      <main className="container mx-auto px-4 py-8 md:py-12">
+        <div className="text-center mb-8 md:mb-12 animate-fade-in">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <h1 className="text-4xl md:text-5xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
               Power Saver TX
             </h1>
             <span className="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-md border border-red-200">
               BETA
             </span>
           </div>
-          <p className="text-xl md:text-2xl font-semibold text-primary">
+          <p className="text-xl md:text-2xl font-semibold text-primary mb-4">
             Simple. Savings.
           </p>
           {isMobile && (
-            <div className="flex items-center justify-center gap-3 md:gap-4 mt-4">
+            <div className="flex items-center justify-center gap-3 md:gap-4 mt-4 mb-6">
               <DevMessageDialog />
               <BugReportDialog />
             </div>
           )}
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-4 mt-4">
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
             Compare energy plans and save money with Power Saver TX
           </p>
         </div>
 
-        <div className="space-y-4">
-          <SearchForm onSearch={onSearch} isLoading={isLoading} />
+        <div className="space-y-6 md:space-y-8">
+          <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-sm border border-gray-100">
+            <SearchForm onSearch={onSearch} isLoading={isLoading} />
+          </div>
           
           {plans && (
             <>
@@ -145,16 +147,18 @@ export default function Index({ comparedPlans, onCompare, search, onSearch, esti
               </div>
 
               {isLoading ? (
-                <div className="text-center py-8 md:py-12">
+                <div className="text-center py-12 md:py-16">
                   <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-primary border-r-transparent" />
                 </div>
               ) : (
-                <PlanGrid
-                  plans={filteredPlans}
-                  onCompare={onCompare}
-                  comparedPlans={comparedPlans}
-                  estimatedUse={estimatedUse}
-                />
+                <div className="animate-fade-in">
+                  <PlanGrid
+                    plans={filteredPlans}
+                    onCompare={onCompare}
+                    comparedPlans={comparedPlans}
+                    estimatedUse={estimatedUse}
+                  />
+                </div>
               )}
             </>
           )}
