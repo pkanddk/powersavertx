@@ -67,7 +67,7 @@ export function PlanFilters(props: PlanFiltersProps) {
       </div>
 
       {/* Desktop Filters */}
-      <div className="hidden md:flex flex-wrap gap-4">
+      <div className="hidden md:grid grid-cols-4 gap-4">
         <FilterSelect
           label="Sort by Price"
           value={props.currentSort}
