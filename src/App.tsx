@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 import Index from "./pages/Index";
 import Compare from "./pages/Compare";
 import Alerts from "./pages/Alerts";
@@ -8,6 +8,7 @@ import { Plan } from "./lib/api";
 import { Toaster } from "./components/ui/toaster";
 import { AuthSidebar } from "./components/auth/AuthSidebar";
 import { Footer } from "./components/Footer";
+import Pricing from "./pages/Pricing";
 
 function App() {
   const [comparedPlans, setComparedPlans] = useState<Plan[]>([]);
@@ -46,7 +47,13 @@ function App() {
             <Route
               path="/"
               element={
-                <Index
+                <Index onSearch={handleSearch} />
+              }
+            />
+            <Route
+              path="/pricing"
+              element={
+                <Pricing
                   comparedPlans={comparedPlans}
                   onCompare={handleCompare}
                   search={search}

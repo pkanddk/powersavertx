@@ -17,8 +17,15 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    console.log("[send-bug-report] Starting to process bug report");
     const bugReport: BugReport = await req.json();
     
+    if (!RESEND_API_KEY) {
+      console.error("[send-bug-report] RESEND_API_KEY is not set");
+      throw new Error("RESEND_API_KEY is not configured");
+    }
+
+    console.log("[send-bug-report] Sending email to pkshow@me.com");
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -30,21 +37,30 @@ const handler = async (req: Request): Promise<Response> => {
         to: ["pkshow@me.com"],
         subject: "New Bug Report from Power Saver TX",
         html: `
-          <h2>New Bug Report</h2>
-          <p>${bugReport.description}</p>
+          <div style="font-family: Arial, sans-serif; padding: 20px;">
+            <h2 style="color: #333;">New Bug Report</h2>
+            <div style="background: #f5f5f5; padding: 15px; border-radius: 5px; margin-top: 20px;">
+              <p style="margin: 0; line-height: 1.6;">${bugReport.description}</p>
+            </div>
+          </div>
         `,
       }),
     });
 
+    const responseText = await res.text();
+    console.log("[send-bug-report] Resend API response:", responseText);
+
     if (!res.ok) {
-      throw new Error(await res.text());
+      console.error("[send-bug-report] Error from Resend API:", responseText);
+      throw new Error(`Failed to send email: ${responseText}`);
     }
 
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
-  } catch (error) {
+  } catch (error: any) {
+    console.error("[send-bug-report] Error:", error);
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
