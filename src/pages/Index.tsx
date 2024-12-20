@@ -61,9 +61,9 @@ export default function Index({ comparedPlans, onCompare, search, onSearch, esti
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white">
       <WelcomeDialog zipCode={search?.zipCode} />
-      <main className="container mx-auto px-4 py-6 md:py-12">
-        <div className="text-center mb-8 md:mb-12">
-          <div className="flex items-center justify-center gap-2 mb-3 md:mb-4">
+      <main className="container mx-auto px-4 py-6">
+        <div className="text-center mb-6">
+          <div className="flex items-center justify-center gap-2 mb-3">
             <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900">
               Power Saver TX
             </h1>
