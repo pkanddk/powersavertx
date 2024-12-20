@@ -8,12 +8,69 @@ import {
 } from "@/components/ui/table";
 import { Plan } from "@/lib/api";
 import { formatPrice } from "@/lib/utils/formatPrice";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface PlanComparisonTableProps {
   plans: Plan[];
 }
 
 export function PlanComparisonTable({ plans }: PlanComparisonTableProps) {
+  const isMobile = useIsMobile();
+
+  if (isMobile) {
+    return (
+      <div className="space-y-8">
+        {plans.map((plan) => (
+          <div key={plan.company_id} className="bg-white rounded-lg border border-border">
+            <div className="p-4 border-b border-border bg-muted/30">
+              <h3 className="font-semibold text-lg">{plan.plan_name}</h3>
+            </div>
+            <div className="divide-y divide-border">
+              <div className="p-4 flex flex-col gap-2">
+                <span className="text-sm text-muted-foreground">Provider</span>
+                <div className="flex flex-col items-start gap-2">
+                  <img
+                    src={plan.company_logo || "/placeholder.svg"}
+                    alt={plan.company_name}
+                    className="h-8 object-contain"
+                  />
+                  <span className="text-sm">{plan.company_name}</span>
+                </div>
+              </div>
+              
+              <div className="p-4 flex flex-col gap-2">
+                <span className="text-sm text-muted-foreground">Price per kWh</span>
+                <span className="text-lg font-semibold">{formatPrice(plan.price_kwh)}</span>
+              </div>
+
+              <div className="p-4 flex flex-col gap-2">
+                <span className="text-sm text-muted-foreground">Base Charge</span>
+                <span>{plan.base_charge ? `$${plan.base_charge}/month` : 'None'}</span>
+              </div>
+
+              <div className="p-4 flex flex-col gap-2">
+                <span className="text-sm text-muted-foreground">Contract Length</span>
+                <span>{plan.contract_length} {plan.contract_length === 1 ? 'month' : 'months'}</span>
+              </div>
+
+              <div className="p-4 flex flex-col gap-2">
+                <span className="text-sm text-muted-foreground">Plan Type</span>
+                <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
+                  {plan.plan_type_name}
+                </span>
+              </div>
+
+              <div className="p-4 flex flex-col gap-2">
+                <span className="text-sm text-muted-foreground">Renewable Energy</span>
+                <span>{plan.renewable_percentage}%</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="overflow-auto">
       <Table>
