@@ -30,12 +30,17 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
 
       {/* Content */}
       <div className="relative z-10 max-w-3xl mx-auto text-center space-y-8 px-4">
-        <div className="space-y-4">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white">
-            Find the Best Electricity Plans in Texas
-          </h1>
-          <p className="text-xl text-white/90">
-            Compare rates and save on your electricity bill
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <h1 className="text-5xl md:text-6xl font-bold tracking-tight text-white">
+              Power Saver TX
+            </h1>
+            <p className="text-xl md:text-2xl text-white/90">
+              Compare and save on your electricity bill. Simple savings.
+            </p>
+          </div>
+          <p className="text-lg text-white/80">
+            Find and compare the best electricity plans in Texas
           </p>
         </div>
 
