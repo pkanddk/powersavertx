@@ -3,6 +3,7 @@ import { PlanComparisonTable } from "@/components/PlanComparisonTable";
 import { ArrowLeft } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Plan } from "@/lib/api";
+import { useEffect } from "react";
 
 interface ComparePageProps {
   plans: Plan[];
@@ -13,8 +14,13 @@ interface ComparePageProps {
 export default function ComparePage({ plans, onRemove, estimatedUse }: ComparePageProps) {
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (plans.length === 0) {
+      navigate('/');
+    }
+  }, [plans.length, navigate]);
+
   if (plans.length === 0) {
-    navigate('/');
     return null;
   }
 
