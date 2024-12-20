@@ -2,47 +2,60 @@ import { useNavigate } from "react-router-dom";
 import { SearchForm } from "@/components/SearchForm";
 import { Badge } from "@/components/ui/badge";
 
-interface IndexProps {
-  onSearch: (zipCode: string, estimatedUse: string) => void;
-}
-
-export default function Index({ onSearch }: IndexProps) {
+export default function Index({ onSearch }: { onSearch: (zipCode: string, estimatedUse: string) => void }) {
   const navigate = useNavigate();
 
   const handleSearch = (zipCode: string, estimatedUse: string) => {
-    onSearch(zipCode, estimatedUse);
-    navigate("/pricing");
+    try {
+      console.log("[Index] Handling search:", { zipCode, estimatedUse });
+      onSearch(zipCode, estimatedUse);
+      navigate("/pricing");
+    } catch (error) {
+      console.error("[Index] Error in handleSearch:", error);
+    }
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center bg-gradient-to-b from-sky-50/50 via-white to-white px-4">
-      <div className="max-w-3xl mx-auto text-center space-y-8">
+    <div className="relative min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center">
+      {/* Hero Image Background */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center"
+        style={{
+          backgroundImage: "url('/lovable-uploads/a4379cad-194e-455b-abe8-bfe06c3cdf2a.png')",
+          backgroundPosition: "center 65%"
+        }}
+      >
+        <div className="absolute inset-0 bg-black/40" />
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10 max-w-3xl mx-auto text-center space-y-8 px-4">
         <div className="space-y-4">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-gray-900">
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white">
             Find the Best Electricity Plans in Texas
           </h1>
-          <p className="text-xl text-muted-foreground">
+          <p className="text-xl text-white/90">
             Compare rates and save on your electricity bill
           </p>
         </div>
 
         <div className="flex flex-wrap justify-center gap-2">
-          <Badge variant="secondary" className="text-sm">
+          <Badge variant="secondary" className="text-sm bg-white/20 backdrop-blur-sm text-white border-white/30">
             100+ Plans Available
           </Badge>
-          <Badge variant="secondary" className="text-sm">
+          <Badge variant="secondary" className="text-sm bg-white/20 backdrop-blur-sm text-white border-white/30">
             Real-Time Rates
           </Badge>
-          <Badge variant="secondary" className="text-sm">
+          <Badge variant="secondary" className="text-sm bg-white/20 backdrop-blur-sm text-white border-white/30">
             Price Alerts
           </Badge>
         </div>
 
-        <div className="w-full max-w-xl mx-auto">
+        <div className="w-full max-w-xl mx-auto glass-effect rounded-2xl p-4 md:p-6">
           <SearchForm onSearch={handleSearch} />
         </div>
 
-        <div className="text-sm text-muted-foreground">
+        <div className="text-sm text-white/80">
           Enter your ZIP code to see available plans in your area
         </div>
       </div>
