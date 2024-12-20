@@ -115,7 +115,7 @@ export default function Index({ comparedPlans, onCompare, search, onSearch, esti
               </div>
 
               <div className="hidden md:block">
-                <div className="space-y-4">
+                <div className="space-y-2">
                   <PlanFilters
                     onSortChange={setSortOrder}
                     onContractLengthChange={setContractLength}
@@ -135,7 +135,7 @@ export default function Index({ comparedPlans, onCompare, search, onSearch, esti
                     currentCancellationFee={cancellationFeeRange}
                     plans={plans}
                   />
-                  <div className="flex justify-end gap-3">
+                  <div className="flex justify-end gap-3 mb-2">
                     <DevMessageDialog />
                     <BugReportDialog />
                   </div>
