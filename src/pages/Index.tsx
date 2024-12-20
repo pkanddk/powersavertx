@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { SearchForm } from "@/components/SearchForm";
+import { Badge } from "@/components/ui/badge";
 
 interface IndexProps {
   onSearch: (zipCode: string, estimatedUse: string) => void;
