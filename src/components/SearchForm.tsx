@@ -45,7 +45,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex items-center justify-center gap-4 max-w-2xl mx-auto">
+    <form onSubmit={handleSubmit} className="flex items-center gap-4 max-w-2xl mx-auto">
       <Input
         type="text"
         placeholder="Enter ZIP Code"
@@ -55,7 +55,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
           console.log("[SearchForm] ZIP code changed:", value);
           setZipCode(value);
         }}
-        className="flex-1 max-w-md"
+        className="flex-1"
         pattern="[0-9]{5}"
         maxLength={5}
         required
