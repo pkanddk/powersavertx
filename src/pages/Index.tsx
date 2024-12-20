@@ -12,6 +12,7 @@ import { BugReportDialog } from "@/components/BugReportDialog";
 import { DevMessageDialog } from "@/components/DevMessageDialog";
 import { searchPlans } from "@/lib/api";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Badge } from "@/components/ui/badge";
 
 interface IndexProps {
   comparedPlans: Plan[];
@@ -77,9 +78,17 @@ export default function Index({ comparedPlans, onCompare, search, onSearch, esti
         </div>
         <div className="relative h-full flex flex-col items-center justify-center px-4 text-center z-10">
           <div className="transform -translate-y-20 md:-translate-y-12 lg:-translate-y-16">
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-4 md:mb-6 animate-fade-in">
-              Power Saver TX
-            </h1>
+            <div className="flex items-center justify-center gap-2 mb-4 md:mb-6">
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white animate-fade-in">
+                Power Saver TX
+              </h1>
+              <Badge 
+                variant="secondary" 
+                className="text-xs md:text-sm bg-white/20 backdrop-blur-sm text-white border-white/30 animate-fade-in"
+              >
+                Beta
+              </Badge>
+            </div>
             <p className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto mb-6 md:mb-8 animate-fade-in delay-100">
               Empowering Texans with smarter energy choices for a sustainable future
             </p>
