@@ -39,7 +39,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
 
   return (
     <div className="w-full max-w-2xl mx-auto py-2">
-      <form onSubmit={handleSubmit} className="flex items-center justify-center space-x-4">
+      <form onSubmit={handleSubmit} className="flex flex-col md:flex-row items-center justify-center gap-4 md:space-x-4 px-4 md:px-0">
         <Input
           type="text"
           placeholder="Enter ZIP Code"
@@ -49,7 +49,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
             console.log("[SearchForm] ZIP code changed:", value);
             setZipCode(value);
           }}
-          className="w-[180px] h-10"
+          className="w-full md:w-[180px] h-10"
           pattern="[0-9]{5}"
           maxLength={5}
           required
@@ -58,7 +58,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
           value={estimatedUse}
           onValueChange={handleEstimatedUseChange}
         >
-          <SelectTrigger className="w-[140px] h-10">
+          <SelectTrigger className="w-full md:w-[140px] h-10">
             <SelectValue placeholder="Select usage" />
           </SelectTrigger>
           <SelectContent>
@@ -70,7 +70,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
         <Button 
           type="submit" 
           disabled={isLoading}
-          className="w-[140px] h-10 bg-primary hover:bg-primary/90"
+          className="w-full md:w-[140px] h-10 bg-primary hover:bg-primary/90"
         >
           {isLoading ? "Searching..." : "Search Plans"}
         </Button>
