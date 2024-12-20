@@ -65,25 +65,27 @@ export default function Index({ comparedPlans, onCompare, search, onSearch, esti
       <WelcomeDialog zipCode={search?.zipCode} />
       
       {/* Hero Section */}
-      <div className="relative h-[60vh] md:h-[70vh] lg:h-[80vh] w-full overflow-hidden">
+      <div className="relative h-[50vh] md:h-[60vh] lg:h-[65vh] w-full overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage: "url('/lovable-uploads/a4379cad-194e-455b-abe8-bfe06c3cdf2a.png')",
-            backgroundPosition: "center 30%"
+            backgroundPosition: "center 65%"
           }}
         >
           <div className="absolute inset-0 bg-black/40" />
         </div>
-        <div className="relative h-full flex flex-col items-center justify-center px-4 text-center z-10">
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 animate-fade-in">
-            Power Saver TX
-          </h1>
-          <p className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto mb-8 animate-fade-in delay-100">
-            Empowering Texans with smarter energy choices for a sustainable future
-          </p>
-          <div className="w-full max-w-2xl mx-auto glass-effect rounded-2xl p-6 animate-fade-in delay-200">
-            <SearchForm onSearch={onSearch} isLoading={isLoading} />
+        <div className="relative h-full flex flex-col items-center justify-center px-4 text-center z-10 pt-0 md:pt-0 lg:pt-0">
+          <div className="transform -translate-y-8 md:-translate-y-12 lg:-translate-y-16">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 animate-fade-in">
+              Power Saver TX
+            </h1>
+            <p className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto mb-8 animate-fade-in delay-100">
+              Empowering Texans with smarter energy choices for a sustainable future
+            </p>
+            <div className="w-full max-w-2xl mx-auto glass-effect rounded-2xl p-6 animate-fade-in delay-200">
+              <SearchForm onSearch={onSearch} isLoading={isLoading} />
+            </div>
           </div>
         </div>
       </div>
