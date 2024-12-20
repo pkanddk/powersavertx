@@ -70,6 +70,9 @@ export function AuthSidebar() {
                 className="h-10 w-10"
               />
               <span>Power Saver TX</span>
+              <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">
+                Beta
+              </span>
             </div>
           </SheetTitle>
         </SheetHeader>
