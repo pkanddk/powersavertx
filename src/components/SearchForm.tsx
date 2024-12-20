@@ -38,37 +38,43 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex items-center space-x-4 max-w-2xl mx-auto">
-      <Input
-        type="text"
-        placeholder="Enter ZIP Code"
-        value={zipCode}
-        onChange={(e) => {
-          const value = e.target.value.replace(/\D/g, "").slice(0, 5);
-          console.log("[SearchForm] ZIP code changed:", value);
-          setZipCode(value);
-        }}
-        className="w-[200px]"
-        pattern="[0-9]{5}"
-        maxLength={5}
-        required
-      />
-      <Select
-        value={estimatedUse}
-        onValueChange={handleEstimatedUseChange}
-      >
-        <SelectTrigger className="w-[140px]">
-          <SelectValue placeholder="Select usage" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="500">500 kWh</SelectItem>
-          <SelectItem value="1000">1000 kWh</SelectItem>
-          <SelectItem value="2000">2000 kWh</SelectItem>
-        </SelectContent>
-      </Select>
-      <Button type="submit" disabled={isLoading}>
-        {isLoading ? "Searching..." : "Search Plans"}
-      </Button>
-    </form>
+    <div className="w-full max-w-2xl mx-auto">
+      <form onSubmit={handleSubmit} className="flex justify-center items-center gap-4">
+        <Input
+          type="text"
+          placeholder="Enter ZIP Code"
+          value={zipCode}
+          onChange={(e) => {
+            const value = e.target.value.replace(/\D/g, "").slice(0, 5);
+            console.log("[SearchForm] ZIP code changed:", value);
+            setZipCode(value);
+          }}
+          className="w-[180px]"
+          pattern="[0-9]{5}"
+          maxLength={5}
+          required
+        />
+        <Select
+          value={estimatedUse}
+          onValueChange={handleEstimatedUseChange}
+        >
+          <SelectTrigger className="w-[140px]">
+            <SelectValue placeholder="Select usage" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="500">500 kWh</SelectItem>
+            <SelectItem value="1000">1000 kWh</SelectItem>
+            <SelectItem value="2000">2000 kWh</SelectItem>
+          </SelectContent>
+        </Select>
+        <Button 
+          type="submit" 
+          disabled={isLoading}
+          className="w-[140px] bg-primary hover:bg-primary/90"
+        >
+          {isLoading ? "Searching..." : "Search Plans"}
+        </Button>
+      </form>
+    </div>
   );
 }
