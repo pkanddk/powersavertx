@@ -38,7 +38,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto py-4">
+    <div className="w-full max-w-2xl mx-auto py-2">
       <form onSubmit={handleSubmit} className="flex items-center justify-center space-x-4">
         <Input
           type="text"
