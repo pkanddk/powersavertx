@@ -88,7 +88,11 @@ export function MobileFiltersDialog({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="md:hidden">
+        <Button 
+          variant="outline" 
+          size="default"
+          className="md:hidden w-full h-10 mt-4 md:mt-0"
+        >
           <SlidersHorizontal className="h-4 w-4 mr-2" />
           Filters
         </Button>
