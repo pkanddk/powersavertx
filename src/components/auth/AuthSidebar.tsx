@@ -65,7 +65,7 @@ export function AuthSidebar() {
           <SheetTitle className="text-left">
             <div className="flex items-center gap-2">
               <img
-                src="/lovable-uploads/f5d9d82f-2512-4bcd-96fe-aeca04160865.png"
+                src="/lovable-uploads/7e3b864f-3c42-4e90-823d-0ef30995d907.png"
                 alt="Power Saver TX Logo"
                 className="h-10 w-10"
               />
