@@ -49,7 +49,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
             console.log("[SearchForm] ZIP code changed:", value);
             setZipCode(value);
           }}
-          className="w-full md:w-[180px] h-10"
+          className="w-full md:w-[180px] h-12 md:h-10 text-lg md:text-base rounded-xl md:rounded-md shadow-sm border-gray-200 focus:ring-2 focus:ring-primary/20 bg-white/80 backdrop-blur-sm"
           pattern="[0-9]{5}"
           maxLength={5}
           required
@@ -58,10 +58,10 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
           value={estimatedUse}
           onValueChange={handleEstimatedUseChange}
         >
-          <SelectTrigger className="w-full md:w-[140px] h-10">
+          <SelectTrigger className="w-full md:w-[140px] h-12 md:h-10 text-lg md:text-base rounded-xl md:rounded-md shadow-sm border-gray-200 bg-white/80 backdrop-blur-sm">
             <SelectValue placeholder="Select usage" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="rounded-xl md:rounded-md">
             <SelectItem value="500">500 kWh</SelectItem>
             <SelectItem value="1000">1000 kWh</SelectItem>
             <SelectItem value="2000">2000 kWh</SelectItem>
@@ -70,7 +70,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
         <Button 
           type="submit" 
           disabled={isLoading}
-          className="w-full md:w-[140px] h-10 bg-primary hover:bg-primary/90"
+          className="w-full md:w-[140px] h-12 md:h-10 text-lg md:text-base rounded-xl md:rounded-md bg-primary hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all duration-200"
         >
           {isLoading ? "Searching..." : "Search Plans"}
         </Button>
