@@ -11,6 +11,7 @@ import { WelcomeDialog } from "@/components/WelcomeDialog";
 import { BugReportDialog } from "@/components/BugReportDialog";
 import { DevMessageDialog } from "@/components/DevMessageDialog";
 import { searchPlans } from "@/lib/api";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface IndexProps {
   comparedPlans: Plan[];
@@ -30,6 +31,7 @@ export default function Index({ comparedPlans, onCompare, search, onSearch, esti
   const [renewableFilter, setRenewableFilter] = useState("all");
   const [cancellationFeeRange, setCancellationFeeRange] = useState<[number, number]>([0, 1000]);
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   const { data: plans, isLoading } = useQuery({
     queryKey: ["plans", search?.zipCode, search?.estimatedUse],
@@ -71,15 +73,15 @@ export default function Index({ comparedPlans, onCompare, search, onSearch, esti
               BETA
             </span>
           </div>
-          <div className="flex flex-col items-center gap-2">
-            <p className="text-xl md:text-2xl font-semibold text-primary">
-              Simple. Savings.
-            </p>
-            <div className="flex items-center gap-3 md:gap-4">
+          <p className="text-xl md:text-2xl font-semibold text-primary">
+            Simple. Savings.
+          </p>
+          {isMobile && (
+            <div className="flex items-center justify-center gap-3 md:gap-4 mt-4">
               <DevMessageDialog />
               <BugReportDialog />
             </div>
-          </div>
+          )}
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-4 mt-4">
             Compare energy plans and save money with Power Saver TX
           </p>
@@ -113,25 +115,31 @@ export default function Index({ comparedPlans, onCompare, search, onSearch, esti
               </div>
 
               <div className="hidden md:block">
-                <PlanFilters
-                  onSortChange={setSortOrder}
-                  onContractLengthChange={setContractLength}
-                  onPlanTypeChange={setPlanType}
-                  onPrepaidChange={setPrepaidFilter}
-                  onTimeOfUseChange={setTimeOfUseFilter}
-                  onCompanyChange={setCompanyFilter}
-                  onRenewableChange={setRenewableFilter}
-                  onCancellationFeeChange={setCancellationFeeRange}
-                  currentSort={sortOrder}
-                  currentContractLength={contractLength}
-                  currentPlanType={planType}
-                  currentPrepaid={prepaidFilter}
-                  currentTimeOfUse={timeOfUseFilter}
-                  currentCompany={companyFilter}
-                  currentRenewable={renewableFilter}
-                  currentCancellationFee={cancellationFeeRange}
-                  plans={plans}
-                />
+                <div className="space-y-4">
+                  <PlanFilters
+                    onSortChange={setSortOrder}
+                    onContractLengthChange={setContractLength}
+                    onPlanTypeChange={setPlanType}
+                    onPrepaidChange={setPrepaidFilter}
+                    onTimeOfUseChange={setTimeOfUseFilter}
+                    onCompanyChange={setCompanyFilter}
+                    onRenewableChange={setRenewableFilter}
+                    onCancellationFeeChange={setCancellationFeeRange}
+                    currentSort={sortOrder}
+                    currentContractLength={contractLength}
+                    currentPlanType={planType}
+                    currentPrepaid={prepaidFilter}
+                    currentTimeOfUse={timeOfUseFilter}
+                    currentCompany={companyFilter}
+                    currentRenewable={renewableFilter}
+                    currentCancellationFee={cancellationFeeRange}
+                    plans={plans}
+                  />
+                  <div className="flex justify-end gap-3">
+                    <DevMessageDialog />
+                    <BugReportDialog />
+                  </div>
+                </div>
               </div>
 
               {isLoading ? (
