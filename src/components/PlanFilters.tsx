@@ -98,7 +98,6 @@ export function PlanFilters(props: PlanFiltersProps) {
             { value: "all", label: "All Plan Types" },
             { value: "fixed", label: "Fixed Rate Only" },
             { value: "variable", label: "Variable Rate Only" },
-            { value: "indexed", label: "Indexed Rate Only" },
           ]}
         />
         <FilterSelect
@@ -120,7 +119,7 @@ export function PlanFilters(props: PlanFiltersProps) {
           options={[
             { value: "all", label: "Show All" },
             { value: "prepaid-only", label: "Prepaid Only" },
-            { value: "no-prepaid", label: "No Prepaid" },
+            { value: "no-prepaid", label: "Do Not Show Prepaid Plans" },
           ]}
         />
         <FilterSelect
