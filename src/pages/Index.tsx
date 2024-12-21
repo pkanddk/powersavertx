@@ -39,9 +39,6 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
               Compare and save on your electricity bill. Simple savings.
             </p>
           </div>
-          <p className="text-lg text-white/80">
-            Find and compare the best electricity plans in Texas
-          </p>
         </div>
 
         <div className="flex flex-wrap justify-center gap-2">
