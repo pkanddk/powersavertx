@@ -9,6 +9,17 @@ import {
 import { FilterSelect } from "./FilterSelect";
 import { SlidersHorizontal } from "lucide-react";
 import { Plan } from "@/lib/api";
+import { 
+  sortOptions, 
+  contractLengthOptions, 
+  planTypeOptions,
+  prepaidOptions,
+  timeOfUseOptions,
+  renewableOptions,
+  cancellationFeeOptions 
+} from "./filterOptions";
+import { handleCancellationFeeChange, getCurrentCancellationFeeValue } from "./utils/cancellationFeeUtils";
+import { getCompanyOptions } from "./CompanyOptions";
 
 interface MobileFiltersDialogProps {
   onSortChange: (value: string) => void;
@@ -30,60 +41,8 @@ interface MobileFiltersDialogProps {
   plans?: Plan[];
 }
 
-export function MobileFiltersDialog({
-  onSortChange,
-  onContractLengthChange,
-  onPlanTypeChange,
-  onPrepaidChange,
-  onTimeOfUseChange,
-  onCompanyChange,
-  onRenewableChange,
-  onCancellationFeeChange,
-  currentSort,
-  currentContractLength,
-  currentPlanType,
-  currentPrepaid,
-  currentTimeOfUse,
-  currentCompany,
-  currentRenewable,
-  currentCancellationFee,
-  plans = [],
-}: MobileFiltersDialogProps) {
-  const companies = Array.from(new Set(plans.map(plan => plan.company_id))).map(id => {
-    const plan = plans.find(p => p.company_id === id);
-    return {
-      id: plan?.company_id || '',
-      name: plan?.company_name || ''
-    };
-  }).sort((a, b) => a.name.localeCompare(b.name));
-
-  const handleCancellationFeeChange = (value: string) => {
-    switch (value) {
-      case "under-50":
-        onCancellationFeeChange([0, 49]);
-        break;
-      case "50-100":
-        onCancellationFeeChange([50, 100]);
-        break;
-      case "100-200":
-        onCancellationFeeChange([100, 200]);
-        break;
-      case "over-200":
-        onCancellationFeeChange([201, 99999]);
-        break;
-      default:
-        onCancellationFeeChange([0, 99999]);
-    }
-  };
-
-  const getCurrentCancellationFeeValue = () => {
-    const [min, max] = currentCancellationFee;
-    if (min === 0 && max === 49) return "under-50";
-    if (min === 50 && max === 100) return "50-100";
-    if (min === 100 && max === 200) return "100-200";
-    if (min === 201) return "over-200";
-    return "all";
-  };
+export function MobileFiltersDialog(props: MobileFiltersDialogProps) {
+  const companyOptions = getCompanyOptions(props.plans);
 
   return (
     <Dialog>
@@ -104,91 +63,51 @@ export function MobileFiltersDialog({
         <div className="space-y-4 py-4">
           <FilterSelect
             label="Sort by Price"
-            value={currentSort}
-            onValueChange={onSortChange}
-            options={[
-              { value: "price-asc", label: "Price: Low to High" },
-              { value: "price-desc", label: "Price: High to Low" },
-            ]}
+            value={props.currentSort}
+            onValueChange={props.onSortChange}
+            options={sortOptions}
           />
           <FilterSelect
             label="Contract Length"
-            value={currentContractLength}
-            onValueChange={onContractLengthChange}
-            options={[
-              { value: "all", label: "All Lengths" },
-              { value: "length-asc", label: "Length: Short to Long" },
-              { value: "length-desc", label: "Length: Long to Short" },
-              { value: "0-6", label: "0-6 Months" },
-              { value: "7-12", label: "7-12 Months" },
-              { value: "13+", label: "13+ Months" },
-            ]}
+            value={props.currentContractLength}
+            onValueChange={props.onContractLengthChange}
+            options={contractLengthOptions}
           />
           <FilterSelect
             label="Plan Type"
-            value={currentPlanType}
-            onValueChange={onPlanTypeChange}
-            options={[
-              { value: "all", label: "All Plan Types" },
-              { value: "fixed", label: "Fixed Rate Only" },
-              { value: "variable", label: "Variable Rate Only" },
-            ]}
+            value={props.currentPlanType}
+            onValueChange={props.onPlanTypeChange}
+            options={planTypeOptions}
           />
           <FilterSelect
             label="Company"
-            value={currentCompany}
-            onValueChange={onCompanyChange}
-            options={[
-              { value: "all", label: "All Companies" },
-              ...companies.map(company => ({
-                value: company.id,
-                label: company.name,
-              })),
-            ]}
+            value={props.currentCompany}
+            onValueChange={props.onCompanyChange}
+            options={companyOptions}
           />
           <FilterSelect
             label="Prepaid Plans"
-            value={currentPrepaid}
-            onValueChange={onPrepaidChange}
-            options={[
-              { value: "all", label: "Show All" },
-              { value: "prepaid-only", label: "Prepaid Only" },
-              { value: "no-prepaid", label: "Do Not Show Prepaid Plans" },
-            ]}
+            value={props.currentPrepaid}
+            onValueChange={props.onPrepaidChange}
+            options={prepaidOptions}
           />
           <FilterSelect
             label="Time of Use"
-            value={currentTimeOfUse}
-            onValueChange={onTimeOfUseChange}
-            options={[
-              { value: "all", label: "Show All" },
-              { value: "tou-only", label: "Time of Use Only" },
-              { value: "no-tou", label: "No Time of Use" },
-            ]}
+            value={props.currentTimeOfUse}
+            onValueChange={props.onTimeOfUseChange}
+            options={timeOfUseOptions}
           />
           <FilterSelect
             label="Renewable Energy"
-            value={currentRenewable}
-            onValueChange={onRenewableChange}
-            options={[
-              { value: "all", label: "Show All" },
-              { value: "100", label: "100% Renewable" },
-              { value: "50", label: "50%+ Renewable" },
-              { value: "25", label: "25%+ Renewable" },
-              { value: "0-25", label: "0-25% Renewable" },
-            ]}
+            value={props.currentRenewable}
+            onValueChange={props.onRenewableChange}
+            options={renewableOptions}
           />
           <FilterSelect
             label="Cancellation Fee"
-            value={getCurrentCancellationFeeValue()}
-            onValueChange={handleCancellationFeeChange}
-            options={[
-              { value: "all", label: "All Fees" },
-              { value: "under-50", label: "Under $50" },
-              { value: "50-100", label: "$50 - $100" },
-              { value: "100-200", label: "$100 - $200" },
-              { value: "over-200", label: "Over $200" },
-            ]}
+            value={getCurrentCancellationFeeValue(props.currentCancellationFee)}
+            onValueChange={(value) => props.onCancellationFeeChange(handleCancellationFeeChange(value))}
+            options={cancellationFeeOptions}
           />
         </div>
       </DialogContent>
