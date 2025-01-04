@@ -34,8 +34,8 @@ const makeRequest = async (url: string, method: string, headers: Record<string, 
     console.log("[Edge Function] Request Method:", method);
     console.log("[Edge Function] Request Headers:", headers);
 
-    // Remove any trailing colons from the URL
-    const cleanUrl = url.replace(/:\/?$/, '');
+    // Clean the URL by removing any trailing colons and slashes
+    const cleanUrl = url.replace(/[:\/]+$/, '');
     console.log("[Edge Function] Cleaned URL:", cleanUrl);
     
     const response = await fetch(cleanUrl, {
