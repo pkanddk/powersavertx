@@ -75,6 +75,20 @@ export function AuthContent({ session, handleSignOut }: AuthContentProps) {
           },
         },
       }}
+      onError={(error) => {
+        console.error('Auth error:', error);
+        // Handle specific error cases
+        if (error.message.includes('Invalid login credentials')) {
+          return {
+            message: 'The username or password you entered is incorrect',
+            status: 401
+          };
+        }
+        return {
+          message: 'An error occurred during authentication',
+          status: 500
+        };
+      }}
     />
   );
 }
