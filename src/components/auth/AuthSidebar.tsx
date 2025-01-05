@@ -145,15 +145,24 @@ export function AuthSidebar() {
                     },
                   },
                 },
+                // Handle auth errors through the appearance prop
+                className: {
+                  message: 'text-red-500',
+                  messageError: 'text-red-500',
+                },
               }}
               providers={[]}
-              onError={(error) => {
-                console.error("[AuthSidebar] Auth error:", error);
-                toast({
-                  title: "Authentication Error",
-                  description: error.message,
-                  variant: "destructive",
-                });
+              localization={{
+                variables: {
+                  sign_in: {
+                    email_label: 'Email',
+                    password_label: 'Password',
+                    button_label: 'Sign In',
+                    loading_button_label: 'Signing in...',
+                    social_provider_text: 'Sign in with {{provider}}',
+                    link_text: "Don't have an account? Sign up",
+                  },
+                },
               }}
             />
           )}
