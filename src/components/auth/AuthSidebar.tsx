@@ -54,6 +54,16 @@ export function AuthSidebar() {
           title: "Welcome back!",
           description: "You have successfully signed in.",
         });
+      } else if (_event === 'USER_DELETED') {
+        toast({
+          title: "Account deleted",
+          description: "Your account has been successfully deleted.",
+        });
+      } else if (_event === 'PASSWORD_RECOVERY') {
+        toast({
+          title: "Password recovery email sent",
+          description: "Please check your email for password reset instructions.",
+        });
       }
       
       setSession(session);
@@ -177,6 +187,7 @@ export function AuthSidebar() {
                     loading_button_label: 'Signing in...',
                     social_provider_text: 'Sign in with {{provider}}',
                     link_text: "Don't have an account? Sign up",
+                    error_message: 'Invalid email or password',
                   },
                   sign_up: {
                     email_label: 'Email',
@@ -188,6 +199,7 @@ export function AuthSidebar() {
                     social_provider_text: 'Sign up with {{provider}}',
                     link_text: "Already have an account? Sign in",
                     confirmation_text: 'Check your email for the confirmation link',
+                    error_message: 'Unable to create account',
                   },
                 },
               }}
