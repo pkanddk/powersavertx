@@ -15,6 +15,9 @@ import { Menu } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ProfileForm } from "./ProfileForm";
 
+const MAX_LOGIN_ATTEMPTS = 3;
+const LOGIN_ATTEMPT_TIMEOUT = 15 * 60 * 1000; // 15 minutes in milliseconds
+
 export function AuthSidebar() {
   const [open, setOpen] = useState(false);
   const [session, setSession] = useState<any>(null);
@@ -31,7 +34,6 @@ export function AuthSidebar() {
         setSession(initialSession);
       } catch (error: any) {
         console.error("[AuthSidebar] Error getting initial session:", error);
-        // Clear any potentially invalid session state
         await supabase.auth.signOut();
         setSession(null);
       } finally {
@@ -46,13 +48,21 @@ export function AuthSidebar() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
       console.log("[AuthSidebar] Auth state changed:", _event, session?.user?.email);
+      
+      if (_event === 'SIGNED_IN') {
+        toast({
+          title: "Welcome back!",
+          description: "You have successfully signed in.",
+        });
+      }
+      
       setSession(session);
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [toast]);
 
   const handleSignOut = async () => {
     try {
@@ -147,18 +157,37 @@ export function AuthSidebar() {
                 },
                 className: {
                   message: 'text-red-500',
+                  button: 'bg-primary hover:bg-primary/90',
+                  container: 'space-y-4',
+                  label: 'text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
+                  input: 'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
                 },
               }}
               providers={[]}
+              redirectTo={window.location.origin}
+              magicLink={true}
               localization={{
                 variables: {
                   sign_in: {
                     email_label: 'Email',
                     password_label: 'Password',
+                    email_input_placeholder: 'Your email address',
+                    password_input_placeholder: 'Your password',
                     button_label: 'Sign In',
                     loading_button_label: 'Signing in...',
                     social_provider_text: 'Sign in with {{provider}}',
                     link_text: "Don't have an account? Sign up",
+                  },
+                  sign_up: {
+                    email_label: 'Email',
+                    password_label: 'Password',
+                    email_input_placeholder: 'Your email address',
+                    password_input_placeholder: 'Create a strong password',
+                    button_label: 'Sign Up',
+                    loading_button_label: 'Signing up...',
+                    social_provider_text: 'Sign up with {{provider}}',
+                    link_text: "Already have an account? Sign in",
+                    confirmation_text: 'Check your email for the confirmation link',
                   },
                 },
               }}
