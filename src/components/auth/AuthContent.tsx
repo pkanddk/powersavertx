@@ -28,6 +28,12 @@ export function AuthContent({ session, handleSignOut }: AuthContentProps) {
 
   return (
     <div className="space-y-6">
+      <div className="text-center space-y-2 mb-6">
+        <h2 className="text-2xl font-semibold tracking-tight">Welcome Back</h2>
+        <p className="text-muted-foreground">
+          Sign in to your account or create a new one
+        </p>
+      </div>
       <Auth
         supabaseClient={supabase}
         appearance={{
