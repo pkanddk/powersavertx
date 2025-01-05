@@ -52,17 +52,6 @@ export function AuthContent({ session, handleSignOut }: AuthContentProps) {
       }}
       localization={{
         variables: {
-          sign_up: {
-            email_label: 'Email',
-            password_label: 'Password',
-            email_input_placeholder: 'Your email address',
-            password_input_placeholder: 'Create a strong password',
-            button_label: 'Sign Up',
-            loading_button_label: 'Signing up...',
-            social_provider_text: 'Sign up with {{provider}}',
-            link_text: "Already have an account? Sign in",
-            confirmation_text: 'Check your email for the confirmation link',
-          },
           sign_in: {
             email_label: 'Email',
             password_label: 'Password',
@@ -72,6 +61,19 @@ export function AuthContent({ session, handleSignOut }: AuthContentProps) {
             loading_button_label: 'Signing in...',
             social_provider_text: 'Sign in with {{provider}}',
             link_text: "Don't have an account? Sign up",
+          },
+          sign_up: {
+            email_label: 'Email',
+            password_label: 'Password',
+            password_label_confirm: 'Confirm Password',
+            email_input_placeholder: 'Your email address',
+            password_input_placeholder: 'Create a strong password',
+            password_input_placeholder_confirm: 'Confirm your password',
+            button_label: 'Sign Up',
+            loading_button_label: 'Signing up...',
+            social_provider_text: 'Sign up with {{provider}}',
+            link_text: "Already have an account? Sign in",
+            confirmation_text: 'Check your email for the confirmation link',
           },
           forgotten_password: {
             email_label: 'Email',
