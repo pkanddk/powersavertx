@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProfileForm } from "./ProfileForm";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { useEffect } from "react";
 
 interface AuthContentProps {
   session: any;
@@ -12,6 +13,37 @@ interface AuthContentProps {
 
 export function AuthContent({ session, handleSignOut }: AuthContentProps) {
   const { toast } = useToast();
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("[Auth Debug] Auth state changed:", {
+        event,
+        email: session?.user?.email,
+        id: session?.user?.id
+      });
+
+      if (event === 'SIGNED_IN') {
+        toast({
+          title: "Welcome!",
+          description: "You have successfully signed in.",
+        });
+      } else if (event === 'SIGNED_OUT') {
+        toast({
+          title: "Goodbye!",
+          description: "You have been signed out.",
+        });
+      } else if (event === 'USER_UPDATED') {
+        toast({
+          title: "Profile Updated",
+          description: "Your profile has been updated.",
+        });
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [toast]);
 
   if (session) {
     return (
@@ -29,15 +61,6 @@ export function AuthContent({ session, handleSignOut }: AuthContentProps) {
     );
   }
 
-  // Add auth state change listener for debugging
-  supabase.auth.onAuthStateChange((event, session) => {
-    console.log("[Auth Debug] Auth state changed:", {
-      event,
-      email: session?.user?.email,
-      id: session?.user?.id
-    });
-  });
-
   return (
     <Auth
       supabaseClient={supabase}
@@ -48,11 +71,13 @@ export function AuthContent({ session, handleSignOut }: AuthContentProps) {
             colors: {
               brand: 'rgb(147, 51, 234)',
               brandAccent: 'rgb(126, 34, 206)',
+              messageText: 'rgb(239, 68, 68)',
+              messageBackground: 'rgb(254, 242, 242)',
             },
           },
         },
         className: {
-          message: 'text-red-500',
+          message: 'text-red-500 bg-red-50 p-3 rounded-md mb-4',
           button: 'bg-primary hover:bg-primary/90',
           container: 'space-y-4',
           label: 'text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
@@ -88,17 +113,17 @@ export function AuthContent({ session, handleSignOut }: AuthContentProps) {
       providers={[]}
       redirectTo={window.location.origin}
       view="sign_in"
-      onError={(error) => {
-        console.error("[Auth Debug] Authentication error:", {
-          message: error.message,
-          description: error.description,
-          status: error.status
-        });
-        toast({
-          title: "Authentication Error",
-          description: error.message,
-          variant: "destructive",
-        });
+      showLinks={true}
+      appearance={{
+        extend: true,
+        className: {
+          container: 'w-full space-y-4',
+          label: 'text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
+          input: 'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+          message: 'text-red-500 bg-red-50 p-3 rounded-md mb-4',
+          button: 'bg-primary hover:bg-primary/90 text-white w-full py-2 rounded-md transition-colors',
+          anchor: 'text-primary hover:text-primary/80',
+        },
       }}
     />
   );
