@@ -26,25 +26,34 @@ export function ProfileFormProvider({
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [priceAlerts, setPriceAlerts] = useState<PriceAlert[]>([]);
 
+  // Load user profile on mount
   useEffect(() => {
     loadProfile();
   }, []);
 
   const loadProfile = async () => {
     try {
+      console.log("[ProfileForm] Loading profile...");
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("No user found");
+      if (!user) {
+        console.error("[ProfileForm] No user found");
+        throw new Error("No user found");
+      }
 
+      // Load profile data
       const { data: profile, error: profileError } = await supabase
         .from("user_profiles")
         .select("*")
         .eq("user_id", user.id)
         .single();
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error("[ProfileForm] Error loading profile:", profileError);
+        throw profileError;
+      }
 
       if (profile) {
-        console.log("[ProfileForm] Loaded profile:", profile);
+        console.log("[ProfileForm] Profile loaded:", profile);
         form.reset({
           zip_code: profile.zip_code || "",
           renewable_preference: profile.renewable_preference || false,
@@ -53,6 +62,7 @@ export function ProfileFormProvider({
         });
       }
 
+      // Load price alerts
       const { data: alerts, error: alertsError } = await supabase
         .from("user_plan_tracking")
         .select(`
@@ -63,16 +73,20 @@ export function ProfileFormProvider({
           energy_plans (
             plan_name,
             company_name,
-            go_to_plan
+            go_to_plan,
+            renewable_percentage
           )
         `)
         .eq("user_id", profile.id)
         .eq("active", true);
 
-      if (alertsError) throw alertsError;
+      if (alertsError) {
+        console.error("[ProfileForm] Error loading alerts:", alertsError);
+        throw alertsError;
+      }
 
       if (alerts) {
-        console.log("[ProfileForm] Loaded alerts:", alerts);
+        console.log("[ProfileForm] Alerts loaded:", alerts);
         setPriceAlerts(alerts.map(alert => ({
           id: alert.id,
           plan_id: alert.plan_id,
@@ -81,11 +95,12 @@ export function ProfileFormProvider({
           kwh_usage: alert.kwh_usage,
           price_threshold: alert.price_threshold,
           go_to_plan: alert.energy_plans.go_to_plan,
+          renewable_percentage: alert.energy_plans.renewable_percentage,
           alert_type: 'specific'
         })));
       }
     } catch (error: any) {
-      console.error("[ProfileForm] Error loading profile:", error);
+      console.error("[ProfileForm] Error in loadProfile:", error);
       toast({
         title: "Error",
         description: "Failed to load your profile",
@@ -99,6 +114,7 @@ export function ProfileFormProvider({
   const handleSubmit = async (data: ProfileFormData) => {
     setIsLoading(true);
     try {
+      console.log("[ProfileForm] Submitting profile update:", data);
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No user found");
 
@@ -119,6 +135,7 @@ export function ProfileFormProvider({
         description: "Your profile has been successfully updated.",
       });
     } catch (error: any) {
+      console.error("[ProfileForm] Error in handleSubmit:", error);
       toast({
         title: "Error",
         description: error.message,
@@ -131,6 +148,7 @@ export function ProfileFormProvider({
 
   const handleDeleteAlert = async (alertId: string) => {
     try {
+      console.log("[ProfileForm] Deleting alert:", alertId);
       const { error } = await supabase
         .from("user_plan_tracking")
         .update({ active: false })
@@ -144,6 +162,7 @@ export function ProfileFormProvider({
         description: "Price alert has been removed successfully.",
       });
     } catch (error: any) {
+      console.error("[ProfileForm] Error in handleDeleteAlert:", error);
       toast({
         title: "Error",
         description: "Failed to delete price alert",
