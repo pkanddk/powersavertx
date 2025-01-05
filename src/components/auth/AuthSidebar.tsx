@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -11,53 +11,13 @@ import { Menu } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AuthHeader } from "./AuthHeader";
 import { AuthContent } from "./AuthContent";
+import { useAuthState } from "@/hooks/useAuthState";
 
 export function AuthSidebar() {
   const [open, setOpen] = useState(false);
-  const [session, setSession] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { session, isLoading } = useAuthState();
   const { toast } = useToast();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    // Initial session check
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setIsLoading(false);
-      console.log("[AuthSidebar] Initial session check:", session?.user?.email);
-    });
-
-    // Subscribe to auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("[AuthSidebar] Auth state changed:", event, session?.user?.email);
-      setSession(session);
-      
-      if (event === 'SIGNED_IN') {
-        toast({
-          title: "Welcome back!",
-          description: "You have successfully signed in.",
-        });
-        setOpen(false); // Close sidebar after successful sign in
-      } else if (event === 'SIGNED_OUT') {
-        toast({
-          title: "Signed out",
-          description: "You have been signed out successfully.",
-        });
-        navigate("/"); // Redirect to home page after sign out
-      } else if (event === 'USER_UPDATED') {
-        toast({
-          title: "Profile Updated",
-          description: "Your profile has been updated successfully.",
-        });
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [toast, navigate]);
 
   const handleSignOut = async () => {
     try {
