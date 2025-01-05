@@ -1,11 +1,11 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { profileSchema } from "./types";
+import { profileSchema, type ProfileFormData } from "./types";
 import { ProfileFormProvider } from "./profile/ProfileFormProvider";
 import { ProfileFormContent } from "./profile/ProfileFormContent";
 
 export function ProfileForm() {
-  const form = useForm({
+  const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       zip_code: "",
