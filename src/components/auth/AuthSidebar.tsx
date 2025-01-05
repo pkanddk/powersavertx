@@ -145,10 +145,8 @@ export function AuthSidebar() {
                     },
                   },
                 },
-                // Handle auth errors through the appearance prop
                 className: {
                   message: 'text-red-500',
-                  messageError: 'text-red-500',
                 },
               }}
               providers={[]}
