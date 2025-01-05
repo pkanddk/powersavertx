@@ -37,6 +37,11 @@ export function AuthContent({ session, handleSignOut }: AuthContentProps) {
           title: "Profile Updated",
           description: "Your profile has been updated.",
         });
+      } else if (event === 'PASSWORD_RECOVERY') {
+        toast({
+          title: "Password Recovery",
+          description: "Check your email for password reset instructions.",
+        });
       }
     });
 
@@ -78,7 +83,7 @@ export function AuthContent({ session, handleSignOut }: AuthContentProps) {
         },
         className: {
           message: 'text-red-500 bg-red-50 p-3 rounded-md mb-4',
-          button: 'bg-primary hover:bg-primary/90',
+          button: 'bg-primary hover:bg-primary/90 text-primary-foreground',
           container: 'space-y-4',
           label: 'text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
           input: 'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
@@ -102,11 +107,19 @@ export function AuthContent({ session, handleSignOut }: AuthContentProps) {
             password_label: 'Password',
             email_input_placeholder: 'Your email address',
             password_input_placeholder: 'Create a strong password',
+            confirmation_text: 'Check your email for the confirmation link',
             button_label: 'Sign Up',
             loading_button_label: 'Signing up...',
             social_provider_text: 'Sign up with {{provider}}',
             link_text: "Already have an account? Sign in",
-            confirmation_text: 'Check your email for the confirmation link',
+          },
+          forgotten_password: {
+            email_label: 'Email',
+            password_label: 'Password',
+            email_input_placeholder: 'Your email address',
+            button_label: 'Send Reset Instructions',
+            loading_button_label: 'Sending reset instructions...',
+            link_text: "Forgot your password?",
           },
         },
       }}
