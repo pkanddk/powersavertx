@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { ProfileForm } from "./ProfileForm";
 
 export function AuthSidebar() {
@@ -147,6 +147,14 @@ export function AuthSidebar() {
                 },
               }}
               providers={[]}
+              onError={(error) => {
+                console.error("[AuthSidebar] Auth error:", error);
+                toast({
+                  title: "Authentication Error",
+                  description: error.message,
+                  variant: "destructive",
+                });
+              }}
             />
           )}
         </div>
