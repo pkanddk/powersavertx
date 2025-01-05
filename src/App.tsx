@@ -9,6 +9,7 @@ import { Toaster } from "./components/ui/toaster";
 import { AuthSidebar } from "./components/auth/AuthSidebar";
 import { Footer } from "./components/Footer";
 import Pricing from "./pages/Pricing";
+import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 
 function App() {
   const [comparedPlans, setComparedPlans] = useState<Plan[]>([]);
@@ -64,14 +65,23 @@ function App() {
             <Route
               path="/compare"
               element={
-                <Compare
-                  plans={comparedPlans}
-                  onRemove={handleCompare}
-                  estimatedUse={estimatedUse}
-                />
+                <ProtectedRoute>
+                  <Compare
+                    plans={comparedPlans}
+                    onRemove={handleCompare}
+                    estimatedUse={estimatedUse}
+                  />
+                </ProtectedRoute>
               }
             />
-            <Route path="/alerts" element={<Alerts />} />
+            <Route
+              path="/alerts"
+              element={
+                <ProtectedRoute>
+                  <Alerts />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/faq" element={<FAQ />} />
           </Routes>
         </div>
