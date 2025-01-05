@@ -86,7 +86,7 @@ export function AuthContent({ session, handleSignOut }: AuthContentProps) {
         }}
         providers={[]}
         redirectTo={window.location.origin}
-        view="sign_up"
+        view="sign_in"
         showLinks={true}
       />
     </div>
