@@ -71,7 +71,7 @@ export function AuthContent({ session, handleSignOut }: AuthContentProps) {
             button_label: 'Sign Up',
             loading_button_label: 'Signing up...',
             social_provider_text: 'Sign up with {{provider}}',
-            link_text: "Already have an account? Sign in",
+            link_text: "Have an account? Sign in here",
           },
           forgotten_password: {
             email_label: 'Email',
