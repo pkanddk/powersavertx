@@ -3,8 +3,6 @@ import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileForm } from "./ProfileForm";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
-import { useEffect } from "react";
 
 interface AuthContentProps {
   session: any;
@@ -12,44 +10,6 @@ interface AuthContentProps {
 }
 
 export function AuthContent({ session, handleSignOut }: AuthContentProps) {
-  const { toast } = useToast();
-
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("[Auth Debug] Auth state changed:", {
-        event,
-        email: session?.user?.email,
-        id: session?.user?.id
-      });
-
-      if (event === 'SIGNED_IN') {
-        toast({
-          title: "Welcome!",
-          description: "You have successfully signed in.",
-        });
-      } else if (event === 'SIGNED_OUT') {
-        toast({
-          title: "Goodbye!",
-          description: "You have been signed out.",
-        });
-      } else if (event === 'USER_UPDATED') {
-        toast({
-          title: "Profile Updated",
-          description: "Your profile has been updated.",
-        });
-      } else if (event === 'PASSWORD_RECOVERY') {
-        toast({
-          title: "Password Recovery",
-          description: "Check your email for password reset instructions.",
-        });
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [toast]);
-
   if (session) {
     return (
       <div className="space-y-6">

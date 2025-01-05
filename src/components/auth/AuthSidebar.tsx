@@ -20,26 +20,36 @@ export function AuthSidebar() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Initial session check
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setIsLoading(false);
+      console.log("[AuthSidebar] Initial session check:", session?.user?.email);
     });
 
+    // Subscribe to auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log("[AuthSidebar] Auth state changed:", _event, session?.user?.email);
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("[AuthSidebar] Auth state changed:", event, session?.user?.email);
       setSession(session);
       
-      if (_event === 'SIGNED_IN') {
+      if (event === 'SIGNED_IN') {
         toast({
           title: "Welcome back!",
           description: "You have successfully signed in.",
         });
-      } else if (_event === 'SIGNED_OUT') {
+        setOpen(false); // Close sidebar after successful sign in
+      } else if (event === 'SIGNED_OUT') {
         toast({
           title: "Signed out",
           description: "You have been signed out successfully.",
+        });
+        navigate("/"); // Redirect to home page after sign out
+      } else if (event === 'USER_UPDATED') {
+        toast({
+          title: "Profile Updated",
+          description: "Your profile has been updated successfully.",
         });
       }
     });
@@ -47,7 +57,7 @@ export function AuthSidebar() {
     return () => {
       subscription.unsubscribe();
     };
-  }, [toast]);
+  }, [toast, navigate]);
 
   const handleSignOut = async () => {
     try {
