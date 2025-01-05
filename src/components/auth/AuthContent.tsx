@@ -114,17 +114,6 @@ export function AuthContent({ session, handleSignOut }: AuthContentProps) {
       redirectTo={window.location.origin}
       view="sign_in"
       showLinks={true}
-      appearance={{
-        extend: true,
-        className: {
-          container: 'w-full space-y-4',
-          label: 'text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
-          input: 'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
-          message: 'text-red-500 bg-red-50 p-3 rounded-md mb-4',
-          button: 'bg-primary hover:bg-primary/90 text-white w-full py-2 rounded-md transition-colors',
-          anchor: 'text-primary hover:text-primary/80',
-        },
-      }}
     />
   );
 }
