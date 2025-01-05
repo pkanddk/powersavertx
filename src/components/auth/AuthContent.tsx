@@ -75,7 +75,7 @@ export function AuthContent({ session, handleSignOut }: AuthContentProps) {
       }}
       providers={[]}
       redirectTo={window.location.origin}
-      magicLink={true}
+      view="sign_in"
     />
   );
 }
