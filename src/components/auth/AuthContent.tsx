@@ -65,7 +65,6 @@ export function AuthContent({ session, handleSignOut }: AuthContentProps) {
           sign_up: {
             email_label: 'Email',
             password_label: 'Password',
-            password_label_confirmation: 'Confirm Password',
             email_input_placeholder: 'Your email address',
             password_input_placeholder: 'Create a strong password',
             confirmation_text: 'Check your email for the confirmation link',
