@@ -44,7 +44,7 @@ export function AuthContent({ session, handleSignOut }: AuthContentProps) {
           },
           className: {
             message: 'text-red-500 bg-red-50 p-3 rounded-md mb-4',
-            button: 'bg-primary hover:bg-primary/90 text-primary-foreground',
+            button: 'bg-primary hover:bg-primary/90 text-primary-foreground w-full',
             container: 'space-y-4',
             label: 'text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
             input: 'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
@@ -53,6 +53,17 @@ export function AuthContent({ session, handleSignOut }: AuthContentProps) {
         }}
         localization={{
           variables: {
+            sign_up: {
+              email_label: 'Email',
+              password_label: 'Password',
+              email_input_placeholder: 'Your email address',
+              password_input_placeholder: 'Your password',
+              button_label: 'Sign Up',
+              loading_button_label: 'Signing up...',
+              social_provider_text: 'Sign up with {{provider}}',
+              link_text: "Already have an account? Sign in",
+              confirmation_text: 'Check your email for the confirmation link',
+            },
             sign_in: {
               email_label: 'Email',
               password_label: 'Password',
@@ -62,17 +73,6 @@ export function AuthContent({ session, handleSignOut }: AuthContentProps) {
               loading_button_label: 'Signing in...',
               social_provider_text: 'Sign in with {{provider}}',
               link_text: "Don't have an account? Sign up",
-            },
-            sign_up: {
-              email_label: 'Email',
-              password_label: 'Password',
-              email_input_placeholder: 'Your email address',
-              password_input_placeholder: 'Create a strong password',
-              confirmation_text: 'Check your email for the confirmation link',
-              button_label: 'Sign Up',
-              loading_button_label: 'Signing up...',
-              social_provider_text: 'Sign up with {{provider}}',
-              link_text: "Already have an account? Sign in",
             },
             forgotten_password: {
               email_label: 'Email',
@@ -86,12 +86,9 @@ export function AuthContent({ session, handleSignOut }: AuthContentProps) {
         }}
         providers={[]}
         redirectTo={window.location.origin}
-        view="sign_in"
+        view="sign_up"
         showLinks={true}
       />
-      <div className="text-center text-sm text-muted-foreground">
-        <p>Click the "Don't have an account? Sign up" link above to create a new account</p>
-      </div>
     </div>
   );
 }
