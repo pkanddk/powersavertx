@@ -20,28 +20,16 @@ export function AuthSidebar() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Initialize auth state
-    const initializeAuth = async () => {
-      try {
-        const { data: { session: initialSession }, error: sessionError } = await supabase.auth.getSession();
-        if (sessionError) throw sessionError;
-        setSession(initialSession);
-      } catch (error: any) {
-        console.error("[AuthSidebar] Error getting initial session:", error);
-        await supabase.auth.signOut();
-        setSession(null);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setIsLoading(false);
+    });
 
-    initializeAuth();
-
-    // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       console.log("[AuthSidebar] Auth state changed:", _event, session?.user?.email);
+      setSession(session);
       
       if (_event === 'SIGNED_IN') {
         toast({
@@ -53,14 +41,7 @@ export function AuthSidebar() {
           title: "Signed out",
           description: "You have been signed out successfully.",
         });
-      } else if (_event === 'PASSWORD_RECOVERY') {
-        toast({
-          title: "Password recovery email sent",
-          description: "Please check your email for password reset instructions.",
-        });
       }
-      
-      setSession(session);
     });
 
     return () => {
