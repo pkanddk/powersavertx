@@ -3,6 +3,7 @@ import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileForm } from "./ProfileForm";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 interface AuthContentProps {
   session: any;
@@ -10,6 +11,8 @@ interface AuthContentProps {
 }
 
 export function AuthContent({ session, handleSignOut }: AuthContentProps) {
+  const { toast } = useToast();
+
   if (session) {
     return (
       <div className="space-y-6">
@@ -25,6 +28,15 @@ export function AuthContent({ session, handleSignOut }: AuthContentProps) {
       </div>
     );
   }
+
+  // Add auth state change listener for debugging
+  supabase.auth.onAuthStateChange((event, session) => {
+    console.log("[Auth Debug] Auth state changed:", {
+      event,
+      email: session?.user?.email,
+      id: session?.user?.id
+    });
+  });
 
   return (
     <Auth
@@ -76,6 +88,18 @@ export function AuthContent({ session, handleSignOut }: AuthContentProps) {
       providers={[]}
       redirectTo={window.location.origin}
       view="sign_in"
+      onError={(error) => {
+        console.error("[Auth Debug] Authentication error:", {
+          message: error.message,
+          description: error.description,
+          status: error.status
+        });
+        toast({
+          title: "Authentication Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      }}
     />
   );
 }
