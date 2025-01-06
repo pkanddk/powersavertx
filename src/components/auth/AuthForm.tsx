@@ -17,24 +17,37 @@ export function AuthForm({ error }: AuthFormProps) {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("[AuthForm] Auth state change event:", event);
+      
       if (event === 'SIGNED_IN') {
         if (session) {
-          console.log("User signed in successfully");
+          console.log("[AuthForm] User signed in successfully");
           setAuthError(null);
         }
+      } else if (event === 'USER_UPDATED') {
+        console.log("[AuthForm] User updated");
       }
     });
 
     // Listen for auth errors through custom events
-    const handleAuthError = (event: CustomEvent) => {
+    const handleAuthError = (event: CustomEvent<{ error: AuthError }>) => {
       const error = event.detail?.error;
       if (error?.message) {
-        console.log("Auth error:", error.message);
-        setAuthError(error.message);
+        console.error("[AuthForm] Auth error:", error);
+        
+        // Convert technical error messages to user-friendly ones
+        let userMessage = "An error occurred during authentication. Please try again.";
+        if (error.message.includes("invalid_credentials")) {
+          userMessage = "Invalid email or password. Please check your credentials and try again.";
+        } else if (error.message.includes("Email not confirmed")) {
+          userMessage = "Please verify your email address before signing in.";
+        }
+        
+        setAuthError(userMessage);
         toast({
           variant: "destructive",
           title: "Authentication Error",
-          description: error.message
+          description: userMessage
         });
       }
     };
