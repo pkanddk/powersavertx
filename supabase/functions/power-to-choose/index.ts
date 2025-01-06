@@ -34,7 +34,6 @@ const makeRequest = async (url: string, method: string, headers: Record<string, 
     console.log("[Edge Function] Request Method:", method);
     console.log("[Edge Function] Request Headers:", headers);
 
-    // Clean the URL by removing any trailing colons and slashes
     const cleanUrl = url.replace(/[:\/]+$/, '');
     console.log("[Edge Function] Cleaned URL:", cleanUrl);
     
@@ -46,31 +45,17 @@ const makeRequest = async (url: string, method: string, headers: Record<string, 
     console.log("[Edge Function] Response Status:", response.status);
     
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error("[Edge Function] Error Response:", errorText);
-      throw new Error(`Unable to fetch energy plans. Please try again later.`);
+      throw new Error("Unable to fetch energy plans. Please try again later.");
     }
 
-    // Read the response text once
+    // Read the response text once and store it
     const responseText = await response.text();
-    console.log("[Edge Function] Raw response:", responseText);
+    console.log("[Edge Function] Response received");
 
     let data;
     try {
       data = JSON.parse(responseText);
-      console.log("[Edge Function] Parsed response:", data);
-      
-      if (Array.isArray(data)) {
-        data.forEach((plan, index) => {
-          console.log(`[Edge Function] Plan ${index}:`, {
-            id: plan.id,
-            plan_name: plan.plan_name,
-            pricing_details: plan.pricing_details,
-            company_name: plan.company_name
-          });
-        });
-      }
-      
+      console.log("[Edge Function] Response parsed successfully");
     } catch (parseError) {
       console.error("[Edge Function] JSON parse error:", parseError);
       throw new Error("We're having trouble processing the energy plans data. Please try again later.");
@@ -134,9 +119,7 @@ const makeRequest = async (url: string, method: string, headers: Record<string, 
       detail_kwh2000: plan.detail_kwh2000 || null
     }));
 
-    console.log(`[Edge Function] Transformed ${transformedPlans.length} plans`);
     return transformedPlans;
-
   } catch (error) {
     console.error(`[Edge Function] Request failed:`, error);
     throw error;
