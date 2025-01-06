@@ -56,7 +56,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex justify-center gap-4 max-w-xl mx-auto">
+    <form onSubmit={handleSubmit} className="flex flex-wrap justify-center gap-4 max-w-xl mx-auto">
       <Input
         type="text"
         placeholder="Enter ZIP Code"
@@ -66,7 +66,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
           console.log("[SearchForm] ZIP code changed:", value);
           setZipCode(value);
         }}
-        className="h-12 text-lg bg-white/95 border-0 rounded-lg shadow-md w-[200px]"
+        className="h-12 text-lg glass-effect border-0 rounded-lg w-[200px] text-white placeholder:text-white/70"
         pattern="[0-9]{5}"
         maxLength={5}
         required
@@ -78,7 +78,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
           setEstimatedUse(value);
         }}
       >
-        <SelectTrigger className="h-12 text-lg bg-white/95 border-0 rounded-lg shadow-md w-[160px]">
+        <SelectTrigger className="h-12 text-lg glass-effect border-0 rounded-lg w-[160px] text-white">
           <SelectValue placeholder="Select usage" />
         </SelectTrigger>
         <SelectContent>
@@ -90,7 +90,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
       <Button 
         type="submit" 
         disabled={isLoading}
-        className="h-12 text-lg bg-violet-500 hover:bg-violet-600 text-white rounded-lg shadow-md px-8"
+        className="h-12 text-lg bg-violet-500/90 hover:bg-violet-600/90 text-white rounded-lg shadow-lg px-8 backdrop-blur-sm"
       >
         {isLoading ? "Searching..." : "Search Plans"}
       </Button>
