@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { AuthError } from "@supabase/supabase-js";
 
 export default function AuthPage() {
   const navigate = useNavigate();
@@ -41,7 +42,7 @@ export default function AuthPage() {
   }, [navigate]);
 
   // Handle authentication errors
-  const handleAuthError = (error: Error) => {
+  const handleAuthError = (error: AuthError) => {
     console.error("Auth error:", error);
     let errorMessage = "An unexpected error occurred. Please try again.";
 
