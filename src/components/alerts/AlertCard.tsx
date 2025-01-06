@@ -25,7 +25,8 @@ export function AlertCard({ alert, onDelete, onEdit }: AlertCardProps) {
 
         if (!error && plan) {
           const priceKey = `price_kwh${alert.kwh_usage}` as keyof typeof plan;
-          setCurrentPrice(plan[priceKey] as number);
+          const price = plan[priceKey];
+          setCurrentPrice(typeof price === 'number' ? price : null);
         }
       }
     };
