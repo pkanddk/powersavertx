@@ -13,7 +13,7 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col bg-white" style={{ background: '#ffffff' }}>
       <div className="absolute top-4 right-4 z-10">
         <AuthMenu />
       </div>
