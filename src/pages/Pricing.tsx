@@ -58,16 +58,21 @@ export default function Pricing({ onSearch, onCompare, comparedPlans, search, es
       <div className="relative min-h-[calc(100vh-4rem)]">
         {/* Hero Image Background */}
         <div 
-          className="absolute inset-0 bg-cover bg-center z-0"
-          style={{ 
-            backgroundImage: "url('/lovable-uploads/5e950f3a-e331-4c06-aa8f-d883b1d7795f.png')",
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
+          className="absolute inset-0 z-0 overflow-hidden"
           aria-label="Decorative hero image showing a pink house with wind turbine, representing clean energy and home power"
           role="img"
         >
-          <div className="absolute inset-0 bg-black/30" />
+          <div 
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ 
+              backgroundImage: "url('/lovable-uploads/5e950f3a-e331-4c06-aa8f-d883b1d7795f.png')",
+              backgroundSize: 'cover',
+              backgroundPosition: 'center 40%',
+              transform: 'scale(1.1)', // Slight scale to prevent white edges during parallax
+            }}
+          >
+            <div className="absolute inset-0 bg-black/30" />
+          </div>
         </div>
 
         {/* Content */}
@@ -143,6 +148,7 @@ export default function Pricing({ onSearch, onCompare, comparedPlans, search, es
                     onCompare={onCompare}
                     comparedPlans={comparedPlans}
                     estimatedUse={estimatedUse}
+                    isLoading={isLoading}
                   />
                 </main>
               </div>
@@ -156,7 +162,6 @@ export default function Pricing({ onSearch, onCompare, comparedPlans, search, es
         <ComparisonBar
           plans={comparedPlans}
           onRemove={onCompare}
-          estimatedUse={estimatedUse}
         />
       )}
     </div>
