@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 
 interface UniversalAlertFormProps {
   onSubmit: (kwhUsage: string, priceThreshold: string) => Promise<void>;
@@ -18,11 +19,38 @@ interface UniversalAlertFormProps {
 export function UniversalAlertForm({ onSubmit }: UniversalAlertFormProps) {
   const [kwhUsage, setKwhUsage] = useState("1000");
   const [priceThreshold, setPriceThreshold] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await onSubmit(kwhUsage, priceThreshold);
-    setPriceThreshold("");
+    
+    if (!priceThreshold || priceThreshold.trim() === "") {
+      toast({
+        title: "Error",
+        description: "Please enter a price threshold",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const numericThreshold = parseFloat(priceThreshold);
+    if (isNaN(numericThreshold) || numericThreshold <= 0) {
+      toast({
+        title: "Error",
+        description: "Please enter a valid price threshold greater than 0",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await onSubmit(kwhUsage, priceThreshold);
+      setPriceThreshold("");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -49,17 +77,18 @@ export function UniversalAlertForm({ onSubmit }: UniversalAlertFormProps) {
             </Select>
           </div>
           <div className="space-y-2">
-            <Label>Price Threshold (¢/kWh)</Label>
+            <Label>Price Threshold (¢/kWh) *</Label>
             <Input
               type="number"
               step="0.1"
               value={priceThreshold}
               onChange={(e) => setPriceThreshold(e.target.value)}
               placeholder="e.g., 12.5"
+              required
             />
           </div>
-          <Button type="submit" className="w-full">
-            Set Universal Alert
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? "Setting Alert..." : "Set Universal Alert"}
           </Button>
         </form>
       </CardContent>
