@@ -62,24 +62,23 @@ export default function Pricing({ comparedPlans, onCompare, search, onSearch, es
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-50/50 via-white to-white">
-      {/* Hero Image Section */}
-      <div className="relative h-[400px] md:h-[500px] w-full">
+      <div className="relative h-[600px] w-full">
         <div 
           className="absolute inset-0 bg-cover bg-center"
           style={{ 
-            backgroundImage: "url('/lovable-uploads/24a52124-3203-4852-b1df-3cd62b4b6027.png')",
+            backgroundImage: "url('/lovable-uploads/c6873c6c-fdb8-4ffb-8e5d-d66ecc4ee2d6.png')",
             backgroundSize: 'cover',
             backgroundPosition: 'center',
           }}
         >
-          <div className="absolute inset-0 bg-black/40" />
+          <div className="absolute inset-0 bg-black/30" />
         </div>
         <div className="relative z-10 h-full flex flex-col items-center justify-center text-white px-4">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">Compare Energy Plans</h1>
-          <p className="text-xl md:text-2xl text-white/90 max-w-2xl text-center mb-8">
+          <h1 className="text-5xl md:text-7xl font-bold mb-6">Compare Energy Plans</h1>
+          <p className="text-xl md:text-2xl text-white/90 max-w-2xl text-center mb-12">
             Find the best electricity rates in your area
           </p>
-          <div className="w-full max-w-2xl">
+          <div className="w-full max-w-xl">
             <SearchForm onSearch={onSearch} isLoading={isLoading} />
           </div>
         </div>
