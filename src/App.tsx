@@ -7,10 +7,9 @@ import Pricing from "@/pages/Pricing";
 import Compare from "@/pages/Compare";
 import Auth from "@/pages/Auth";
 import FAQ from "@/pages/FAQ";
-import Alerts from "@/pages/Alerts";
+import ManageAlerts from "@/pages/ManageAlerts";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { Footer } from "@/components/Footer";
-import { AuthMenu } from "@/components/auth/AuthMenu";
 
 export default function App() {
   const [selectedPlans, setSelectedPlans] = useState<Plan[]>([]);
@@ -35,11 +34,6 @@ export default function App() {
   return (
     <Router>
       <div className="flex flex-col min-h-screen">
-        {/* Global Auth Menu */}
-        <div className="fixed top-4 left-4 z-50">
-          <AuthMenu />
-        </div>
-        
         <main className="flex-grow">
           <Routes>
             <Route index element={<Index onSearch={handleSearch} />} />
@@ -76,7 +70,7 @@ export default function App() {
               path="/alerts"
               element={
                 <ProtectedRoute>
-                  <Alerts />
+                  <ManageAlerts />
                 </ProtectedRoute>
               }
             />
