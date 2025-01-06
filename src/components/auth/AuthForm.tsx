@@ -32,7 +32,7 @@ export function AuthForm({ error }: AuthFormProps) {
 
       // Handle authentication errors
       if (session?.error) {
-        console.error("Detailed auth error:", {
+        console.error("Authentication error details:", {
           message: session.error.message,
           status: session.error.status,
           name: session.error.name,
@@ -43,16 +43,18 @@ export function AuthForm({ error }: AuthFormProps) {
         
         if (session.error instanceof AuthError) {
           const errorBody = session.error.message;
-          console.log("Error body:", errorBody);
+          console.log("Error details:", errorBody);
           
           if (errorBody.includes('Invalid login credentials')) {
-            errorMessage = "Incorrect email or password. Please try again.";
-          } else if (errorBody.includes('Password should be at least 6 characters')) {
-            errorMessage = "Password must be at least 6 characters long";
+            errorMessage = "Invalid email or password. Please check your credentials and try again.";
           } else if (errorBody.includes('Email not confirmed')) {
-            errorMessage = "Please verify your email address";
+            errorMessage = "Please verify your email address before signing in.";
+          } else if (errorBody.includes('Password should be at least 6 characters')) {
+            errorMessage = "Password must be at least 6 characters long.";
           } else if (errorBody.includes('Invalid email')) {
-            errorMessage = "Please enter a valid email address";
+            errorMessage = "Please enter a valid email address.";
+          } else if (errorBody.includes('failed to call url')) {
+            errorMessage = "Unable to connect to authentication service. Please check your internet connection and try again.";
           } else {
             errorMessage = session.error.message;
           }
@@ -74,11 +76,13 @@ export function AuthForm({ error }: AuthFormProps) {
         const { data, error } = await supabase.auth.getSession();
         if (error) {
           console.error("Supabase connection error:", error);
+          setAuthError("Unable to connect to authentication service. Please try again later.");
         } else {
           console.log("Supabase connection successful:", data);
         }
       } catch (err) {
         console.error("Failed to test Supabase connection:", err);
+        setAuthError("Unable to establish connection with authentication service.");
       }
     };
 
