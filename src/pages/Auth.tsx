@@ -26,26 +26,43 @@ export default function AuthPage() {
 
     // Add event listener for form submission
     const handleFormSubmit = (event: Event) => {
+      console.log("Form submit event captured:", event);
       const form = event.target as HTMLFormElement;
-      if (!form || !form.matches('form')) return;
+      console.log("Form element:", form);
+      
+      if (!form || !form.matches('form')) {
+        console.log("Not a form element");
+        return;
+      }
       
       const passwordInput = form.querySelector('input[type="password"]') as HTMLInputElement;
-      if (!passwordInput) return;
+      console.log("Password input:", passwordInput);
+      
+      if (!passwordInput) {
+        console.log("No password input found");
+        return;
+      }
 
+      console.log("Password length:", passwordInput.value.length);
       if (passwordInput.value.length < 6) {
+        console.log("Password too short, preventing submission");
         event.preventDefault();
         event.stopPropagation();
         setError("Password must be at least 6 characters long");
         return false;
       }
       
+      console.log("Password valid, allowing submission");
       setError(null);
     };
 
+    // Try both capturing and non-capturing phases
     document.addEventListener('submit', handleFormSubmit, true);
+    document.addEventListener('submit', (e) => console.log("Non-capture phase submit:", e), false);
 
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth state change:", event);
       if (event === "SIGNED_IN") {
         navigate("/");
       } else if (event === "PASSWORD_RECOVERY") {
