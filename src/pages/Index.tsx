@@ -1,75 +1,57 @@
 import { useNavigate } from "react-router-dom";
 import { SearchForm } from "@/components/SearchForm";
 import { Badge } from "@/components/ui/badge";
-import { AuthMenu } from "@/components/auth/AuthMenu";
 
 export default function Index({ onSearch }: { onSearch: (zipCode: string, estimatedUse: string) => void }) {
   const navigate = useNavigate();
 
   const handleSearch = (zipCode: string, estimatedUse: string) => {
-    try {
-      console.log("[Index] Handling search:", { zipCode, estimatedUse });
-      if (!zipCode || zipCode.length !== 5) {
-        throw new Error("Please enter a valid 5-digit ZIP code");
-      }
-      onSearch(zipCode, estimatedUse);
-      navigate("/pricing");
-    } catch (error) {
-      console.error("[Index] Error in handleSearch:", error);
-    }
+    console.log("[Index] Handling search with:", { zipCode, estimatedUse });
+    onSearch(zipCode, estimatedUse);
+    navigate("/pricing");
   };
 
   return (
     <div className="relative min-h-[calc(100vh-4rem)]">
-      {/* Auth Navigation - Positioned on the left */}
-      <div className="absolute top-4 left-4 z-20">
-        <AuthMenu />
-      </div>
-
       {/* Main Content */}
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)]">
         {/* Hero Image Background */}
         <div 
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage: "url('/lovable-uploads/a4379cad-194e-455b-abe8-bfe06c3cdf2a.png')",
-            backgroundPosition: "center 65%"
+          className="absolute inset-0 bg-cover bg-center z-0"
+          style={{ 
+            backgroundImage: "url('/lovable-uploads/f5d9d82f-2512-4bcd-96fe-aeca04160865.png')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
           }}
         >
-          <div className="absolute inset-0 bg-black/40" />
+          <div className="absolute inset-0 bg-black/50" />
         </div>
 
         {/* Content */}
-        <div className="relative z-10 max-w-3xl mx-auto text-center space-y-8 px-4">
-          <div className="space-y-6">
-            <div className="space-y-2">
-              <h1 className="text-5xl md:text-6xl font-bold tracking-tight text-white">
-                Power Saver TX
-              </h1>
-              <p className="text-xl md:text-2xl text-white/90">
-                Compare and save on your electricity bill. Simple savings.
-              </p>
-            </div>
-          </div>
+        <div className="relative z-10 text-center space-y-6 px-4">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white">
+            Find Your Perfect Energy Plan
+          </h1>
+          <p className="text-xl text-white/90 max-w-2xl mx-auto">
+            Compare electricity rates and plans from top providers in your area
+          </p>
 
-          <div className="flex flex-wrap justify-center gap-2">
-            <Badge variant="secondary" className="text-sm bg-white/20 backdrop-blur-sm text-white border-white/30">
-              100+ Plans Available
-            </Badge>
-            <Badge variant="secondary" className="text-sm bg-white/20 backdrop-blur-sm text-white border-white/30">
-              Real-Time Rates
-            </Badge>
-            <Badge variant="secondary" className="text-sm bg-white/20 backdrop-blur-sm text-white border-white/30">
-              Price Alerts
-            </Badge>
-          </div>
-
-          <div className="w-full max-w-xl mx-auto glass-effect rounded-2xl p-4 md:p-6">
+          {/* Search Form */}
+          <div className="max-w-md mx-auto w-full">
             <SearchForm onSearch={handleSearch} />
           </div>
 
-          <div className="text-sm text-white/80">
-            Enter your ZIP code to see available plans in your area
+          {/* Features */}
+          <div className="flex flex-wrap justify-center gap-2 mt-6">
+            <Badge variant="secondary" className="bg-white/20 backdrop-blur-sm text-white border-white/30">
+              No Signup Required
+            </Badge>
+            <Badge variant="secondary" className="bg-white/20 backdrop-blur-sm text-white border-white/30">
+              Real-Time Rates
+            </Badge>
+            <Badge variant="secondary" className="bg-white/20 backdrop-blur-sm text-white border-white/30">
+              Trusted Providers
+            </Badge>
           </div>
         </div>
       </div>
