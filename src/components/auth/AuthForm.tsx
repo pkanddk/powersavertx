@@ -27,6 +27,7 @@ export function AuthForm({ error }: AuthFormProps) {
       
       let errorMessage = "Please check your email and password.";
       
+      // Convert technical errors to user-friendly messages
       if (error.message?.includes("Email not confirmed")) {
         errorMessage = "Please check your email and click the verification link to sign in.";
       }
@@ -40,7 +41,8 @@ export function AuthForm({ error }: AuthFormProps) {
         errorMessage = "Password must be at least 6 characters.";
       }
       else if (error.message?.includes("body stream") || 
-               error.message?.includes("json")) {
+               error.message?.includes("json") ||
+               error.message?.includes("Failed to execute")) {
         errorMessage = "Please refresh the page and try again.";
       }
       else if (error.message?.includes("Invalid login credentials") || 
@@ -58,15 +60,33 @@ export function AuthForm({ error }: AuthFormProps) {
       });
     };
 
+    // Listen for auth errors from Supabase events
     window.addEventListener('supabase.auth.error', (event: any) => {
       if (event.detail?.error) {
         handleAuthError(event.detail.error);
       }
     });
 
+    // Also catch any JSON parsing or response errors
+    const originalFetch = window.fetch;
+    window.fetch = async function(...args) {
+      try {
+        const response = await originalFetch.apply(this, args);
+        return response;
+      } catch (error: any) {
+        if (error.message?.includes('body stream') || 
+            error.message?.includes('json') ||
+            error.message?.includes('Failed to execute')) {
+          handleAuthError(error);
+        }
+        throw error;
+      }
+    };
+
     return () => {
       subscription.unsubscribe();
       window.removeEventListener('supabase.auth.error', handleAuthError);
+      window.fetch = originalFetch;
     };
   }, [toast]);
 
