@@ -2,6 +2,7 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 
 export const PlanSchema = z.object({
+  id: z.string(),  // Add this line
   company_id: z.string(),
   company_name: z.string(),
   company_logo: z.string().nullable(),
