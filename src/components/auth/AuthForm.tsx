@@ -17,52 +17,41 @@ export function AuthForm({ error }: AuthFormProps) {
 
   useEffect(() => {
     const handleAuthStateChange = async (event: string, session: any) => {
+      console.log("Auth state change event:", event, session);
+      
       if (event === "SIGNED_IN") {
         console.log("User signed in successfully");
-      } else if (event === "USER_UPDATED") {
-        console.log("User updated");
       } else if (event === "SIGNED_OUT") {
         console.log("User signed out");
-      }
-    };
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(handleAuthStateChange);
-
-    // Set up error handling for sign in attempts
-    const {
-      data: { subscription: authSubscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === "SIGNED_OUT") {
         try {
-          const { error } = await supabase.auth.getSession();
+          const { data: { session }, error } = await supabase.auth.getSession();
           if (error) {
             console.error("Auth error:", error);
-            setAuthError("Invalid email or password");
+            const errorMessage = error instanceof AuthError ? error.message : "Invalid email or password";
+            setAuthError(errorMessage);
             toast({
               title: "Authentication Error",
-              description: "Invalid email or password",
+              description: errorMessage,
               variant: "destructive",
             });
           }
         } catch (error) {
           console.error("Error checking session:", error);
-          if (error instanceof AuthError) {
-            setAuthError(error.message);
-            toast({
-              title: "Authentication Error",
-              description: error.message,
-              variant: "destructive",
-            });
-          }
+          const errorMessage = error instanceof AuthError ? error.message : "An unexpected error occurred";
+          setAuthError(errorMessage);
+          toast({
+            title: "Authentication Error",
+            description: errorMessage,
+            variant: "destructive",
+          });
         }
       }
-    });
+    };
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(handleAuthStateChange);
 
     return () => {
       subscription.unsubscribe();
-      authSubscription.unsubscribe();
     };
   }, [toast]);
 
