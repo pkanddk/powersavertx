@@ -17,16 +17,26 @@ export function AlertCard({ alert, onDelete, onEdit }: AlertCardProps) {
   useEffect(() => {
     const fetchCurrentPrice = async () => {
       if (alert.alert_type === 'specific' && alert.plan_id) {
+        console.log('Fetching current price for plan:', alert.plan_id);
         const { data: plan, error } = await supabase
           .from('energy_plans')
           .select('*')
           .eq('id', alert.plan_id)
           .maybeSingle();
 
-        if (!error && plan) {
+        if (error) {
+          console.error('Error fetching current price:', error);
+          return;
+        }
+
+        if (plan) {
+          console.log('Plan data:', plan);
           const priceKey = `price_kwh${alert.kwh_usage}` as keyof typeof plan;
           const price = plan[priceKey];
+          console.log('Current price:', price, 'for usage:', alert.kwh_usage);
           setCurrentPrice(typeof price === 'number' ? price : null);
+        } else {
+          console.log('No plan found for id:', alert.plan_id);
         }
       }
     };
@@ -50,7 +60,7 @@ export function AlertCard({ alert, onDelete, onEdit }: AlertCardProps) {
           <p className="text-sm text-muted-foreground">
             Price threshold: {formatPrice(alert.price_threshold)}/kWh
           </p>
-          {currentPrice !== null && alert.alert_type === 'specific' && (
+          {alert.alert_type === 'specific' && (
             <p className="text-sm text-muted-foreground">
               Current price: {formatPrice(currentPrice)}/kWh
             </p>
