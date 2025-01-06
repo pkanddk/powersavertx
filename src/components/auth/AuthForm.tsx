@@ -5,6 +5,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
+import { AuthError } from '@supabase/supabase-js';
 
 interface AuthFormProps {
   error: string | null;
@@ -15,7 +16,7 @@ export function AuthForm({ error }: AuthFormProps) {
   const [authError, setAuthError] = useState<string | null>(null);
 
   useEffect(() => {
-    const handleAuthStateChange = async (event: any, session: any) => {
+    const handleAuthStateChange = async (event: string, session: any) => {
       if (event === "SIGNED_IN") {
         console.log("User signed in successfully");
       } else if (event === "USER_UPDATED") {
@@ -29,20 +30,27 @@ export function AuthForm({ error }: AuthFormProps) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(handleAuthStateChange);
 
-    // Listen for auth errors from Supabase
-    supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'USER_ERROR') {
-        setAuthError("Invalid email or password");
-        toast({
-          title: "Authentication Error",
-          description: "Invalid email or password",
-          variant: "destructive",
-        });
+    // Set up error handling for sign in attempts
+    const {
+      data: { subscription: authSubscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === "SIGNED_OUT") {
+        const signInError = await supabase.auth.getError();
+        if (signInError) {
+          console.error("Auth error:", signInError);
+          setAuthError("Invalid email or password");
+          toast({
+            title: "Authentication Error",
+            description: "Invalid email or password",
+            variant: "destructive",
+          });
+        }
       }
     });
 
     return () => {
       subscription.unsubscribe();
+      authSubscription.unsubscribe();
     };
   }, [toast]);
 
