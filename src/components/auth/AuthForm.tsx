@@ -29,23 +29,23 @@ export function AuthForm({ error }: AuthFormProps) {
       }
     });
 
-    // Create a custom error handler for Supabase auth errors
+    // Early error handler to catch and format auth errors
     const handleAuthError = (error: AuthError) => {
-      console.error("[AuthForm] Auth error:", error);
+      console.error("[AuthForm] Auth error details:", error);
       
-      // Map technical error messages to user-friendly ones
-      let userMessage = "An error occurred during sign in. Please try again.";
+      // Map error messages before they propagate
+      let userMessage = "An error occurred. Please try again.";
       
-      if (error.message?.includes("invalid_credentials") || error.message?.includes("Invalid login credentials")) {
-        userMessage = "The email or password you entered is incorrect. Please try again.";
+      if (error.message?.toLowerCase().includes("invalid")) {
+        userMessage = "The email or password you entered is incorrect.";
       } else if (error.message?.includes("Email not confirmed")) {
         userMessage = "Please verify your email address before signing in.";
       } else if (error.message?.includes("rate limit")) {
-        userMessage = "Too many sign in attempts. Please wait a moment and try again.";
-      } else if (error.message?.includes("User already registered")) {
-        userMessage = "An account with this email already exists. Please sign in instead.";
-      } else if (error.message?.includes("Password should be at least 6 characters")) {
-        userMessage = "Your password must be at least 6 characters long.";
+        userMessage = "Too many attempts. Please wait a moment.";
+      } else if (error.message?.includes("registered")) {
+        userMessage = "This email is already registered.";
+      } else if (error.message?.includes("Password")) {
+        userMessage = "Password must be at least 6 characters.";
       }
       
       setAuthError(userMessage);
@@ -54,9 +54,11 @@ export function AuthForm({ error }: AuthFormProps) {
         title: "Sign In Error",
         description: userMessage,
       });
+
+      // Prevent error from bubbling up
+      return userMessage;
     };
 
-    // Listen for auth errors through custom events
     const handleAuthEvent = (event: CustomEvent<{ error: AuthError }>) => {
       if (event.detail?.error) {
         handleAuthError(event.detail.error);
