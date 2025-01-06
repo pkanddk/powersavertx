@@ -45,7 +45,9 @@ export function AuthForm({ error }: AuthFormProps) {
           const errorBody = session.error.message;
           console.log("Error details:", errorBody);
           
-          if (errorBody.includes('Invalid login credentials')) {
+          if (errorBody.includes('failed to call url')) {
+            errorMessage = "Unable to connect to the authentication service. Please check if you have a stable internet connection and try again. If the issue persists, the service might be temporarily unavailable.";
+          } else if (errorBody.includes('Invalid login credentials')) {
             errorMessage = "Invalid email or password. Please check your credentials and try again.";
           } else if (errorBody.includes('Email not confirmed')) {
             errorMessage = "Please verify your email address before signing in.";
@@ -53,8 +55,6 @@ export function AuthForm({ error }: AuthFormProps) {
             errorMessage = "Password must be at least 6 characters long.";
           } else if (errorBody.includes('Invalid email')) {
             errorMessage = "Please enter a valid email address.";
-          } else if (errorBody.includes('failed to call url')) {
-            errorMessage = "Unable to connect to authentication service. Please check your internet connection and try again.";
           } else {
             errorMessage = session.error.message;
           }
@@ -76,10 +76,11 @@ export function AuthForm({ error }: AuthFormProps) {
         const { data, error } = await supabase.auth.getSession();
         if (error) {
           console.error("Supabase connection error:", error);
-          setAuthError("Unable to connect to authentication service. Please try again later.");
+          const errorMessage = "Unable to connect to authentication service. Please try again later.";
+          setAuthError(errorMessage);
           toast({
             title: "Connection Error",
-            description: "Unable to connect to authentication service. Please try again later.",
+            description: errorMessage,
             variant: "destructive",
           });
         } else {
@@ -87,10 +88,11 @@ export function AuthForm({ error }: AuthFormProps) {
         }
       } catch (err) {
         console.error("Failed to test Supabase connection:", err);
-        setAuthError("Unable to establish connection with authentication service.");
+        const errorMessage = "Unable to establish connection with authentication service.";
+        setAuthError(errorMessage);
         toast({
           title: "Connection Error",
-          description: "Unable to establish connection with authentication service.",
+          description: errorMessage,
           variant: "destructive",
         });
       }
