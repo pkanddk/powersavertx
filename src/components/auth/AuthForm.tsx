@@ -29,7 +29,13 @@ export function AuthForm({ error: initialError }: AuthFormProps) {
           email,
           password,
         });
-        if (signInError) throw signInError;
+        if (signInError) {
+          // Parse the error message from the response
+          if (signInError.message === "Invalid login credentials") {
+            throw new Error("Invalid email or password. Please try again.");
+          }
+          throw signInError;
+        }
       } else {
         const { error: signUpError } = await supabase.auth.signUp({
           email,
