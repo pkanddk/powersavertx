@@ -3,10 +3,12 @@
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+  background: white;
 }
 
 .card {
   padding: 2em;
+  background: white;
 }
 
 .read-the-docs {

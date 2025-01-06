@@ -13,12 +13,20 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-white" style={{ background: '#ffffff' }}>
+    <div 
+      className="min-h-screen flex flex-col" 
+      style={{ 
+        backgroundColor: 'white',
+        backgroundImage: 'none',
+        position: 'relative',
+        zIndex: 1
+      }}
+    >
       <div className="absolute top-4 right-4 z-10">
         <AuthMenu />
       </div>
 
-      <main className="flex-1 flex items-center justify-center min-h-0">
+      <main className="flex-1 flex items-center justify-center min-h-0" style={{ backgroundColor: 'white' }}>
         <div className="w-full max-w-xl px-4 py-6">
           <h1 className="text-4xl font-bold text-foreground text-center">
             Find Your Perfect Energy Plan

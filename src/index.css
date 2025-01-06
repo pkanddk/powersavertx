@@ -33,5 +33,7 @@
   }
   body {
     @apply bg-white text-foreground;
+    background-color: white !important;
+    background-image: none !important;
   }
 }
