@@ -23,7 +23,8 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
           backgroundPosition: 'center',
         }}
       >
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/30" />
+        {/* Lighter gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/10" />
       </div>
 
       {/* Content Container */}
@@ -38,21 +39,21 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
             Compare electricity rates and plans from top providers in your area
           </p>
 
-          {/* Search Form Container */}
-          <div className="w-full max-w-md mx-auto bg-white/20 backdrop-blur-md p-8 rounded-2xl shadow-xl">
+          {/* Search Form Container - Removed backdrop blur */}
+          <div className="w-full max-w-md mx-auto">
             <SearchForm onSearch={handleSearch} />
           </div>
 
-          {/* Feature Badges */}
+          {/* Feature Badges - Removed backdrop blur */}
           <div className="flex flex-wrap justify-center gap-3 mt-8">
-            <Badge variant="secondary" className="bg-white/30 backdrop-blur-sm text-white border-transparent">
+            <Badge variant="secondary" className="text-white border-white/20 bg-transparent">
               <Sparkles className="w-4 h-4 mr-2" />
               No Signup Required
             </Badge>
-            <Badge variant="secondary" className="bg-white/30 backdrop-blur-sm text-white border-transparent">
+            <Badge variant="secondary" className="text-white border-white/20 bg-transparent">
               Real-Time Rates
             </Badge>
-            <Badge variant="secondary" className="bg-white/30 backdrop-blur-sm text-white border-transparent">
+            <Badge variant="secondary" className="text-white border-white/20 bg-transparent">
               Trusted Providers
             </Badge>
           </div>
