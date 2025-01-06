@@ -4,7 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthContainer } from "@/components/auth/AuthContainer";
 import { AuthForm } from "@/components/auth/AuthForm";
-import { AuthError, AuthChangeEvent } from '@supabase/supabase-js';
+import { AuthError } from '@supabase/supabase-js';
 
 export default function AuthPage() {
   const navigate = useNavigate();
@@ -13,17 +13,23 @@ export default function AuthPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is already logged in
     const checkUser = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { user }, error } = await supabase.auth.getUser();
         console.log("Current user:", user);
+        if (error) throw error;
+        
         if (user) {
           console.log("User already logged in, redirecting to home");
           navigate("/");
         }
       } catch (error) {
         console.error("Error checking user:", error);
+        toast({
+          title: "Error",
+          description: "Failed to check authentication status",
+          variant: "destructive",
+        });
       } finally {
         setIsLoading(false);
       }
@@ -62,11 +68,9 @@ export default function AuthPage() {
       setError(null);
     };
 
-    // Add form submit handler
     document.addEventListener('submit', handleFormSubmit, true);
 
-    // Auth state change listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state change event:", event);
       
       if (event === 'SIGNED_IN') {
@@ -78,36 +82,6 @@ export default function AuthPage() {
         setError(null);
       }
     });
-
-    // Handle auth errors through a separate listener
-    const handleAuthError = async (error: AuthError) => {
-      console.error("Auth error:", error);
-      
-      if (error.message.includes("already registered")) {
-        const message = "This email is already registered. Please sign in instead.";
-        setError(message);
-        toast({
-          title: "Account Exists",
-          description: message,
-          variant: "destructive",
-        });
-      } else if (error.message.includes("Invalid login credentials")) {
-        const message = "Invalid email or password. Please try again.";
-        setError(message);
-        toast({
-          title: "Login Failed",
-          description: message,
-          variant: "destructive",
-        });
-      } else {
-        setError(error.message);
-        toast({
-          title: "Authentication Error",
-          description: error.message,
-          variant: "destructive",
-        });
-      }
-    };
 
     return () => {
       subscription.unsubscribe();

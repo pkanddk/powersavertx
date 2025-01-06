@@ -21,15 +21,30 @@ function App() {
   const [estimatedUse, setEstimatedUse] = useState("500");
   const [user, setUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     const checkUser = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { user }, error } = await supabase.auth.getUser();
+        if (error) {
+          console.error('Error checking user:', error);
+          toast({
+            title: "Authentication Error",
+            description: error.message,
+            variant: "destructive",
+          });
+          return;
+        }
         console.log("App - Current user:", user);
         setUser(user);
       } catch (error) {
         console.error('Error checking user:', error);
+        toast({
+          title: "System Error",
+          description: "Failed to check authentication status",
+          variant: "destructive",
+        });
       } finally {
         setIsLoading(false);
       }
@@ -37,16 +52,51 @@ function App() {
 
     checkUser();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("App - Auth state change:", event);
-      setUser(session?.user ?? null);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("App - Auth state change:", event, session);
+      
+      if (event === 'SIGNED_IN') {
+        setUser(session?.user ?? null);
+        toast({
+          title: "Welcome!",
+          description: "You have successfully signed in.",
+        });
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null);
+        toast({
+          title: "Signed out",
+          description: "You have been signed out successfully.",
+        });
+      } else if (event === 'USER_UPDATED') {
+        setUser(session?.user ?? null);
+      }
     });
 
-    return () => subscription.unsubscribe();
-  }, []);
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [toast]);
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Error signing out:', error);
+        toast({
+          title: "Error",
+          description: "Failed to sign out. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+    } catch (error) {
+      console.error('Error signing out:', error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred while signing out.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleCompare = (plan: Plan) => {
@@ -121,7 +171,9 @@ function App() {
         <div className="flex-grow">
           <Routes>
             <Route path="/" element={<Index onSearch={handleSearch} />} />
-            <Route path="/auth" element={<Auth />} />
+            <Route path="/auth" element={
+              user ? <Navigate to="/" replace /> : <Auth />
+            } />
             <Route
               path="/pricing"
               element={

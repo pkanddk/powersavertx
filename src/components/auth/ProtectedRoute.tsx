@@ -10,9 +10,21 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      console.log("Protected route - Current user:", user);
-      setIsAuthenticated(!!user);
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser();
+        if (error) throw error;
+        
+        console.log("Protected route - Current user:", user);
+        setIsAuthenticated(!!user);
+      } catch (error) {
+        console.error("Error checking authentication:", error);
+        setIsAuthenticated(false);
+        toast({
+          title: "Authentication Error",
+          description: "Failed to verify authentication status",
+          variant: "destructive",
+        });
+      }
     };
     
     checkAuth();
