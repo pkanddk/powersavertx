@@ -81,7 +81,11 @@ export function AlertCard({ alert, onDelete, onEdit }: AlertCardProps) {
   }, [alert]);
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
+    <div className={`rounded-lg shadow-md p-6 ${
+      alert.alert_type === 'universal' 
+        ? 'bg-[#ea384c]/10' 
+        : 'bg-white'
+    }`}>
       <div className="flex justify-between items-start">
         <div className="space-y-2">
           <h3 className="text-lg font-semibold">
@@ -98,7 +102,7 @@ export function AlertCard({ alert, onDelete, onEdit }: AlertCardProps) {
           </p>
           {alert.alert_type === 'specific' && (
             <p className="text-sm text-muted-foreground">
-              Current price: {formatPrice(currentPrice)}/kWh
+              Current price: {currentPrice ? formatPrice(currentPrice) : 'N/A'}/kWh
             </p>
           )}
         </div>
