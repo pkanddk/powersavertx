@@ -58,7 +58,7 @@ export function AuthForm({ error: initialError }: AuthFormProps) {
       <Alert variant="default" className="bg-blue-50 border-blue-200">
         <Info className="h-4 w-4 text-blue-600" />
         <AlertDescription className="text-sm text-blue-700 font-medium">
-          {mode === "signin" ? "Sign in to your account" : "Create a new account"}
+          {mode === "signin" ? "Enter your credentials" : "Create a new account"}
         </AlertDescription>
       </Alert>
 
