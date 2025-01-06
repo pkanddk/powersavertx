@@ -13,57 +13,7 @@ import Auth from "./pages/Auth";
 import { Button } from "./components/ui/button";
 import { useToast } from "./hooks/use-toast";
 import { LogOut, Loader2 } from "lucide-react";
-
-// Protected route wrapper component
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const { toast } = useToast();
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setIsAuthenticated(!!user);
-    };
-    
-    checkAuth();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setIsAuthenticated(!!session);
-      
-      if (event === 'SIGNED_IN') {
-        toast({
-          title: "Welcome back!",
-          description: "You have successfully signed in.",
-        });
-      } else if (event === 'SIGNED_OUT') {
-        toast({
-          title: "Signed out",
-          description: "You have been signed out successfully.",
-        });
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [toast]);
-
-  if (isAuthenticated === null) {
-    return (
-      <div className="flex items-center justify-center min-h-[200px]">
-        <Loader2 className="h-6 w-6 animate-spin" />
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    toast({
-      title: "Authentication required",
-      description: "Please sign in to access this feature.",
-    });
-    return <Navigate to="/auth" replace />;
-  }
-
-  return <>{children}</>;
-};
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 
 function App() {
   const [comparedPlans, setComparedPlans] = useState<Plan[]>([]);
@@ -76,6 +26,7 @@ function App() {
     const checkUser = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
+        console.log("App - Current user:", user);
         setUser(user);
       } catch (error) {
         console.error('Error checking user:', error);
@@ -87,6 +38,7 @@ function App() {
     checkUser();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("App - Auth state change:", event);
       setUser(session?.user ?? null);
     });
 

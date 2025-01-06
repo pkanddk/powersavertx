@@ -10,19 +10,28 @@ export default function AuthPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Check if user is already logged in
     const checkUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        navigate("/");
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        console.log("Current user:", user);
+        if (user) {
+          console.log("User already logged in, redirecting to home");
+          navigate("/");
+        }
+      } catch (error) {
+        console.error("Error checking user:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     checkUser();
 
-    // Single form submission handler for password validation
+    // Form submission handler for password validation
     const handleFormSubmit = (event: Event) => {
       const form = event.target as HTMLFormElement;
       if (!form || !form.matches('form')) return;
@@ -61,6 +70,7 @@ export default function AuthPage() {
       console.log("Auth state change event:", event);
       
       if (event === 'SIGNED_IN') {
+        console.log("User signed in, redirecting to home");
         navigate("/");
       } else if (event === 'PASSWORD_RECOVERY') {
         setError("Please check your email to reset your password.");
@@ -99,21 +109,21 @@ export default function AuthPage() {
       }
     };
 
-    // Subscribe to auth errors
-    const {
-      data: { subscription: errorSubscription },
-    } = supabase.auth.onAuthStateChange((event: AuthChangeEvent) => {
-      if (event === 'SIGNED_OUT') {
-        setError(null);
-      }
-    });
-
     return () => {
       subscription.unsubscribe();
-      errorSubscription.unsubscribe();
       document.removeEventListener('submit', handleFormSubmit, true);
     };
   }, [navigate, toast]);
+
+  if (isLoading) {
+    return (
+      <AuthContainer>
+        <div className="flex justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      </AuthContainer>
+    );
+  }
 
   return (
     <AuthContainer>
