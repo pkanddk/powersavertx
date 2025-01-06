@@ -25,7 +25,7 @@ export default function AuthPage() {
     checkUser();
 
     // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN") {
         navigate("/");
       } else if (event === "PASSWORD_RECOVERY") {
@@ -34,56 +34,11 @@ export default function AuthPage() {
         setError(null);
       } else if (event === "SIGNED_OUT") {
         setError(null);
-      } else if (event === "USER_DELETED") {
-        setError(null);
       }
     });
-
-    // Set up auth error listener with proper error handling
-    const authListener = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_UP") {
-        toast({
-          title: "Account created",
-          description: "Please check your email to confirm your account.",
-        });
-      }
-    });
-
-    // Set up error handling for auth responses
-    const setupAuthErrorHandling = () => {
-      const messageHandler = (e: MessageEvent) => {
-        if (e.data?.error_description) {
-          let errorMessage = e.data.error_description;
-          
-          // Handle specific error cases
-          if (errorMessage.includes("password")) {
-            setError("Password must be at least 6 characters long");
-            toast({
-              variant: "destructive",
-              title: "Invalid Password",
-              description: "Password must be at least 6 characters long",
-            });
-          } else if (errorMessage.includes("credentials")) {
-            setError("Invalid email or password");
-            toast({
-              variant: "destructive",
-              title: "Authentication Error",
-              description: "Invalid email or password",
-            });
-          }
-        }
-      };
-
-      window.addEventListener("message", messageHandler);
-      return () => window.removeEventListener("message", messageHandler);
-    };
-
-    const cleanup = setupAuthErrorHandling();
 
     return () => {
       subscription.unsubscribe();
-      authListener.data.subscription.unsubscribe();
-      cleanup();
     };
   }, [navigate, toast]);
 
