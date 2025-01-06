@@ -27,7 +27,7 @@ export default function App() {
   };
 
   const handleRemovePlan = (plan: Plan) => {
-    setSelectedPlans(prev => prev.filter(p => p.id !== plan.id));
+    setSelectedPlans(prev => prev.filter(p => p.company_id !== plan.company_id));
   };
 
   return (
