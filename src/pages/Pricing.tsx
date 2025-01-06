@@ -21,6 +21,16 @@ export default function Pricing({ onSearch, onCompare, comparedPlans, search, es
   const isMobile = useIsMobile();
   const [isLoading, setIsLoading] = useState(false);
   const [plans, setPlans] = useState<Plan[]>([]);
+  
+  // State for filters
+  const [currentSort, setCurrentSort] = useState("price-asc");
+  const [currentContractLength, setCurrentContractLength] = useState("all");
+  const [currentPlanType, setCurrentPlanType] = useState("all");
+  const [currentPrepaid, setCurrentPrepaid] = useState("all");
+  const [currentTimeOfUse, setCurrentTimeOfUse] = useState("all");
+  const [currentCompany, setCurrentCompany] = useState("all");
+  const [currentRenewable, setCurrentRenewable] = useState("all");
+  const [currentCancellationFee, setCurrentCancellationFee] = useState<[number, number]>([0, 99999]);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   useEffect(() => {
@@ -112,8 +122,6 @@ export default function Pricing({ onSearch, onCompare, comparedPlans, search, es
 
                 {/* Mobile Filters Dialog */}
                 <MobileFiltersDialog
-                  isOpen={showMobileFilters}
-                  onClose={() => setShowMobileFilters(false)}
                   onSortChange={setCurrentSort}
                   onContractLengthChange={setCurrentContractLength}
                   onPlanTypeChange={setCurrentPlanType}
@@ -140,7 +148,6 @@ export default function Pricing({ onSearch, onCompare, comparedPlans, search, es
                     onCompare={onCompare}
                     comparedPlans={comparedPlans}
                     estimatedUse={estimatedUse}
-                    isLoading={isLoading}
                   />
                 </main>
               </div>
@@ -154,7 +161,6 @@ export default function Pricing({ onSearch, onCompare, comparedPlans, search, es
         <ComparisonBar
           plans={comparedPlans}
           onRemove={onCompare}
-          estimatedUse={estimatedUse}
         />
       )}
     </div>
