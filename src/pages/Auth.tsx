@@ -36,17 +36,14 @@ export default function AuthPage() {
         event.preventDefault();
         event.stopPropagation();
         
-        // Clear and re-focus the password input
         passwordInput.value = '';
         passwordInput.focus();
         
-        // Show error message
-        setError("Password must be at least 6 characters long");
-        
-        // Show toast notification
+        const message = "Password must be at least 6 characters long";
+        setError(message);
         toast({
           title: "Invalid Password",
-          description: "Password must be at least 6 characters long",
+          description: message,
           variant: "destructive",
         });
         
@@ -56,11 +53,13 @@ export default function AuthPage() {
       setError(null);
     };
 
-    // Add event listener in capturing phase to intercept before Supabase's handler
+    // Add event listener in capturing phase
     document.addEventListener('submit', handleFormSubmit, true);
 
     // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth event:", event);
+      
       if (event === "SIGNED_IN") {
         navigate("/");
       } else if (event === "PASSWORD_RECOVERY") {
@@ -69,12 +68,33 @@ export default function AuthPage() {
         setError(null);
       } else if (event === "SIGNED_OUT") {
         setError(null);
+      } else if (event === "USER_DELETED") {
+        setError(null);
       }
     });
+
+    // Add error listener for Supabase auth errors
+    const handleAuthError = (event: CustomEvent) => {
+      const error = event.detail?.error;
+      console.log("Auth error:", error);
+      
+      if (error?.message?.includes("User already registered")) {
+        setError("This email is already registered. Please sign in instead.");
+        toast({
+          title: "Account Exists",
+          description: "This email is already registered. Please sign in instead.",
+          variant: "destructive",
+        });
+      }
+    };
+
+    // Listen for Supabase auth errors
+    window.addEventListener('supabase.auth.error', handleAuthError as EventListener);
 
     return () => {
       subscription.unsubscribe();
       document.removeEventListener('submit', handleFormSubmit, true);
+      window.removeEventListener('supabase.auth.error', handleAuthError as EventListener);
     };
   }, [navigate, toast]);
 
