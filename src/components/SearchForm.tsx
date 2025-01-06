@@ -57,49 +57,51 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-4">
-      <div className="flex-1">
-        <Input
-          type="text"
-          inputMode="numeric"
-          pattern="[0-9]*"
-          placeholder="Enter ZIP Code"
-          value={zipCode}
-          onChange={(e) => {
-            const value = e.target.value.replace(/\D/g, "").slice(0, 5);
-            console.log("[SearchForm] ZIP code changed:", value);
-            setZipCode(value);
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <div className="flex flex-col md:flex-row gap-4">
+        <div className="flex-1">
+          <Input
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            placeholder="Enter ZIP Code"
+            value={zipCode}
+            onChange={(e) => {
+              const value = e.target.value.replace(/\D/g, "").slice(0, 5);
+              console.log("[SearchForm] ZIP code changed:", value);
+              setZipCode(value);
+            }}
+            className="h-16 text-xl bg-white/10 backdrop-blur-md border-white/20 text-white placeholder:text-gray-300 focus:ring-2 focus:ring-purple-400"
+            maxLength={5}
+            required
+          />
+        </div>
+        
+        <Select
+          value={estimatedUse}
+          onValueChange={(value) => {
+            console.log("[SearchForm] Estimated use changed:", value);
+            setEstimatedUse(value);
           }}
-          className="h-14 text-lg bg-white/10 backdrop-blur-md border-0 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-purple-400"
-          maxLength={5}
-          required
-        />
+        >
+          <SelectTrigger className="h-16 min-w-[180px] bg-white/10 backdrop-blur-md border-white/20 text-white">
+            <SelectValue placeholder="Select usage" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="500">500 kWh</SelectItem>
+            <SelectItem value="1000">1000 kWh</SelectItem>
+            <SelectItem value="2000">2000 kWh</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
-      
-      <Select
-        value={estimatedUse}
-        onValueChange={(value) => {
-          console.log("[SearchForm] Estimated use changed:", value);
-          setEstimatedUse(value);
-        }}
-      >
-        <SelectTrigger className="h-14 min-w-[140px] bg-white/10 backdrop-blur-md border-0 text-white">
-          <SelectValue placeholder="Select usage" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="500">500 kWh</SelectItem>
-          <SelectItem value="1000">1000 kWh</SelectItem>
-          <SelectItem value="2000">2000 kWh</SelectItem>
-        </SelectContent>
-      </Select>
 
       <Button 
         type="submit" 
         disabled={isLoading}
-        className="h-14 px-8 bg-gradient-to-r from-purple-400 to-pink-400 hover:from-purple-500 hover:to-pink-500 text-white border-0"
+        className="h-16 text-lg bg-gradient-to-r from-purple-400 to-pink-400 hover:from-purple-500 hover:to-pink-500 text-white border-0"
       >
-        <Search className="h-5 w-5 mr-2" />
-        {isLoading ? "Searching..." : "Search"}
+        <Search className="h-6 w-6 mr-2" />
+        {isLoading ? "Searching..." : "Search Rates"}
       </Button>
     </form>
   );
