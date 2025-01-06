@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { Card } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Info } from "lucide-react";
 
 export default function AuthPage() {
   const navigate = useNavigate();
@@ -40,6 +42,14 @@ export default function AuthPage() {
             Sign in to access premium features and price alerts
           </p>
         </div>
+
+        <Alert variant="default" className="bg-blue-50 border-blue-200">
+          <Info className="h-4 w-4 text-blue-600" />
+          <AlertDescription className="text-sm text-blue-700">
+            Password must be at least 6 characters long
+          </AlertDescription>
+        </Alert>
+
         <Auth
           supabaseClient={supabase}
           appearance={{
@@ -53,7 +63,8 @@ export default function AuthPage() {
               }
             }
           }}
-          providers={[]}
+          providers={["google"]}
+          redirectTo={window.location.origin}
         />
       </Card>
     </div>
