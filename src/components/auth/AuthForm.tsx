@@ -32,42 +32,26 @@ export function AuthForm({ error }: AuthFormProps) {
 
       // Handle authentication errors
       if (session?.error) {
-        console.error("Authentication error details:", {
-          message: session.error.message,
-          status: session.error.status,
-          name: session.error.name,
-          stack: session.error.stack
-        });
+        console.error("Authentication error:", session.error);
         
         let errorMessage = "An unexpected error occurred";
         
         if (session.error instanceof AuthError) {
-          try {
-            // Try to parse the error body if it exists
-            const errorBody = session.error.message;
-            const responseBody = typeof errorBody === 'string' && errorBody.includes('{') 
-              ? JSON.parse(errorBody.substring(errorBody.indexOf('{')))
-              : null;
-            
-            console.log("Parsed error response:", responseBody);
-            
-            if (responseBody?.code === "invalid_credentials") {
-              errorMessage = "Invalid email or password. Please check your credentials and try again.";
-            } else if (errorBody.includes('Email not confirmed')) {
-              errorMessage = "Please verify your email address before signing in.";
-            } else if (errorBody.includes('Password should be at least 6 characters')) {
-              errorMessage = "Password must be at least 6 characters long.";
-            } else if (errorBody.includes('Invalid email')) {
-              errorMessage = "Please enter a valid email address.";
-            } else if (errorBody.includes('failed to call url')) {
-              // Development environment specific message
-              errorMessage = "Authentication failed. Please ensure you've configured the Site URL and Redirect URLs in Supabase to match your development URL (e.g., http://localhost:5173 or your preview URL).";
-            } else {
-              errorMessage = responseBody?.message || session.error.message;
-            }
-          } catch (parseError) {
-            console.error("Error parsing error response:", parseError);
-            errorMessage = session.error.message;
+          const errorBody = session.error.message;
+          console.log("Error body:", errorBody);
+          
+          // Handle specific error cases
+          if (errorBody.includes('Invalid login credentials') || errorBody.includes('invalid_credentials')) {
+            errorMessage = "Invalid email or password. Please check your credentials and try again.";
+          } else if (errorBody.includes('Email not confirmed')) {
+            errorMessage = "Please verify your email address before signing in.";
+          } else if (errorBody.includes('Password should be at least 6 characters')) {
+            errorMessage = "Password must be at least 6 characters long.";
+          } else if (errorBody.includes('Invalid email')) {
+            errorMessage = "Please enter a valid email address.";
+          } else {
+            // For development environment
+            errorMessage = "Authentication failed. Make sure you're using the correct email and password.";
           }
         }
         
@@ -87,7 +71,7 @@ export function AuthForm({ error }: AuthFormProps) {
         const { data, error } = await supabase.auth.getSession();
         if (error) {
           console.error("Supabase connection error:", error);
-          const errorMessage = "Unable to connect to authentication service. Please ensure your development environment is properly configured.";
+          const errorMessage = "Unable to connect to authentication service. Please try again later.";
           setAuthError(errorMessage);
           toast({
             title: "Connection Error",
@@ -131,7 +115,7 @@ export function AuthForm({ error }: AuthFormProps) {
       <Alert variant="default" className="mb-4 bg-blue-50 border-blue-200">
         <Info className="h-4 w-4 text-blue-600" />
         <AlertDescription className="text-sm text-blue-700 font-medium">
-          For development: Make sure to set your Site URL and Redirect URLs in Supabase to match your development URL
+          Enter your email and password to sign in
         </AlertDescription>
       </Alert>
 
