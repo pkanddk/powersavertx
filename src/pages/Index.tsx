@@ -13,24 +13,25 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
   };
 
   return (
-    <div className="relative min-h-[calc(100vh-4rem)]">
+    <div className="relative min-h-screen">
       {/* Auth Menu - Now only on the right side */}
       <div className="absolute top-4 right-4 z-50">
         <AuthMenu />
       </div>
 
       {/* Main Content */}
-      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)]">
+      <div className="flex flex-col items-center justify-center min-h-screen">
         {/* Hero Image Background */}
         <div 
           className="absolute inset-0 bg-cover bg-center z-0"
           style={{ 
-            backgroundImage: "url('/lovable-uploads/f5d9d82f-2512-4bcd-96fe-aeca04160865.png')",
+            backgroundImage: "url('/lovable-uploads/d9ee4c20-c018-4d57-99e8-7520e837bb79.png')",
             backgroundSize: 'cover',
             backgroundPosition: 'center',
+            height: '100vh'
           }}
         >
-          <div className="absolute inset-0 bg-black/50" />
+          <div className="absolute inset-0 bg-black/40" />
         </div>
 
         {/* Content */}
