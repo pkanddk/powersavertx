@@ -20,10 +20,10 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
 
       <main className="flex-1 flex items-center justify-center min-h-0">
         <div className="w-full max-w-xl px-4 py-6">
-          <h1 className="text-4xl font-bold text-white text-center">
+          <h1 className="text-4xl font-bold text-foreground text-center">
             Find Your Perfect Energy Plan
           </h1>
-          <p className="text-lg text-white/80 mt-1 text-center">
+          <p className="text-lg text-muted-foreground mt-1 text-center">
             Compare electricity rates and plans from top providers in your area
           </p>
           
@@ -32,9 +32,9 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
           </div>
 
           <div className="flex justify-center mt-3">
-            <Badge variant="outline" className="bg-white/10 text-white border-0 mx-0.5">No Signup Required</Badge>
-            <Badge variant="outline" className="bg-white/10 text-white border-0 mx-0.5">Real-Time Rates</Badge>
-            <Badge variant="outline" className="bg-white/10 text-white border-0 mx-0.5">Trusted Providers</Badge>
+            <Badge variant="outline" className="mx-0.5">No Signup Required</Badge>
+            <Badge variant="outline" className="mx-0.5">Real-Time Rates</Badge>
+            <Badge variant="outline" className="mx-0.5">Trusted Providers</Badge>
           </div>
         </div>
       </main>

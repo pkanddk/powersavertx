@@ -36,11 +36,6 @@
   }
 }
 
-/* Glass effect */
-.glass-effect {
-  @apply bg-white/10 backdrop-blur-md border border-white/20 shadow-lg;
-}
-
 /* Modern hover effects */
 .hover-card-effect {
   @apply transition-all duration-300;
