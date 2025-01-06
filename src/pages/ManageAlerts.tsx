@@ -20,6 +20,15 @@ export interface AlertSettings {
   alert_type: 'specific' | 'universal';
 }
 
+// Helper function to sort alerts with universal first
+const sortAlerts = (alerts: AlertSettings[]) => {
+  return alerts.sort((a, b) => {
+    if (a.alert_type === 'universal') return -1;
+    if (b.alert_type === 'universal') return 1;
+    return 0;
+  });
+};
+
 export default function ManageAlerts() {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -95,14 +104,7 @@ export default function ManageAlerts() {
         );
       }
 
-      // Sort alerts to ensure universal alert is always first
-      const sortedAlerts = formattedAlerts.sort((a, b) => {
-        if (a.alert_type === 'universal') return -1;
-        if (b.alert_type === 'universal') return 1;
-        return 0;
-      });
-
-      setAlerts(sortedAlerts);
+      setAlerts(sortAlerts(formattedAlerts));
     } catch (error: any) {
       console.error('Error loading alerts:', error);
       toast({
@@ -136,7 +138,7 @@ export default function ManageAlerts() {
         if (error) throw error;
       }
 
-      setAlerts(prev => prev.filter(a => a.id !== alert.id));
+      setAlerts(prev => sortAlerts(prev.filter(a => a.id !== alert.id)));
       toast({
         title: "Alert deleted",
         description: "The price alert has been removed successfully.",
@@ -174,9 +176,9 @@ export default function ManageAlerts() {
         if (error) throw error;
       }
 
-      setAlerts(prev => prev.map(a => 
+      setAlerts(prev => sortAlerts(prev.map(a => 
         a.id === alert.id ? { ...a, price_threshold: newThreshold } : a
-      ));
+      )));
 
       toast({
         title: "Alert updated",
@@ -213,7 +215,7 @@ export default function ManageAlerts() {
 
       setAlerts(prev => {
         const filtered = prev.filter(a => a.alert_type !== 'universal');
-        return [...filtered, newAlert];
+        return sortAlerts([...filtered, newAlert]);
       });
 
       toast({
