@@ -14,17 +14,6 @@ export function AuthForm({ error }: AuthFormProps) {
   const { toast } = useToast();
   const [authError, setAuthError] = useState<string | null>(null);
 
-  const handleAuthError = (error: any) => {
-    console.log("Auth error:", error);
-    const errorMessage = error?.message || "Invalid email or password";
-    setAuthError(errorMessage);
-    toast({
-      title: "Authentication Error",
-      description: errorMessage,
-      variant: "destructive",
-    });
-  };
-
   useEffect(() => {
     const handleAuthStateChange = (event: string, session: any) => {
       console.log("Auth state change event:", event);
@@ -32,6 +21,19 @@ export function AuthForm({ error }: AuthFormProps) {
       if (event === 'SIGNED_IN' && session) {
         console.log("User signed in successfully");
         setAuthError(null); // Clear any existing errors
+      } else if (event === 'USER_DELETED' || event === 'SIGNED_OUT') {
+        console.log("Auth event:", event);
+      } else if (event === 'PASSWORD_RECOVERY') {
+        console.log("Password recovery initiated");
+      } else if (event.includes('ERROR')) {
+        console.log("Auth error event:", event);
+        const errorMessage = "Invalid email or password";
+        setAuthError(errorMessage);
+        toast({
+          title: "Authentication Error",
+          description: errorMessage,
+          variant: "destructive",
+        });
       }
     };
 
@@ -83,7 +85,6 @@ export function AuthForm({ error }: AuthFormProps) {
           }
         }}
         providers={[]}
-        onError={handleAuthError}
         redirectTo={window.location.origin}
         localization={{
           variables: {
