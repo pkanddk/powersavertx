@@ -80,6 +80,9 @@ export default function AuthPage() {
               }
             },
             style: {
+              button: {
+                borderRadius: '0.375rem',
+              },
               input: {
                 borderRadius: '0.375rem',
               },
@@ -92,6 +95,17 @@ export default function AuthPage() {
           }}
           providers={[]}
           redirectTo={window.location.origin}
+          localization={{
+            variables: {
+              sign_up: {
+                password_too_short: "Password should be at least 6 characters long",
+                password_validation_failed: "Password must be at least 6 characters long"
+              },
+              sign_in: {
+                password_validation_failed: "Password must be at least 6 characters long"
+              }
+            }
+          }}
         />
       </Card>
     </div>
