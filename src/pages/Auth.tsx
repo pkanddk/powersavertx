@@ -25,44 +25,42 @@ export default function AuthPage() {
     checkUser();
 
     // Add event listener for form submission
-    const handleFormSubmit = (event: Event) => {
-      console.log("Form submit event captured:", event);
+    const handleFormSubmit = async (event: Event) => {
       const form = event.target as HTMLFormElement;
-      console.log("Form element:", form);
-      
-      if (!form || !form.matches('form')) {
-        console.log("Not a form element");
-        return;
-      }
+      if (!form || !form.matches('form')) return;
       
       const passwordInput = form.querySelector('input[type="password"]') as HTMLInputElement;
-      console.log("Password input:", passwordInput);
-      
-      if (!passwordInput) {
-        console.log("No password input found");
-        return;
-      }
+      if (!passwordInput) return;
 
-      console.log("Password length:", passwordInput.value.length);
       if (passwordInput.value.length < 6) {
-        console.log("Password too short, preventing submission");
         event.preventDefault();
         event.stopPropagation();
+        
+        // Clear and re-focus the password input
+        passwordInput.value = '';
+        passwordInput.focus();
+        
+        // Show error message
         setError("Password must be at least 6 characters long");
+        
+        // Show toast notification
+        toast({
+          title: "Invalid Password",
+          description: "Password must be at least 6 characters long",
+          variant: "destructive",
+        });
+        
         return false;
       }
       
-      console.log("Password valid, allowing submission");
       setError(null);
     };
 
-    // Try both capturing and non-capturing phases
+    // Add event listener in capturing phase to intercept before Supabase's handler
     document.addEventListener('submit', handleFormSubmit, true);
-    document.addEventListener('submit', (e) => console.log("Non-capture phase submit:", e), false);
 
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("Auth state change:", event);
       if (event === "SIGNED_IN") {
         navigate("/");
       } else if (event === "PASSWORD_RECOVERY") {
