@@ -17,6 +17,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    console.log("[Auth] Mode:", mode);
     const checkUser = async () => {
       try {
         const { data: { user }, error } = await supabase.auth.getUser();
@@ -25,11 +26,11 @@ export default function AuthPage({ mode }: AuthPageProps) {
         }
         
         if (user) {
-          console.log("User already logged in, redirecting to home");
+          console.log("[Auth] User already logged in, redirecting to home");
           navigate("/");
         }
       } catch (error) {
-        console.error("Error checking user:", error);
+        console.error("[Auth] Error checking user:", error);
         if (error instanceof AuthError) {
           setError(error.message);
         } else {
@@ -43,10 +44,10 @@ export default function AuthPage({ mode }: AuthPageProps) {
     checkUser();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("Auth state change event:", event);
+      console.log("[Auth] Auth state change event:", event);
       
       if (event === 'SIGNED_IN') {
-        console.log("User signed in, redirecting to home");
+        console.log("[Auth] User signed in, redirecting to home");
         navigate("/");
       }
     });
@@ -68,7 +69,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
 
   return (
     <AuthContainer>
-      <AuthForm error={error} />
+      <AuthForm mode={mode} error={error} />
     </AuthContainer>
   );
 }
