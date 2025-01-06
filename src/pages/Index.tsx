@@ -13,39 +13,37 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
   };
 
   return (
-    <div 
-      className="min-h-screen flex flex-col" 
-      style={{ 
-        backgroundColor: 'white',
-        backgroundImage: 'none',
-        position: 'relative',
-        zIndex: 1
-      }}
-    >
+    <div className="min-h-screen bg-gradient-to-b from-sky-50/50 via-white to-white">
       <div className="absolute top-4 right-4 z-10">
         <AuthMenu />
       </div>
 
-      <main className="flex-1 flex items-center justify-center min-h-0" style={{ backgroundColor: 'white' }}>
-        <div className="w-full max-w-xl px-4 py-6">
-          <h1 className="text-4xl font-bold text-foreground text-center">
+      <div className="container mx-auto px-4 flex items-center justify-center min-h-screen">
+        <div className="w-full max-w-lg mx-auto text-center py-8 md:py-12">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-3">
             Find Your Perfect Energy Plan
           </h1>
-          <p className="text-lg text-muted-foreground mt-1 text-center">
+          <p className="text-base md:text-lg text-muted-foreground mb-6">
             Compare electricity rates and plans from top providers in your area
           </p>
           
-          <div className="mt-4 flex justify-center">
+          <div className="mb-4">
             <SearchForm onSearch={handleSearch} />
           </div>
 
-          <div className="flex justify-center mt-3">
-            <Badge variant="outline" className="mx-0.5">No Signup Required</Badge>
-            <Badge variant="outline" className="mx-0.5">Real-Time Rates</Badge>
-            <Badge variant="outline" className="mx-0.5">Trusted Providers</Badge>
+          <div className="flex flex-wrap justify-center gap-2">
+            <Badge variant="secondary" className="bg-primary/10 text-primary">
+              No Signup Required
+            </Badge>
+            <Badge variant="secondary" className="bg-primary/10 text-primary">
+              Real-Time Rates
+            </Badge>
+            <Badge variant="secondary" className="bg-primary/10 text-primary">
+              Trusted Providers
+            </Badge>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
