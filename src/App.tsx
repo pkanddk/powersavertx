@@ -10,10 +10,14 @@ import Alerts from "./pages/Alerts";
 import FAQ from "./pages/FAQ";
 import Pricing from "./pages/Pricing";
 import Auth from "./pages/Auth";
+import { Button } from "./components/ui/button";
+import { useToast } from "./hooks/use-toast";
+import { LogOut, Loader2 } from "lucide-react";
 
 // Protected route wrapper component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -25,16 +29,36 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setIsAuthenticated(!!session);
+      
+      if (event === 'SIGNED_IN') {
+        toast({
+          title: "Welcome back!",
+          description: "You have successfully signed in.",
+        });
+      } else if (event === 'SIGNED_OUT') {
+        toast({
+          title: "Signed out",
+          description: "You have been signed out successfully.",
+        });
+      }
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [toast]);
 
   if (isAuthenticated === null) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-[200px]">
+        <Loader2 className="h-6 w-6 animate-spin" />
+      </div>
+    );
   }
 
   if (!isAuthenticated) {
+    toast({
+      title: "Authentication required",
+      description: "Please sign in to access this feature.",
+    });
     return <Navigate to="/auth" replace />;
   }
 
@@ -45,6 +69,33 @@ function App() {
   const [comparedPlans, setComparedPlans] = useState<Plan[]>([]);
   const [search, setSearch] = useState<{ zipCode: string; estimatedUse: string } | null>(null);
   const [estimatedUse, setEstimatedUse] = useState("500");
+  const [user, setUser] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const checkUser = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        setUser(user);
+      } catch (error) {
+        console.error('Error checking user:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkUser();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+  };
 
   const handleCompare = (plan: Plan) => {
     setComparedPlans((prev) => {
@@ -72,6 +123,49 @@ function App() {
   return (
     <Router>
       <div className="min-h-screen flex flex-col">
+        <header className="border-b">
+          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+            <nav className="flex items-center space-x-4">
+              <Button variant="link" onClick={() => window.location.href = "/"}>
+                Home
+              </Button>
+              <Button variant="link" onClick={() => window.location.href = "/faq"}>
+                FAQ
+              </Button>
+              <Button variant="link" onClick={() => window.location.href = "/alerts"}>
+                Alerts
+              </Button>
+            </nav>
+            <div className="flex items-center space-x-4">
+              {isLoading ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+              ) : user ? (
+                <div className="flex items-center space-x-4">
+                  <span className="text-sm text-muted-foreground">
+                    {user.email}
+                  </span>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={handleSignOut}
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign out
+                  </Button>
+                </div>
+              ) : (
+                <Button 
+                  variant="default" 
+                  size="sm"
+                  onClick={() => window.location.href = "/auth"}
+                >
+                  Sign in
+                </Button>
+              )}
+            </div>
+          </div>
+        </header>
+
         <div className="flex-grow">
           <Routes>
             <Route path="/" element={<Index onSearch={handleSearch} />} />
