@@ -14,53 +14,28 @@ export function AuthForm({ error }: AuthFormProps) {
   const { toast } = useToast();
   const [authError, setAuthError] = useState<string | null>(null);
 
+  const handleAuthError = (error: any) => {
+    console.log("Auth error:", error);
+    const errorMessage = error?.message || "Invalid email or password";
+    setAuthError(errorMessage);
+    toast({
+      title: "Authentication Error",
+      description: errorMessage,
+      variant: "destructive",
+    });
+  };
+
   useEffect(() => {
     const handleAuthStateChange = (event: string, session: any) => {
       console.log("Auth state change event:", event);
       
       if (event === 'SIGNED_IN' && session) {
         console.log("User signed in successfully");
-      } else if (event === 'SIGNED_OUT') {
-        console.log("User signed out");
-      } else if (event === 'USER_UPDATED') {
-        console.log("User updated");
-      } else if (event === 'PASSWORD_RECOVERY') {
-        console.log("Password recovery initiated");
+        setAuthError(null); // Clear any existing errors
       }
     };
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(handleAuthStateChange);
-
-    // Set up error listener for auth UI
-    const authContainer = document.querySelector('.supabase-auth-ui_ui-container');
-    if (authContainer) {
-      const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-          if (mutation.type === 'childList') {
-            const errorElements = authContainer.querySelectorAll('[role="alert"]');
-            if (errorElements.length > 0) {
-              const errorMessage = "Invalid email or password";
-              setAuthError(errorMessage);
-              toast({
-                title: "Authentication Error",
-                description: errorMessage,
-                variant: "destructive",
-              });
-            }
-          }
-        });
-      });
-
-      observer.observe(authContainer, {
-        childList: true,
-        subtree: true
-      });
-
-      return () => {
-        observer.disconnect();
-        subscription.unsubscribe();
-      };
-    }
 
     return () => {
       subscription.unsubscribe();
@@ -108,6 +83,7 @@ export function AuthForm({ error }: AuthFormProps) {
           }
         }}
         providers={[]}
+        onError={handleAuthError}
         redirectTo={window.location.origin}
         localization={{
           variables: {
