@@ -15,25 +15,47 @@ export function AuthForm({ error }: AuthFormProps) {
   const [authError, setAuthError] = useState<string | null>(null);
 
   useEffect(() => {
-    const handleAuthStateChange = (event: string, session: any) => {
+    const handleAuthStateChange = async (event: string, session: any) => {
       console.log("Auth state change event:", event);
       
-      if (event === 'SIGNED_IN' && session) {
-        console.log("User signed in successfully");
-        setAuthError(null); // Clear any existing errors
-      } else if (event === 'USER_DELETED' || event === 'SIGNED_OUT') {
-        console.log("Auth event:", event);
-      } else if (event === 'PASSWORD_RECOVERY') {
-        console.log("Password recovery initiated");
-      } else if (event.includes('ERROR')) {
-        console.log("Auth error event:", event);
-        const errorMessage = "Invalid email or password";
-        setAuthError(errorMessage);
-        toast({
-          title: "Authentication Error",
-          description: errorMessage,
-          variant: "destructive",
-        });
+      switch (event) {
+        case 'SIGNED_IN':
+          if (session) {
+            console.log("User signed in successfully");
+            setAuthError(null);
+          }
+          break;
+        case 'USER_DELETED':
+        case 'SIGNED_OUT':
+          console.log("Auth event:", event);
+          break;
+        case 'PASSWORD_RECOVERY':
+          console.log("Password recovery initiated");
+          break;
+        default:
+          // Check if it's an error event
+          if (event.includes('ERROR')) {
+            console.log("Auth error event:", event);
+            let errorMessage = "An error occurred during authentication";
+            
+            // Map specific error events to user-friendly messages
+            if (event.includes('INVALID_LOGIN_CREDENTIALS')) {
+              errorMessage = "Invalid email or password";
+            } else if (event.includes('INVALID_EMAIL')) {
+              errorMessage = "Please enter a valid email address";
+            } else if (event.includes('WEAK_PASSWORD')) {
+              errorMessage = "Password should be at least 6 characters long";
+            } else if (event.includes('EMAIL_TAKEN')) {
+              errorMessage = "This email is already registered";
+            }
+            
+            setAuthError(errorMessage);
+            toast({
+              title: "Authentication Error",
+              description: errorMessage,
+              variant: "destructive",
+            });
+          }
       }
     };
 
