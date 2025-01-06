@@ -14,8 +14,8 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
 
   return (
     <div className="relative min-h-[calc(100vh-4rem)]">
-      {/* Auth Menu */}
-      <div className="absolute top-4 left-4 z-50">
+      {/* Auth Menu - Now only on the right side */}
+      <div className="absolute top-4 right-4 z-50">
         <AuthMenu />
       </div>
 
