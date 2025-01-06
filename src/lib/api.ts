@@ -2,7 +2,7 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 
 export const PlanSchema = z.object({
-  id: z.string(),  // Add this line
+  id: z.string().optional(), // Make id optional since it's not in the API response
   company_id: z.string(),
   company_name: z.string(),
   company_logo: z.string().nullable(),
@@ -71,7 +71,18 @@ export const searchPlans = async (zipCode: string, estimatedUse?: string) => {
     // Parse and validate each plan individually
     const validatedPlans = plansArray.map((plan, index) => {
       try {
-        return PlanSchema.parse(plan);
+        return PlanSchema.parse({
+          ...plan,
+          price_kwh: Number(plan.price_kwh || 0),
+          price_kwh500: Number(plan.price_kwh500 || plan.rate500 || 0),
+          price_kwh1000: Number(plan.price_kwh1000 || plan.rate1000 || 0),
+          price_kwh2000: Number(plan.price_kwh2000 || plan.rate2000 || 0),
+          base_charge: plan.base_charge ? Number(plan.base_charge) : null,
+          contract_length: plan.term_value ? Number(plan.term_value) : (plan.contract_length ? Number(plan.contract_length) : null),
+          prepaid: Boolean(plan.prepaid || false),
+          timeofuse: Boolean(plan.timeofuse || false),
+          renewable_percentage: plan.renewable_percentage !== undefined ? Number(plan.renewable_percentage) : null
+        });
       } catch (error) {
         console.error(`[API] Validation error for plan ${index}:`, error);
         console.error(`[API] Problem plan data:`, plan);
