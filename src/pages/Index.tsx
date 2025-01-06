@@ -11,8 +11,8 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
   };
 
   return (
-    <div className="bg-gradient-to-br from-teal-700 via-teal-600 to-emerald-500">
-      <div className="w-full max-w-xl mx-auto px-4 py-8">
+    <div className="bg-gradient-to-br from-teal-700 via-teal-600 to-emerald-500 py-8">
+      <div className="w-full max-w-xl mx-auto px-4">
         {/* Header */}
         <div className="mb-4">
           <h1 className="text-3xl md:text-5xl font-bold text-white text-center">
