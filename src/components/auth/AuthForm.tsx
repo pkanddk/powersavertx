@@ -23,28 +23,6 @@ export function AuthForm({ error }: AuthFormProps) {
         console.log("User signed in successfully");
       } else if (event === "SIGNED_OUT") {
         console.log("User signed out");
-        try {
-          const { data: { session }, error } = await supabase.auth.getSession();
-          if (error) {
-            console.error("Auth error:", error);
-            const errorMessage = error instanceof AuthError ? error.message : "Invalid email or password";
-            setAuthError(errorMessage);
-            toast({
-              title: "Authentication Error",
-              description: errorMessage,
-              variant: "destructive",
-            });
-          }
-        } catch (error) {
-          console.error("Error checking session:", error);
-          const errorMessage = error instanceof AuthError ? error.message : "An unexpected error occurred";
-          setAuthError(errorMessage);
-          toast({
-            title: "Authentication Error",
-            description: errorMessage,
-            variant: "destructive",
-          });
-        }
       }
     };
 
@@ -54,6 +32,28 @@ export function AuthForm({ error }: AuthFormProps) {
       subscription.unsubscribe();
     };
   }, [toast]);
+
+  const customHandleError = (error: AuthError | Error | null) => {
+    if (!error) return;
+
+    console.error("Authentication error:", error);
+    let errorMessage = "An unexpected error occurred";
+
+    if (error instanceof AuthError) {
+      if (error.message.includes('Invalid login credentials')) {
+        errorMessage = "Incorrect email or password";
+      } else {
+        errorMessage = error.message;
+      }
+    }
+
+    setAuthError(errorMessage);
+    toast({
+      title: "Authentication Error",
+      description: errorMessage,
+      variant: "destructive",
+    });
+  };
 
   return (
     <>
@@ -94,6 +94,7 @@ export function AuthForm({ error }: AuthFormProps) {
         }}
         providers={[]}
         redirectTo={window.location.origin}
+        onError={customHandleError}
         localization={{
           variables: {
             sign_in: {
