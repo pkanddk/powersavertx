@@ -63,7 +63,7 @@ export default function AuthPage() {
               }
             }
           }}
-          providers={["google"]}
+          providers={[]}
           redirectTo={window.location.origin}
         />
       </Card>
