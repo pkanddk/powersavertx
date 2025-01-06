@@ -2,6 +2,8 @@ import { useNavigate } from "react-router-dom";
 import { SearchForm } from "@/components/SearchForm";
 import { Badge } from "@/components/ui/badge";
 import { AuthMenu } from "@/components/auth/AuthMenu";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Lightbulb, Zap, Shield } from "lucide-react";
 
 export default function Index({ onSearch }: { onSearch: (zipCode: string, estimatedUse: string) => void }) {
   const navigate = useNavigate();
@@ -13,33 +15,54 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gradient-to-b from-violet-50 to-white">
       <div className="absolute top-4 right-4">
         <AuthMenu />
       </div>
 
-      <div className="flex flex-col items-center justify-center min-h-screen px-4 py-8">
-        <div className="w-full max-w-md space-y-6">
-          <div className="space-y-2 text-center">
-            <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+      <div className="container mx-auto px-4 py-12">
+        <Card className="max-w-2xl mx-auto shadow-lg">
+          <CardHeader className="text-center space-y-2 pb-2">
+            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
               Find Your Perfect Energy Plan
             </h1>
             <p className="text-muted-foreground">
               Compare electricity rates and plans from top providers in your area
             </p>
-          </div>
+          </CardHeader>
+          
+          <CardContent className="space-y-6">
+            <div className="bg-violet-50 p-6 rounded-lg">
+              <SearchForm onSearch={handleSearch} />
+            </div>
 
-          <SearchForm onSearch={handleSearch} />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="flex items-center space-x-2 text-sm">
+                <Lightbulb className="h-4 w-4 text-violet-500" />
+                <span>No Signup Required</span>
+              </div>
+              <div className="flex items-center space-x-2 text-sm">
+                <Zap className="h-4 w-4 text-violet-500" />
+                <span>Real-Time Rates</span>
+              </div>
+              <div className="flex items-center space-x-2 text-sm">
+                <Shield className="h-4 w-4 text-violet-500" />
+                <span>Trusted Providers</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
+        <div className="mt-8 text-center">
           <div className="flex flex-wrap justify-center gap-2">
-            <Badge className="bg-primary/5 text-primary hover:bg-primary/10">
-              No Signup Required
+            <Badge className="bg-violet-100 text-violet-700 hover:bg-violet-200 border-0">
+              100+ Energy Providers
             </Badge>
-            <Badge className="bg-primary/5 text-primary hover:bg-primary/10">
-              Real-Time Rates
+            <Badge className="bg-violet-100 text-violet-700 hover:bg-violet-200 border-0">
+              Updated Daily
             </Badge>
-            <Badge className="bg-primary/5 text-primary hover:bg-primary/10">
-              Trusted Providers
+            <Badge className="bg-violet-100 text-violet-700 hover:bg-violet-200 border-0">
+              Price Alerts
             </Badge>
           </div>
         </div>

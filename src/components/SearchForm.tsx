@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Search } from "lucide-react";
 
 interface SearchFormProps {
   onSearch: (zipCode: string, estimatedUse: string) => void;
@@ -56,21 +57,24 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex items-center">
-      <Input
-        type="text"
-        placeholder="Enter ZIP Code"
-        value={zipCode}
-        onChange={(e) => {
-          const value = e.target.value.replace(/\D/g, "").slice(0, 5);
-          console.log("[SearchForm] ZIP code changed:", value);
-          setZipCode(value);
-        }}
-        className="w-32 h-9 bg-white/10 backdrop-blur-sm border-0 text-white placeholder:text-white/70 rounded-lg mr-2"
-        pattern="[0-9]{5}"
-        maxLength={5}
-        required
-      />
+    <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
+      <div className="flex-1">
+        <Input
+          type="text"
+          placeholder="Enter ZIP Code"
+          value={zipCode}
+          onChange={(e) => {
+            const value = e.target.value.replace(/\D/g, "").slice(0, 5);
+            console.log("[SearchForm] ZIP code changed:", value);
+            setZipCode(value);
+          }}
+          className="h-11 bg-white border-violet-100 focus:border-violet-300 focus:ring-violet-200"
+          pattern="[0-9]{5}"
+          maxLength={5}
+          required
+        />
+      </div>
+      
       <Select
         value={estimatedUse}
         onValueChange={(value) => {
@@ -78,7 +82,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
           setEstimatedUse(value);
         }}
       >
-        <SelectTrigger className="w-28 h-9 bg-white/10 backdrop-blur-sm border-0 text-white mr-2">
+        <SelectTrigger className="h-11 bg-white border-violet-100 focus:border-violet-300 focus:ring-violet-200">
           <SelectValue placeholder="Select usage" />
         </SelectTrigger>
         <SelectContent>
@@ -87,12 +91,14 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
           <SelectItem value="2000">2000 kWh</SelectItem>
         </SelectContent>
       </Select>
+
       <Button 
         type="submit" 
         disabled={isLoading}
-        className="h-9 bg-violet-500/90 hover:bg-violet-600/90 text-white rounded-lg px-4"
+        className="h-11 bg-violet-600 hover:bg-violet-700 text-white px-8"
       >
-        {isLoading ? "Searching..." : "Search Plans"}
+        <Search className="h-4 w-4 mr-2" />
+        {isLoading ? "Searching..." : "Search"}
       </Button>
     </form>
   );
