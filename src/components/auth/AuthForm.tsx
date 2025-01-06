@@ -29,23 +29,29 @@ export function AuthForm({ error }: AuthFormProps) {
       }
     });
 
-    // Early error handler to catch and format auth errors
-    const handleAuthError = (error: AuthError) => {
-      console.error("[AuthForm] Auth error details:", error);
+    // Handle auth errors before they propagate
+    const handleAuthError = (error: any) => {
+      console.error("[AuthForm] Auth error:", error);
       
-      // Map error messages before they propagate
-      let userMessage = "An error occurred. Please try again.";
+      let userMessage = "An error occurred during sign in. Please try again.";
       
-      if (error.message?.toLowerCase().includes("invalid")) {
-        userMessage = "The email or password you entered is incorrect.";
-      } else if (error.message?.includes("Email not confirmed")) {
-        userMessage = "Please verify your email address before signing in.";
-      } else if (error.message?.includes("rate limit")) {
-        userMessage = "Too many attempts. Please wait a moment.";
-      } else if (error.message?.includes("registered")) {
-        userMessage = "This email is already registered.";
-      } else if (error.message?.includes("Password")) {
-        userMessage = "Password must be at least 6 characters.";
+      // Check if the error is an AuthError
+      if (error instanceof AuthError) {
+        console.log("[AuthForm] Auth error details:", error.message);
+        
+        if (error.message.includes("Invalid login credentials")) {
+          userMessage = "The email or password you entered is incorrect.";
+        } else if (error.message.includes("Email not confirmed")) {
+          userMessage = "Please verify your email address before signing in.";
+        } else if (error.message.includes("rate limit")) {
+          userMessage = "Too many attempts. Please wait a moment and try again.";
+        } else if (error.message.includes("registered")) {
+          userMessage = "This email is already registered. Please sign in instead.";
+        } else if (error.message.includes("Password")) {
+          userMessage = "Password must be at least 6 characters long.";
+        }
+      } else if (error.message?.includes("body stream already read")) {
+        userMessage = "There was a problem signing in. Please try again.";
       }
       
       setAuthError(userMessage);
@@ -54,22 +60,18 @@ export function AuthForm({ error }: AuthFormProps) {
         title: "Sign In Error",
         description: userMessage,
       });
-
-      // Prevent error from bubbling up
-      return userMessage;
     };
 
-    const handleAuthEvent = (event: CustomEvent<{ error: AuthError }>) => {
+    // Listen for auth errors
+    window.addEventListener('supabase.auth.error', (event: any) => {
       if (event.detail?.error) {
         handleAuthError(event.detail.error);
       }
-    };
-
-    window.addEventListener('supabase.auth.error', handleAuthEvent as EventListener);
+    });
 
     return () => {
       subscription.unsubscribe();
-      window.removeEventListener('supabase.auth.error', handleAuthEvent as EventListener);
+      window.removeEventListener('supabase.auth.error', handleAuthError);
     };
   }, [toast]);
 
