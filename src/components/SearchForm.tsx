@@ -57,7 +57,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-4 w-full max-w-2xl mx-auto">
+    <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-4">
       <div className="flex-1">
         <Input
           type="text"
@@ -70,7 +70,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
             console.log("[SearchForm] ZIP code changed:", value);
             setZipCode(value);
           }}
-          className="h-14 text-lg bg-white border-0 shadow-lg placeholder:text-gray-400 text-gray-900"
+          className="h-14 text-lg bg-white/10 backdrop-blur-md border-0 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-purple-400"
           maxLength={5}
           required
         />
@@ -83,7 +83,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
           setEstimatedUse(value);
         }}
       >
-        <SelectTrigger className="h-14 min-w-[140px] bg-white border-0 shadow-lg text-gray-900">
+        <SelectTrigger className="h-14 min-w-[140px] bg-white/10 backdrop-blur-md border-0 text-white">
           <SelectValue placeholder="Select usage" />
         </SelectTrigger>
         <SelectContent>
@@ -96,7 +96,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
       <Button 
         type="submit" 
         disabled={isLoading}
-        className="h-14 px-8 bg-purple-600 hover:bg-purple-700 text-white shadow-lg"
+        className="h-14 px-8 bg-gradient-to-r from-purple-400 to-pink-400 hover:from-purple-500 hover:to-pink-500 text-white border-0"
       >
         <Search className="h-5 w-5 mr-2" />
         {isLoading ? "Searching..." : "Search"}
