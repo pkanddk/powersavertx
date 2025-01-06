@@ -62,6 +62,26 @@ export default function Pricing({ comparedPlans, onCompare, search, onSearch, es
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-50/50 via-white to-white">
+      {/* Hero Image Section */}
+      <div className="relative h-[300px] w-full">
+        <div 
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ 
+            backgroundImage: "url('/lovable-uploads/f5d9d82f-2512-4bcd-96fe-aeca04160865.png')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        >
+          <div className="absolute inset-0 bg-black/50" />
+        </div>
+        <div className="relative z-10 h-full flex flex-col items-center justify-center text-white px-4">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">Compare Energy Plans</h1>
+          <p className="text-xl text-white/90 max-w-2xl text-center">
+            Find the best electricity rates in your area
+          </p>
+        </div>
+      </div>
+
       <div className="container mx-auto px-4 py-8">
         <div className="w-full max-w-2xl mx-auto mb-8">
           <SearchForm onSearch={onSearch} isLoading={isLoading} />
