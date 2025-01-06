@@ -25,8 +25,13 @@ export function AuthForm({ error }: AuthFormProps) {
       }
     };
 
-    const handleAuthError = (event: any) => {
-      if (event?.detail?.error?.message?.includes("Invalid login credentials")) {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(handleAuthStateChange);
+
+    // Listen for auth errors from Supabase
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'USER_ERROR') {
         setAuthError("Invalid email or password");
         toast({
           title: "Authentication Error",
@@ -34,17 +39,10 @@ export function AuthForm({ error }: AuthFormProps) {
           variant: "destructive",
         });
       }
-    };
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(handleAuthStateChange);
-
-    window.addEventListener('supabase.auth.error', handleAuthError as EventListener);
+    });
 
     return () => {
       subscription.unsubscribe();
-      window.removeEventListener('supabase.auth.error', handleAuthError as EventListener);
     };
   }, [toast]);
 
