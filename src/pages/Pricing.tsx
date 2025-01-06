@@ -58,17 +58,17 @@ export default function Pricing({ onSearch, onCompare, comparedPlans, search, es
       <div className="relative min-h-[calc(100vh-4rem)]">
         {/* Hero Image Background */}
         <div 
-          className="absolute inset-0 z-0 overflow-hidden"
+          className="absolute inset-0 z-0"
           aria-label="Decorative hero image showing a pink house with wind turbine, representing clean energy and home power"
           role="img"
         >
           <div 
-            className="absolute inset-0 bg-cover bg-center"
+            className="absolute inset-0"
             style={{ 
               backgroundImage: "url('/lovable-uploads/5e950f3a-e331-4c06-aa8f-d883b1d7795f.png')",
-              backgroundSize: 'cover',
-              backgroundPosition: 'center 40%',
-              transform: 'scale(1.1)', // Slight scale to prevent white edges during parallax
+              backgroundSize: 'contain',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat'
             }}
           >
             <div className="absolute inset-0 bg-black/30" />
