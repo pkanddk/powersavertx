@@ -13,7 +13,7 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
   };
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className="h-screen flex flex-col bg-slate-900">
       <div className="absolute top-4 right-4 z-10">
         <AuthMenu />
       </div>
@@ -38,17 +38,6 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
           </div>
         </div>
       </main>
-
-      <div 
-        className="fixed inset-0 -z-10" 
-        style={{ 
-          backgroundImage: 'url("/lovable-uploads/4401e154-998f-4a3f-99d5-7bcf11361699.png")',
-          backgroundColor: 'rgba(45, 55, 72, 0.5)',
-          backgroundBlendMode: 'overlay',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center'
-        }}
-      />
     </div>
   );
 }
