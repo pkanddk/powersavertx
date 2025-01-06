@@ -6,7 +6,11 @@ import { AuthContainer } from "@/components/auth/AuthContainer";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { AuthError } from '@supabase/supabase-js';
 
-export default function AuthPage() {
+interface AuthPageProps {
+  mode: "sign_in" | "sign_up";
+}
+
+export default function AuthPage({ mode }: AuthPageProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [error, setError] = useState<string | null>(null);
