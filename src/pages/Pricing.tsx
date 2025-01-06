@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SearchForm } from "@/components/SearchForm";
 import { PlanGrid } from "@/components/PlanGrid";
-import { Plan } from "@/lib/api";
+import { Plan, searchPlans } from "@/lib/api";
 import { PlanFilters } from "@/components/PlanFilters";
 import { ComparisonBar } from "@/components/plan/ComparisonBar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MobileFiltersDialog } from "@/components/filters/MobileFiltersDialog";
+import { useToast } from "@/components/ui/use-toast";
 
 interface PricingProps {
   onSearch: (zipCode: string, estimatedUse: string) => void;
@@ -21,6 +22,7 @@ export default function Pricing({ onSearch, onCompare, comparedPlans, search, es
   const isMobile = useIsMobile();
   const [isLoading, setIsLoading] = useState(false);
   const [plans, setPlans] = useState<Plan[]>([]);
+  const { toast } = useToast();
   
   // State for filters
   const [currentSort, setCurrentSort] = useState("price-asc");
@@ -39,19 +41,24 @@ export default function Pricing({ onSearch, onCompare, comparedPlans, search, es
       
       setIsLoading(true);
       try {
-        const response = await fetch(`/api/plans?zip=${search.zipCode}`);
-        if (!response.ok) throw new Error('Failed to fetch plans');
-        const data = await response.json();
-        setPlans(data);
+        console.log("[Pricing] Fetching plans for ZIP:", search.zipCode, "Usage:", search.estimatedUse);
+        const fetchedPlans = await searchPlans(search.zipCode, search.estimatedUse);
+        console.log("[Pricing] Fetched plans:", fetchedPlans);
+        setPlans(fetchedPlans);
       } catch (error) {
-        console.error('Error fetching plans:', error);
+        console.error("[Pricing] Error fetching plans:", error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: error instanceof Error ? error.message : "Failed to fetch plans. Please try again.",
+        });
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchPlans();
-  }, [search?.zipCode]);
+  }, [search?.zipCode, search?.estimatedUse, toast]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-50/50 via-white to-white">
@@ -66,7 +73,7 @@ export default function Pricing({ onSearch, onCompare, comparedPlans, search, es
             className="absolute inset-0"
             style={{ 
               backgroundImage: "url('/lovable-uploads/5e950f3a-e331-4c06-aa8f-d883b1d7795f.png')",
-              backgroundSize: '100% auto',
+              backgroundSize: 'contain',
               backgroundPosition: 'center top',
               backgroundRepeat: 'no-repeat'
             }}
