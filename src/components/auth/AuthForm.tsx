@@ -33,31 +33,44 @@ export function AuthForm({ error }: AuthFormProps) {
     const handleAuthError = (error: any) => {
       console.error("[AuthForm] Auth error:", error);
       
-      let userMessage = "There was a problem with the authentication process. Please try again and if the issue persists, contact support.";
+      let userMessage = "";
       
       // Check if the error is an AuthError
       if (error instanceof AuthError) {
         console.log("[AuthForm] Auth error details:", error.message);
         
-        if (error.message.includes("Invalid login credentials")) {
-          userMessage = "The email or password you entered is incorrect. Please check your credentials and try again.";
-        } else if (error.message.includes("Email not confirmed")) {
-          userMessage = "Please check your email and click the verification link before signing in.";
-        } else if (error.message.includes("rate limit")) {
-          userMessage = "Too many sign in attempts. Please wait a few moments before trying again.";
-        } else if (error.message.includes("registered")) {
-          userMessage = "This email is already registered. Please use the sign in option instead.";
-        } else if (error.message.includes("Password")) {
-          userMessage = "Your password must be at least 6 characters long.";
+        // Parse the error message if it's in JSON format
+        try {
+          const errorBody = JSON.parse(error.message);
+          if (errorBody.message === "Invalid login credentials") {
+            userMessage = "The email or password you entered is incorrect. Please check your credentials and try again.";
+          }
+        } catch {
+          // If parsing fails, handle the error message directly
+          if (error.message.includes("Invalid login credentials")) {
+            userMessage = "The email or password you entered is incorrect. Please check your credentials and try again.";
+          } else if (error.message.includes("Email not confirmed")) {
+            userMessage = "Please check your email and click the verification link before signing in.";
+          } else if (error.message.includes("rate limit")) {
+            userMessage = "Too many sign in attempts. Please wait a few moments before trying again.";
+          } else if (error.message.includes("registered")) {
+            userMessage = "This email is already registered. Please use the sign in option instead.";
+          } else if (error.message.includes("Password")) {
+            userMessage = "Your password must be at least 6 characters long.";
+          } else {
+            userMessage = "There was a problem signing you in. Please check your credentials and try again.";
+          }
         }
       } else if (error.message?.includes("body stream already read")) {
-        userMessage = "The authentication process was interrupted. This usually happens when the page has been open for too long. Please refresh the page and try signing in again. If this keeps happening, try clearing your browser cache.";
+        userMessage = "The page needs to be refreshed. Please reload the page and try signing in again.";
+      } else {
+        userMessage = "There was a problem signing you in. Please check your credentials and try again.";
       }
       
       setAuthError(userMessage);
       toast({
         variant: "destructive",
-        title: "Authentication Error",
+        title: "Sign In Error",
         description: userMessage,
       });
     };
