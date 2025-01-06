@@ -11,10 +11,6 @@ import Alerts from "@/pages/Alerts";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { Footer } from "@/components/Footer";
 
-interface AuthProps {
-  mode: "sign_in" | "sign_up";
-}
-
 export default function App() {
   const [selectedPlans, setSelectedPlans] = useState<Plan[]>([]);
   const [searchParams, setSearchParams] = useState<{
