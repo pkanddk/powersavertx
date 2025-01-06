@@ -59,7 +59,7 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
           <div className="relative w-full max-w-2xl aspect-square rounded-3xl backdrop-blur-xl bg-white/10 border border-white/20 p-8 shadow-2xl">
             <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-3xl"></div>
             <img 
-              src="/lovable-uploads/97e1372f-e6d7-45fb-81e8-8dea9fe98544.png" 
+              src="/lovable-uploads/66ebc069-15b3-433d-b0b9-81041b97fca8.png" 
               alt="Abstract Energy Design"
               className="w-full h-full object-cover rounded-2xl opacity-60"
             />
