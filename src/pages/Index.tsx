@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { SearchForm } from "@/components/SearchForm";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { AuthMenu } from "@/components/auth/AuthMenu";
 
 export default function Index({ onSearch }: { onSearch: (zipCode: string, estimatedUse: string) => void }) {
   const navigate = useNavigate();
@@ -19,34 +19,11 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
     }
   };
 
-  const handleLogin = () => {
-    console.log("[Index] Navigating to login");
-    navigate("/login");
-  };
-
-  const handleSignUp = () => {
-    console.log("[Index] Navigating to signup");
-    navigate("/signup");
-  };
-
   return (
     <div className="relative min-h-[calc(100vh-4rem)]">
       {/* Auth Navigation */}
-      <div className="absolute top-4 right-4 z-20 flex gap-2">
-        <Button 
-          variant="outline" 
-          className="bg-white/20 backdrop-blur-sm text-white border-white/30 hover:bg-white/30"
-          onClick={handleLogin}
-        >
-          Login
-        </Button>
-        <Button 
-          variant="outline" 
-          className="bg-white/20 backdrop-blur-sm text-white border-white/30 hover:bg-white/30"
-          onClick={handleSignUp}
-        >
-          Sign Up
-        </Button>
+      <div className="absolute top-4 right-4 z-20">
+        <AuthMenu />
       </div>
 
       {/* Main Content */}

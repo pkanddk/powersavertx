@@ -1,10 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import { AuthContainer } from "@/components/auth/AuthContainer";
 import { AuthForm } from "@/components/auth/AuthForm";
-import { AuthError } from '@supabase/supabase-js';
+import { useAuthState } from "@/hooks/useAuthState";
 
 interface AuthPageProps {
   mode: "sign_in" | "sign_up";
@@ -13,48 +12,24 @@ interface AuthPageProps {
 export default function AuthPage({ mode }: AuthPageProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { user, isLoading } = useAuthState();
 
   useEffect(() => {
     console.log("[Auth] Mode:", mode);
-    const checkUser = async () => {
-      try {
-        const { data: { user }, error } = await supabase.auth.getUser();
-        
-        // Only redirect if we have a valid user object
-        if (user && user.id) {
-          console.log("[Auth] User already logged in, redirecting to home");
-          navigate("/");
-        }
-      } catch (error) {
-        console.error("[Auth] Error checking user:", error);
-        if (error instanceof AuthError) {
-          setError(error.message);
-        } else {
-          setError("An unexpected error occurred");
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    console.log("[Auth] Current user:", user);
 
-    checkUser();
+    // Only redirect if we have a valid authenticated user
+    if (!isLoading && user) {
+      console.log("[Auth] User already authenticated, redirecting to home");
+      toast({
+        title: "Already signed in",
+        description: "You are already signed in to your account.",
+      });
+      navigate("/");
+    }
+  }, [user, isLoading, navigate, toast, mode]);
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("[Auth] Auth state change event:", event);
-      
-      if (event === 'SIGNED_IN' && session?.user) {
-        console.log("[Auth] User signed in, redirecting to home");
-        navigate("/");
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [navigate]);
-
+  // Don't render anything while checking auth state
   if (isLoading) {
     return (
       <AuthContainer>
@@ -65,9 +40,14 @@ export default function AuthPage({ mode }: AuthPageProps) {
     );
   }
 
-  return (
-    <AuthContainer>
-      <AuthForm mode={mode} error={error} />
-    </AuthContainer>
-  );
+  // Only render the form if user is not authenticated
+  if (!user) {
+    return (
+      <AuthContainer>
+        <AuthForm mode={mode} error={null} />
+      </AuthContainer>
+    );
+  }
+
+  return null;
 }
