@@ -35,38 +35,53 @@ export function AuthForm({ error }: AuthFormProps) {
       
       let userMessage = "";
       
-      // Check if the error is an AuthError
-      if (error instanceof AuthError) {
-        console.log("[AuthForm] Auth error details:", error.message);
-        
-        // Parse the error message if it's in JSON format
-        try {
-          const errorBody = JSON.parse(error.message);
-          if (errorBody.message === "Invalid login credentials") {
-            userMessage = "The email or password you entered is incorrect. Please check your credentials and try again.";
+      try {
+        // First try to parse the error.message if it's JSON
+        if (typeof error.message === 'string' && error.message.includes('{')) {
+          const parsedError = JSON.parse(error.message);
+          console.log("[AuthForm] Parsed error:", parsedError);
+          
+          if (parsedError.message === "Invalid login credentials") {
+            userMessage = "The email or password you entered is incorrect. Please double-check and try again.";
           }
-        } catch {
-          // If parsing fails, handle the error message directly
+        } else if (error instanceof AuthError) {
+          // Handle AuthError instances
           if (error.message.includes("Invalid login credentials")) {
-            userMessage = "The email or password you entered is incorrect. Please check your credentials and try again.";
+            userMessage = "The email or password you entered is incorrect. Please double-check and try again.";
           } else if (error.message.includes("Email not confirmed")) {
-            userMessage = "Please check your email and click the verification link before signing in.";
+            userMessage = "Please verify your email address. Check your inbox for a verification link.";
           } else if (error.message.includes("rate limit")) {
-            userMessage = "Too many sign in attempts. Please wait a few moments before trying again.";
+            userMessage = "Too many attempts. Please wait a moment before trying again.";
           } else if (error.message.includes("registered")) {
-            userMessage = "This email is already registered. Please use the sign in option instead.";
+            userMessage = "This email is already registered. Please sign in instead.";
           } else if (error.message.includes("Password")) {
-            userMessage = "Your password must be at least 6 characters long.";
-          } else {
-            userMessage = "There was a problem signing you in. Please check your credentials and try again.";
+            userMessage = "Password must be at least 6 characters long.";
+          }
+        } else if (error.status === 400) {
+          // Handle HTTP 400 errors
+          try {
+            const errorBody = JSON.parse(error.body);
+            if (errorBody.code === "invalid_credentials") {
+              userMessage = "The email or password you entered is incorrect. Please double-check and try again.";
+            }
+          } catch {
+            userMessage = "Invalid login attempt. Please check your credentials.";
           }
         }
-      } else if (error.message?.includes("body stream already read")) {
-        userMessage = "The page needs to be refreshed. Please reload the page and try signing in again.";
-      } else {
-        userMessage = "There was a problem signing you in. Please check your credentials and try again.";
+      } catch (parseError) {
+        console.error("[AuthForm] Error parsing error message:", parseError);
+      }
+
+      // If no specific message was set, use a fallback
+      if (!userMessage) {
+        if (error.message?.includes("body stream already read")) {
+          userMessage = "Please refresh the page and try again. This error occurs when the page has been open too long.";
+        } else {
+          userMessage = "Authentication failed. Please check your credentials and try again. If this persists, try refreshing the page.";
+        }
       }
       
+      console.log("[AuthForm] Setting error message:", userMessage);
       setAuthError(userMessage);
       toast({
         variant: "destructive",
