@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { formatPrice } from "@/lib/utils/formatPrice";
+import { ArrowLeft } from "lucide-react";
 
 interface AlertHistory {
   id: string;
@@ -50,7 +51,6 @@ export default function Alerts() {
 
         if (alertsError) throw alertsError;
 
-        // Type assertion to ensure the plans field is correctly typed
         const typedAlerts: AlertHistory[] = alerts?.map(alert => ({
           ...alert,
           plans: alert.plans as AlertHistory['plans']
@@ -82,8 +82,16 @@ export default function Alerts() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex items-center mb-8 space-x-4">
+        <Button 
+          variant="ghost" 
+          onClick={() => navigate('/')}
+          className="p-2"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
         <h1 className="text-3xl font-bold">Price Alert History</h1>
+        <div className="flex-grow" />
         <Button onClick={() => navigate('/profile')}>Manage Alerts</Button>
       </div>
 
