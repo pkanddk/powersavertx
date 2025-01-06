@@ -18,7 +18,6 @@ export function AuthForm({ error }: AuthFormProps) {
   useEffect(() => {
     const handleAuthStateChange = async (event: string, session: any) => {
       console.log("Auth state change event:", event);
-      console.log("Session state:", session);
       
       if (event === "SIGNED_IN") {
         console.log("User signed in successfully");
@@ -30,32 +29,8 @@ export function AuthForm({ error }: AuthFormProps) {
         console.log("Password recovery initiated");
       }
 
-      // Handle authentication errors
       if (session?.error) {
-        console.error("Authentication error:", session.error);
-        
-        let errorMessage = "An unexpected error occurred";
-        
-        if (session.error instanceof AuthError) {
-          const errorBody = session.error.message;
-          console.log("Error body:", errorBody);
-          
-          // Handle specific error cases
-          if (errorBody.includes('Invalid login credentials') || errorBody.includes('invalid_credentials')) {
-            errorMessage = "Invalid email or password. Please check your credentials and try again.";
-          } else if (errorBody.includes('Email not confirmed')) {
-            errorMessage = "Please verify your email address before signing in.";
-          } else if (errorBody.includes('Password should be at least 6 characters')) {
-            errorMessage = "Password must be at least 6 characters long.";
-          } else if (errorBody.includes('Invalid email')) {
-            errorMessage = "Please enter a valid email address.";
-          } else {
-            // For development environment
-            errorMessage = "Authentication failed. Make sure you're using the correct email and password.";
-          }
-        }
-        
-        console.log("Setting error message:", errorMessage);
+        const errorMessage = "Invalid email or password";
         setAuthError(errorMessage);
         toast({
           title: "Authentication Error",
@@ -65,31 +40,20 @@ export function AuthForm({ error }: AuthFormProps) {
       }
     };
 
-    // Test Supabase connection
     const testConnection = async () => {
       try {
         const { data, error } = await supabase.auth.getSession();
         if (error) {
           console.error("Supabase connection error:", error);
-          const errorMessage = "Unable to connect to authentication service. Please try again later.";
-          setAuthError(errorMessage);
+          setAuthError("Unable to connect to authentication service");
           toast({
             title: "Connection Error",
-            description: errorMessage,
+            description: "Unable to connect to authentication service",
             variant: "destructive",
           });
-        } else {
-          console.log("Supabase connection successful:", data);
         }
       } catch (err) {
         console.error("Failed to test Supabase connection:", err);
-        const errorMessage = "Unable to establish connection with authentication service.";
-        setAuthError(errorMessage);
-        toast({
-          title: "Connection Error",
-          description: errorMessage,
-          variant: "destructive",
-        });
       }
     };
 
