@@ -62,8 +62,6 @@ export default function Pricing({ comparedPlans, onCompare, search, onSearch, es
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-50/50 via-white to-white">
-      <WelcomeDialog zipCode={search?.zipCode} />
-      
       <div className="container mx-auto px-4 py-8">
         <div className="w-full max-w-2xl mx-auto mb-8">
           <SearchForm onSearch={onSearch} isLoading={isLoading} />
