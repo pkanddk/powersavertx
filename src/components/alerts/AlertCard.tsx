@@ -31,9 +31,24 @@ export function AlertCard({ alert, onDelete, onEdit }: AlertCardProps) {
 
         if (plan) {
           console.log('Plan data:', plan);
-          const priceKey = `price_kwh${alert.kwh_usage}` as keyof typeof plan;
-          const price = plan[priceKey];
-          console.log('Current price:', price, 'for usage:', alert.kwh_usage);
+          // Map the usage to the correct price column
+          let priceColumn: string;
+          switch (alert.kwh_usage) {
+            case '500':
+              priceColumn = 'price_kwh500';
+              break;
+            case '1000':
+              priceColumn = 'price_kwh1000';
+              break;
+            case '2000':
+              priceColumn = 'price_kwh2000';
+              break;
+            default:
+              priceColumn = 'price_kwh1000'; // Default to 1000 kWh if usage is not standard
+          }
+          
+          const price = plan[priceColumn];
+          console.log('Current price:', price, 'for usage:', alert.kwh_usage, 'using column:', priceColumn);
           setCurrentPrice(typeof price === 'number' ? price : null);
         } else {
           console.log('No plan found for id:', alert.plan_id);
