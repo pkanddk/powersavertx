@@ -33,60 +33,35 @@ export function AuthForm({ error }: AuthFormProps) {
     const handleAuthError = (error: any) => {
       console.error("[AuthForm] Auth error:", error);
       
-      let userMessage = "";
+      let errorMessage = "The email or password you entered is incorrect. Please try again.";
       
-      try {
-        // First try to parse the error.message if it's JSON
-        if (typeof error.message === 'string' && error.message.includes('{')) {
-          const parsedError = JSON.parse(error.message);
-          console.log("[AuthForm] Parsed error:", parsedError);
-          
-          if (parsedError.message === "Invalid login credentials") {
-            userMessage = "The email or password you entered is incorrect. Please double-check and try again.";
-          }
-        } else if (error instanceof AuthError) {
-          // Handle AuthError instances
-          if (error.message.includes("Invalid login credentials")) {
-            userMessage = "The email or password you entered is incorrect. Please double-check and try again.";
-          } else if (error.message.includes("Email not confirmed")) {
-            userMessage = "Please verify your email address. Check your inbox for a verification link.";
-          } else if (error.message.includes("rate limit")) {
-            userMessage = "Too many attempts. Please wait a moment before trying again.";
-          } else if (error.message.includes("registered")) {
-            userMessage = "This email is already registered. Please sign in instead.";
-          } else if (error.message.includes("Password")) {
-            userMessage = "Password must be at least 6 characters long.";
-          }
-        } else if (error.status === 400) {
-          // Handle HTTP 400 errors
-          try {
-            const errorBody = JSON.parse(error.body);
-            if (errorBody.code === "invalid_credentials") {
-              userMessage = "The email or password you entered is incorrect. Please double-check and try again.";
-            }
-          } catch {
-            userMessage = "Invalid login attempt. Please check your credentials.";
-          }
-        }
-      } catch (parseError) {
-        console.error("[AuthForm] Error parsing error message:", parseError);
+      // Special case for email verification
+      if (error.message?.includes("Email not confirmed")) {
+        errorMessage = "Please verify your email address before signing in. Check your inbox for a verification link.";
       }
-
-      // If no specific message was set, use a fallback
-      if (!userMessage) {
-        if (error.message?.includes("body stream already read")) {
-          userMessage = "Please refresh the page and try again. This error occurs when the page has been open too long.";
-        } else {
-          userMessage = "Authentication failed. Please check your credentials and try again. If this persists, try refreshing the page.";
-        }
+      // Rate limiting
+      else if (error.message?.includes("rate limit")) {
+        errorMessage = "Too many attempts. Please wait a moment before trying again.";
+      }
+      // Already registered
+      else if (error.message?.includes("already registered")) {
+        errorMessage = "This email is already registered. Please sign in instead.";
+      }
+      // Password requirements
+      else if (error.message?.includes("Password")) {
+        errorMessage = "Password must be at least 6 characters long.";
+      }
+      // Page refresh needed
+      else if (error.message?.includes("body stream already read")) {
+        errorMessage = "Please refresh the page and try again.";
       }
       
-      console.log("[AuthForm] Setting error message:", userMessage);
-      setAuthError(userMessage);
+      console.log("[AuthForm] Setting error message:", errorMessage);
+      setAuthError(errorMessage);
       toast({
         variant: "destructive",
         title: "Sign In Error",
-        description: userMessage,
+        description: errorMessage,
       });
     };
 
