@@ -42,20 +42,35 @@ export function AuthForm({ error }: AuthFormProps) {
         let errorMessage = "An unexpected error occurred";
         
         if (session.error instanceof AuthError) {
-          const errorBody = session.error.message;
-          console.log("Error details:", errorBody);
-          
-          if (errorBody.includes('failed to call url')) {
-            errorMessage = "Unable to connect to the authentication service. Please check if you have a stable internet connection and try again. If the issue persists, the service might be temporarily unavailable.";
-          } else if (errorBody.includes('Invalid login credentials')) {
-            errorMessage = "Invalid email or password. Please check your credentials and try again.";
-          } else if (errorBody.includes('Email not confirmed')) {
-            errorMessage = "Please verify your email address before signing in.";
-          } else if (errorBody.includes('Password should be at least 6 characters')) {
-            errorMessage = "Password must be at least 6 characters long.";
-          } else if (errorBody.includes('Invalid email')) {
-            errorMessage = "Please enter a valid email address.";
-          } else {
+          try {
+            // Try to parse the error body if it exists
+            const errorBody = session.error.message;
+            const responseBody = typeof errorBody === 'string' && errorBody.includes('{') 
+              ? JSON.parse(errorBody.substring(errorBody.indexOf('{')))
+              : null;
+            
+            console.log("Parsed error response:", responseBody);
+            
+            if (responseBody?.code === "invalid_credentials") {
+              errorMessage = "Invalid email or password. Please check your credentials and try again.";
+            } else if (errorBody.includes('Email not confirmed')) {
+              errorMessage = "Please verify your email address before signing in.";
+            } else if (errorBody.includes('Password should be at least 6 characters')) {
+              errorMessage = "Password must be at least 6 characters long.";
+            } else if (errorBody.includes('Invalid email')) {
+              errorMessage = "Please enter a valid email address.";
+            } else if (errorBody.includes('failed to call url')) {
+              // Check if we have more specific error information
+              if (responseBody?.code) {
+                errorMessage = `Authentication failed: ${responseBody.message}`;
+              } else {
+                errorMessage = "Unable to connect to the authentication service. Please try again later.";
+              }
+            } else {
+              errorMessage = responseBody?.message || session.error.message;
+            }
+          } catch (parseError) {
+            console.error("Error parsing error response:", parseError);
             errorMessage = session.error.message;
           }
         }
