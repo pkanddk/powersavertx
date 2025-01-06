@@ -13,7 +13,7 @@ interface AuthFormProps {
 
 export function AuthForm({ error }: AuthFormProps) {
   const { toast } = useToast();
-  const [authError, setAuthError] = useState<string | null>(null);
+  const [authError, setAuthError] = useState<string | null>(error);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -25,8 +25,20 @@ export function AuthForm({ error }: AuthFormProps) {
       }
     });
 
+    // Listen for auth errors
+    const handleAuthError = (event: CustomEvent) => {
+      const error = event.detail?.error;
+      if (error?.message) {
+        console.log("Auth error:", error.message);
+        setAuthError(error.message);
+      }
+    };
+
+    window.addEventListener('supabase.auth.error', handleAuthError as EventListener);
+
     return () => {
       subscription.unsubscribe();
+      window.removeEventListener('supabase.auth.error', handleAuthError as EventListener);
     };
   }, []);
 
@@ -72,6 +84,16 @@ export function AuthForm({ error }: AuthFormProps) {
         }}
         providers={[]}
         redirectTo={window.location.origin}
+        onError={(error) => {
+          console.log("Auth error in onError:", error);
+          if (error instanceof AuthError) {
+            setAuthError(error.message);
+          } else if (error instanceof Error) {
+            setAuthError(error.message);
+          } else {
+            setAuthError("An unexpected error occurred");
+          }
+        }}
         localization={{
           variables: {
             sign_in: {
