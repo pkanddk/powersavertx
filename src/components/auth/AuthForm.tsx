@@ -31,34 +31,29 @@ export function AuthForm({ error }: AuthFormProps) {
     };
   }, [toast]);
 
-  // Create a wrapper around supabase auth to catch errors
-  const supabaseAuthClient = {
-    ...supabase.auth,
-    signInWithPassword: async (credentials: { email: string; password: string }) => {
-      try {
-        console.log("[AuthForm] Attempting sign in");
-        const response = await supabase.auth.signInWithPassword(credentials);
-        console.log("[AuthForm] Sign in response:", response);
-        return response;
-      } catch (error: any) {
-        console.error("[AuthForm] Sign in error:", error);
-        let message = "Unable to sign in. Please try again.";
-        
-        if (error.message?.includes("body stream") || 
-            error.message?.includes("json") ||
-            error.message?.includes("Failed to execute")) {
-          message = "Please refresh the page and try again.";
-        }
-        
-        setAuthError(message);
-        toast({
-          variant: "destructive",
-          title: "Sign in failed",
-          description: message
-        });
-        
-        throw error;
+  // Intercept auth operations to handle errors
+  const handleAuth = async (operation: () => Promise<any>) => {
+    try {
+      console.log("[AuthForm] Attempting auth operation");
+      return await operation();
+    } catch (error: any) {
+      console.error("[AuthForm] Auth error:", error);
+      let message = "Unable to sign in. Please try again.";
+      
+      if (error.message?.includes("body stream") || 
+          error.message?.includes("json") ||
+          error.message?.includes("Failed to execute")) {
+        message = "Please refresh the page and try again.";
       }
+      
+      setAuthError(message);
+      toast({
+        variant: "destructive",
+        title: "Sign in failed",
+        description: message
+      });
+      
+      throw error;
     }
   };
 
@@ -80,7 +75,14 @@ export function AuthForm({ error }: AuthFormProps) {
       </Alert>
 
       <Auth
-        supabaseClient={supabaseAuthClient}
+        supabaseClient={{
+          ...supabase,
+          auth: {
+            ...supabase.auth,
+            signInWithPassword: async (credentials) => 
+              handleAuth(() => supabase.auth.signInWithPassword(credentials))
+          }
+        }}
         appearance={{
           theme: ThemeSupa,
           variables: {
