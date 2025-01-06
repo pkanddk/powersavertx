@@ -23,37 +23,37 @@ export function AuthForm({ error }: AuthFormProps) {
         console.log("User signed in successfully");
       } else if (event === "SIGNED_OUT") {
         console.log("User signed out");
+      } else if (event === "USER_UPDATED") {
+        console.log("User updated");
       }
     };
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(handleAuthStateChange);
 
+    // Set up error listener
+    const {
+      data: { subscription: errorSubscription },
+    } = supabase.auth.onError((error) => {
+      console.error("Auth error from listener:", error);
+      const errorMessage = error instanceof AuthError 
+        ? error.message.includes('Invalid login credentials')
+          ? "Incorrect email or password"
+          : error.message
+        : "An unexpected error occurred";
+      
+      setAuthError(errorMessage);
+      toast({
+        title: "Authentication Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    });
+
     return () => {
       subscription.unsubscribe();
+      errorSubscription.unsubscribe();
     };
   }, [toast]);
-
-  const customHandleError = (error: AuthError | Error | null) => {
-    if (!error) return;
-
-    console.error("Authentication error:", error);
-    let errorMessage = "An unexpected error occurred";
-
-    if (error instanceof AuthError) {
-      if (error.message.includes('Invalid login credentials')) {
-        errorMessage = "Incorrect email or password";
-      } else {
-        errorMessage = error.message;
-      }
-    }
-
-    setAuthError(errorMessage);
-    toast({
-      title: "Authentication Error",
-      description: errorMessage,
-      variant: "destructive",
-    });
-  };
 
   return (
     <>
@@ -94,7 +94,6 @@ export function AuthForm({ error }: AuthFormProps) {
         }}
         providers={[]}
         redirectTo={window.location.origin}
-        onError={customHandleError}
         localization={{
           variables: {
             sign_in: {
