@@ -24,13 +24,15 @@ export default function AuthPage() {
 
     checkUser();
 
-    // Add event listener for form submission
-    const handleFormSubmit = async (event: Event) => {
+    // Single form submission handler for password validation
+    const handleFormSubmit = (event: Event) => {
       const form = event.target as HTMLFormElement;
       if (!form || !form.matches('form')) return;
       
       const passwordInput = form.querySelector('input[type="password"]') as HTMLInputElement;
       if (!passwordInput) return;
+
+      console.log("Form submit handler - Password length:", passwordInput.value.length);
 
       if (passwordInput.value.length < 6) {
         event.preventDefault();
@@ -53,48 +55,40 @@ export default function AuthPage() {
       setError(null);
     };
 
-    // Add event listener in capturing phase
+    // Add form submit handler
     document.addEventListener('submit', handleFormSubmit, true);
 
-    // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth event:", event);
+    // Auth state change listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth state change event:", event);
       
-      if (event === "SIGNED_IN") {
+      if (event === 'SIGNED_IN') {
         navigate("/");
-      } else if (event === "PASSWORD_RECOVERY") {
+      } else if (event === 'PASSWORD_RECOVERY') {
         setError("Please check your email to reset your password.");
-      } else if (event === "USER_UPDATED") {
-        setError(null);
-      } else if (event === "SIGNED_OUT") {
-        setError(null);
-      } else if (event === "USER_DELETED") {
+      } else if (event === 'USER_UPDATED' || event === 'SIGNED_OUT') {
         setError(null);
       }
     });
 
-    // Add error listener for Supabase auth errors
-    const handleAuthError = (event: CustomEvent) => {
-      const error = event.detail?.error;
-      console.log("Auth error:", error);
-      
-      if (error?.message?.includes("User already registered")) {
-        setError("This email is already registered. Please sign in instead.");
+    // Error handler for Supabase auth
+    supabase.auth.onError((error) => {
+      console.log("Supabase auth error:", error);
+
+      if (error.message?.includes("User already registered")) {
+        const message = "This email is already registered. Please sign in instead.";
+        setError(message);
         toast({
           title: "Account Exists",
-          description: "This email is already registered. Please sign in instead.",
+          description: message,
           variant: "destructive",
         });
       }
-    };
-
-    // Listen for Supabase auth errors
-    window.addEventListener('supabase.auth.error', handleAuthError as EventListener);
+    });
 
     return () => {
       subscription.unsubscribe();
       document.removeEventListener('submit', handleFormSubmit, true);
-      window.removeEventListener('supabase.auth.error', handleAuthError as EventListener);
     };
   }, [navigate, toast]);
 
