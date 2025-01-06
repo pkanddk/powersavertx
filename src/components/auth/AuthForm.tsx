@@ -12,12 +12,12 @@ export function AuthForm({ error }: AuthFormProps) {
   return (
     <>
       {error && (
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="mb-4">
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
-      <Alert variant="default" className="bg-blue-50 border-blue-200">
+      <Alert variant="default" className="mb-4 bg-blue-50 border-blue-200">
         <Info className="h-4 w-4 text-blue-600" />
         <AlertDescription className="text-sm text-blue-700">
           Password must be at least 6 characters long

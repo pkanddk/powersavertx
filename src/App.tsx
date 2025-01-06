@@ -14,6 +14,7 @@ import { Button } from "./components/ui/button";
 import { useToast } from "./hooks/use-toast";
 import { LogOut, Loader2 } from "lucide-react";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { AuthError } from '@supabase/supabase-js';
 
 function App() {
   const [comparedPlans, setComparedPlans] = useState<Plan[]>([]);
@@ -29,22 +30,32 @@ function App() {
         const { data: { user }, error } = await supabase.auth.getUser();
         if (error) {
           console.error('Error checking user:', error);
-          toast({
-            title: "Authentication Error",
-            description: error.message,
-            variant: "destructive",
-          });
+          if (error instanceof AuthError) {
+            toast({
+              title: "Authentication Error",
+              description: error.message,
+              variant: "destructive",
+            });
+          }
           return;
         }
         console.log("App - Current user:", user);
         setUser(user);
       } catch (error) {
         console.error('Error checking user:', error);
-        toast({
-          title: "System Error",
-          description: "Failed to check authentication status",
-          variant: "destructive",
-        });
+        if (error instanceof AuthError) {
+          toast({
+            title: "Authentication Error",
+            description: error.message,
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "System Error",
+            description: "Failed to check authentication status",
+            variant: "destructive",
+          });
+        }
       } finally {
         setIsLoading(false);
       }
@@ -69,6 +80,12 @@ function App() {
         });
       } else if (event === 'USER_UPDATED') {
         setUser(session?.user ?? null);
+      } else if (event === 'AUTH_ERROR') {
+        toast({
+          title: "Authentication Error",
+          description: "Please check your credentials and try again",
+          variant: "destructive",
+        });
       }
     });
 
@@ -82,11 +99,19 @@ function App() {
       const { error } = await supabase.auth.signOut();
       if (error) {
         console.error('Error signing out:', error);
-        toast({
-          title: "Error",
-          description: "Failed to sign out. Please try again.",
-          variant: "destructive",
-        });
+        if (error instanceof AuthError) {
+          toast({
+            title: "Error",
+            description: error.message,
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Error",
+            description: "Failed to sign out. Please try again.",
+            variant: "destructive",
+          });
+        }
         return;
       }
     } catch (error) {

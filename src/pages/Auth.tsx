@@ -25,11 +25,11 @@ export default function AuthPage() {
         }
       } catch (error) {
         console.error("Error checking user:", error);
-        toast({
-          title: "Error",
-          description: "Failed to check authentication status",
-          variant: "destructive",
-        });
+        if (error instanceof AuthError) {
+          setError(error.message);
+        } else {
+          setError("An unexpected error occurred");
+        }
       } finally {
         setIsLoading(false);
       }
@@ -80,12 +80,51 @@ export default function AuthPage() {
         setError("Please check your email to reset your password.");
       } else if (event === 'USER_UPDATED' || event === 'SIGNED_OUT') {
         setError(null);
+      } else if (event === 'USER_DELETED') {
+        setError("This account has been deleted.");
+      } else if (event === 'INITIAL_SESSION') {
+        // Handle initial session check
+        if (session) {
+          navigate("/");
+        }
       }
     });
+
+    // Listen for Supabase auth errors
+    const handleAuthError = (event: CustomEvent) => {
+      const error = event.detail?.error;
+      console.error("Auth error:", error);
+      
+      if (error?.message?.includes("Invalid login credentials")) {
+        setError("Invalid email or password");
+        toast({
+          title: "Authentication Error",
+          description: "Invalid email or password",
+          variant: "destructive",
+        });
+      } else if (error?.message?.includes("User already registered")) {
+        setError("An account with this email already exists");
+        toast({
+          title: "Authentication Error",
+          description: "An account with this email already exists",
+          variant: "destructive",
+        });
+      } else {
+        setError(error?.message || "An unexpected error occurred");
+        toast({
+          title: "Authentication Error",
+          description: error?.message || "An unexpected error occurred",
+          variant: "destructive",
+        });
+      }
+    };
+
+    window.addEventListener('supabase.auth.error', handleAuthError as EventListener);
 
     return () => {
       subscription.unsubscribe();
       document.removeEventListener('submit', handleFormSubmit, true);
+      window.removeEventListener('supabase.auth.error', handleAuthError as EventListener);
     };
   }, [navigate, toast]);
 
