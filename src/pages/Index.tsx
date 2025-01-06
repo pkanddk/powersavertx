@@ -13,12 +13,12 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
   };
 
   return (
-    <div className="h-screen flex">
+    <div className="grid h-screen place-items-center">
       <div className="fixed top-4 right-4">
         <AuthMenu />
       </div>
 
-      <div className="w-full self-center px-4">
+      <div className="w-full px-4">
         <div className="flex flex-col items-center">
           <h1 className="text-4xl font-bold text-white">
             Find Your Perfect Energy Plan
