@@ -3,12 +3,14 @@
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
-  background: white;
+  background: white !important;
+  background-image: none !important;
 }
 
 .card {
   padding: 2em;
-  background: white;
+  background: white !important;
+  background-image: none !important;
 }
 
 .read-the-docs {
