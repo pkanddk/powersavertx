@@ -58,7 +58,6 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {/* ZIP Code Input */}
       <div className="space-y-2">
         <Label htmlFor="zipCode" className="text-gray-600 text-sm">ZIP Code</Label>
         <div className="relative">
@@ -77,7 +76,6 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
         </div>
       </div>
 
-      {/* Monthly Usage Select */}
       <div className="space-y-2">
         <Label htmlFor="usage" className="text-gray-600 text-sm">Monthly Usage</Label>
         <div className="relative">
@@ -101,7 +99,6 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
         </div>
       </div>
 
-      {/* Search Button */}
       <button 
         type="submit" 
         disabled={isLoading}

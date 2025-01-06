@@ -2,7 +2,7 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 
 export const PlanSchema = z.object({
-  id: z.string().optional(), // Make id optional since it's not in the API response
+  id: z.string().optional(),
   company_id: z.string(),
   company_name: z.string(),
   company_logo: z.string().nullable(),
