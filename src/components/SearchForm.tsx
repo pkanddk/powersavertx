@@ -58,10 +58,11 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {/* ZIP Code Input */}
       <div className="space-y-2">
-        <Label htmlFor="zipCode">ZIP Code</Label>
+        <Label htmlFor="zipCode" className="text-white">ZIP Code</Label>
         <div className="relative">
-          <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
             id="zipCode"
             type="text"
@@ -71,20 +72,24 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
             placeholder="Enter ZIP Code"
             value={zipCode}
             onChange={(e) => setZipCode(e.target.value.replace(/\D/g, ""))}
-            className="pl-9"
+            className="pl-9 bg-white/90 border-transparent focus:border-primary focus:ring-primary"
           />
         </div>
       </div>
 
+      {/* Monthly Usage Select */}
       <div className="space-y-2">
-        <Label htmlFor="usage">Monthly Usage</Label>
+        <Label htmlFor="usage" className="text-white">Monthly Usage</Label>
         <div className="relative">
-          <Zap className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Zap className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 z-10" />
           <Select
             value={estimatedUse}
             onValueChange={setEstimatedUse}
           >
-            <SelectTrigger id="usage" className="w-full pl-9">
+            <SelectTrigger 
+              id="usage" 
+              className="w-full pl-9 bg-white/90 border-transparent focus:ring-primary"
+            >
               <SelectValue placeholder="Select usage" />
             </SelectTrigger>
             <SelectContent>
@@ -96,10 +101,11 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
         </div>
       </div>
 
+      {/* Search Button */}
       <button 
         type="submit" 
         disabled={isLoading}
-        className="w-full bg-primary hover:bg-primary/90 text-primary-foreground h-10 px-4 rounded-md flex items-center justify-center gap-2 transition-colors"
+        className="w-full bg-primary hover:bg-primary/90 text-white h-11 px-4 rounded-md flex items-center justify-center gap-2 transition-colors"
       >
         <Search className="w-4 h-4" />
         {isLoading ? "Searching..." : "Search Rates"}
