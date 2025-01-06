@@ -35,15 +35,27 @@ export function AuthForm({ error }: AuthFormProps) {
       data: { subscription: authSubscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === "SIGNED_OUT") {
-        const signInError = await supabase.auth.getError();
-        if (signInError) {
-          console.error("Auth error:", signInError);
-          setAuthError("Invalid email or password");
-          toast({
-            title: "Authentication Error",
-            description: "Invalid email or password",
-            variant: "destructive",
-          });
+        try {
+          const { error } = await supabase.auth.getSession();
+          if (error) {
+            console.error("Auth error:", error);
+            setAuthError("Invalid email or password");
+            toast({
+              title: "Authentication Error",
+              description: "Invalid email or password",
+              variant: "destructive",
+            });
+          }
+        } catch (error) {
+          console.error("Error checking session:", error);
+          if (error instanceof AuthError) {
+            setAuthError(error.message);
+            toast({
+              title: "Authentication Error",
+              description: error.message,
+              variant: "destructive",
+            });
+          }
         }
       }
     });
