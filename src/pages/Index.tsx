@@ -13,27 +13,29 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center">
+    <div className="min-h-screen flex items-center">
       <div className="fixed top-4 right-4">
         <AuthMenu />
       </div>
 
-      <div className="text-center">
-        <h1 className="text-5xl font-bold text-white leading-tight">
-          Find Your Perfect Energy Plan
-        </h1>
-        <p className="text-xl text-white/80 mt-2">
-          Compare electricity rates and plans from top providers in your area
-        </p>
-        
-        <div className="mt-8">
-          <SearchForm onSearch={handleSearch} />
-        </div>
+      <div className="w-full px-4">
+        <div className="flex flex-col items-center">
+          <h1 className="text-4xl font-bold text-white">
+            Find Your Perfect Energy Plan
+          </h1>
+          <p className="text-lg text-white/80 mt-1">
+            Compare electricity rates and plans from top providers in your area
+          </p>
+          
+          <div className="mt-4">
+            <SearchForm onSearch={handleSearch} />
+          </div>
 
-        <div className="flex justify-center mt-4">
-          <Badge variant="outline" className="bg-white/10 text-white border-0 mx-1">No Signup Required</Badge>
-          <Badge variant="outline" className="bg-white/10 text-white border-0 mx-1">Real-Time Rates</Badge>
-          <Badge variant="outline" className="bg-white/10 text-white border-0 mx-1">Trusted Providers</Badge>
+          <div className="flex mt-3">
+            <Badge variant="outline" className="bg-white/10 text-white border-0 mx-0.5">No Signup Required</Badge>
+            <Badge variant="outline" className="bg-white/10 text-white border-0 mx-0.5">Real-Time Rates</Badge>
+            <Badge variant="outline" className="bg-white/10 text-white border-0 mx-0.5">Trusted Providers</Badge>
+          </div>
         </div>
       </div>
 
