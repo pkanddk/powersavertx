@@ -68,14 +68,12 @@ export default function AuthPage() {
         setError("Please check your email to reset your password.");
       } else if (event === 'USER_UPDATED' || event === 'SIGNED_OUT') {
         setError(null);
+      } else if (event === 'USER_DELETED') {
+        setError(null);
       }
-    });
 
-    // Error handler for Supabase auth
-    supabase.auth.onError((error) => {
-      console.log("Supabase auth error:", error);
-
-      if (error.message?.includes("User already registered")) {
+      // Handle authentication errors
+      if (event === 'SIGNED_UP' && !session) {
         const message = "This email is already registered. Please sign in instead.";
         setError(message);
         toast({
