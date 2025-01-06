@@ -2,13 +2,16 @@ import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Info } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function AuthPage() {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     // Check if user is already logged in
@@ -21,14 +24,26 @@ export default function AuthPage() {
 
     checkUser();
 
-    // Listen for auth changes
+    // Listen for auth changes and errors
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN") {
         navigate("/");
+      } else if (event === "USER_UPDATED") {
+        setError(null);
       }
     });
 
-    return () => subscription.unsubscribe();
+    // Listen for auth errors
+    const authListener = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_OUT") {
+        setError(null);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+      authListener.data.subscription.unsubscribe();
+    };
   }, [navigate]);
 
   return (
@@ -42,6 +57,12 @@ export default function AuthPage() {
             Sign in to access premium features and price alerts
           </p>
         </div>
+
+        {error && (
+          <Alert variant="destructive">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
 
         <Alert variant="default" className="bg-blue-50 border-blue-200">
           <Info className="h-4 w-4 text-blue-600" />
@@ -65,6 +86,23 @@ export default function AuthPage() {
           }}
           providers={[]}
           redirectTo={window.location.origin}
+          onError={(error) => {
+            console.error("Auth error:", error);
+            if (error.message.includes("Email not confirmed")) {
+              setError("Please check your email to confirm your account before signing in.");
+            } else if (error.message.includes("Invalid login credentials")) {
+              setError("Invalid email or password. Please try again.");
+            } else if (error.message.includes("weak_password")) {
+              setError("Password should be at least 6 characters long.");
+            } else {
+              setError(error.message);
+            }
+            toast({
+              variant: "destructive",
+              title: "Authentication Error",
+              description: error.message,
+            });
+          }}
         />
       </Card>
     </div>
