@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { SearchForm } from "@/components/SearchForm";
 import { Badge } from "@/components/ui/badge";
+import { Sparkles } from "lucide-react";
 
 export default function Index({ onSearch }: { onSearch: (zipCode: string, estimatedUse: string) => void }) {
   const navigate = useNavigate();
@@ -12,44 +13,48 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
   };
 
   return (
-    <div className="relative min-h-[calc(100vh-4rem)]">
-      {/* Hero Image Background */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center z-0"
-        style={{ 
-          backgroundImage: "url('/lovable-uploads/f5d9d82f-2512-4bcd-96fe-aeca04160865.png')",
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
-        <div className="absolute inset-0 bg-black/50" />
-      </div>
+    <div className="bg-gradient-to-b from-primary/5 to-background">
+      <div className="container mx-auto px-4 py-12 md:py-24">
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          {/* Left Column - Content */}
+          <div className="space-y-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary">
+              <Sparkles className="w-4 h-4" />
+              <span className="text-sm font-medium">Compare & Save Today</span>
+            </div>
+            
+            <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
+              Find Your Perfect{" "}
+              <span className="text-primary">Energy Plan</span>
+            </h1>
+            
+            <p className="text-xl text-muted-foreground">
+              Compare electricity rates and plans from top providers in your area. Save money on your energy bills today.
+            </p>
 
-      {/* Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] text-center space-y-6 px-4">
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white">
-          Find Your Perfect Energy Plan
-        </h1>
-        <p className="text-xl text-white/90 max-w-2xl mx-auto">
-          Compare electricity rates and plans from top providers in your area
-        </p>
+            {/* Features */}
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="outline" className="px-3 py-1">
+                No Signup Required
+              </Badge>
+              <Badge variant="outline" className="px-3 py-1">
+                Real-Time Rates
+              </Badge>
+              <Badge variant="outline" className="px-3 py-1">
+                Trusted Providers
+              </Badge>
+            </div>
+          </div>
 
-        {/* Search Form */}
-        <div className="max-w-md mx-auto w-full">
-          <SearchForm onSearch={handleSearch} />
-        </div>
-
-        {/* Features */}
-        <div className="flex flex-wrap justify-center gap-2 mt-6">
-          <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
-            No Signup Required
-          </Badge>
-          <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
-            Real-Time Rates
-          </Badge>
-          <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
-            Trusted Providers
-          </Badge>
+          {/* Right Column - Search Form */}
+          <div className="lg:ml-auto w-full max-w-md">
+            <div className="bg-card rounded-xl border shadow-lg p-6">
+              <h2 className="text-xl font-semibold mb-4">
+                Get Started
+              </h2>
+              <SearchForm onSearch={handleSearch} />
+            </div>
+          </div>
         </div>
       </div>
     </div>
