@@ -19,6 +19,16 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
     }
   };
 
+  const handleLogin = () => {
+    console.log("[Index] Navigating to login");
+    navigate("/login");
+  };
+
+  const handleSignUp = () => {
+    console.log("[Index] Navigating to signup");
+    navigate("/signup");
+  };
+
   return (
     <div className="relative min-h-[calc(100vh-4rem)]">
       {/* Auth Navigation */}
@@ -26,14 +36,14 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
         <Button 
           variant="outline" 
           className="bg-white/20 backdrop-blur-sm text-white border-white/30 hover:bg-white/30"
-          onClick={() => navigate("/login")}
+          onClick={handleLogin}
         >
           Login
         </Button>
         <Button 
           variant="outline" 
           className="bg-white/20 backdrop-blur-sm text-white border-white/30 hover:bg-white/30"
-          onClick={() => navigate("/signup")}
+          onClick={handleSignUp}
         >
           Sign Up
         </Button>
