@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, Link } from "react-router-dom";
 import { useState } from "react";
 import { Plan } from "./lib/api";
 import { Toaster } from "./components/ui/toaster";
@@ -73,15 +73,17 @@ function App() {
         <header className="border-b">
           <div className="container mx-auto px-4 py-4 flex items-center justify-between">
             <nav className="flex items-center space-x-4">
-              <Button variant="link" onClick={() => window.location.href = "/"}>
-                Home
-              </Button>
-              <Button variant="link" onClick={() => window.location.href = "/faq"}>
-                FAQ
-              </Button>
-              <Button variant="link" onClick={() => window.location.href = "/alerts"}>
-                Alerts
-              </Button>
+              <Link to="/">
+                <Button variant="link">Home</Button>
+              </Link>
+              <Link to="/faq">
+                <Button variant="link">FAQ</Button>
+              </Link>
+              {user && (
+                <Link to="/alerts">
+                  <Button variant="link">Alerts</Button>
+                </Link>
+              )}
             </nav>
             <div className="flex items-center space-x-4">
               {isLoading ? (
@@ -101,13 +103,11 @@ function App() {
                   </Button>
                 </div>
               ) : (
-                <Button 
-                  variant="default" 
-                  size="sm"
-                  onClick={() => window.location.href = "/auth"}
-                >
-                  Sign in
-                </Button>
+                <Link to="/auth">
+                  <Button variant="default" size="sm">
+                    Sign in
+                  </Button>
+                </Link>
               )}
             </div>
           </div>
