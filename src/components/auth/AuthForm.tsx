@@ -33,27 +33,27 @@ export function AuthForm({ error }: AuthFormProps) {
     const handleAuthError = (error: any) => {
       console.error("[AuthForm] Auth error:", error);
       
-      let errorMessage = "The email or password you entered is incorrect. Please try again.";
+      let errorMessage = "Unable to sign in. Please check your email and password.";
       
-      // Special case for email verification
       if (error.message?.includes("Email not confirmed")) {
-        errorMessage = "Please verify your email address before signing in. Check your inbox for a verification link.";
+        errorMessage = "Please verify your email address before signing in.";
       }
-      // Rate limiting
       else if (error.message?.includes("rate limit")) {
-        errorMessage = "Too many attempts. Please wait a moment before trying again.";
+        errorMessage = "Too many sign in attempts. Please try again in a few minutes.";
       }
-      // Already registered
       else if (error.message?.includes("already registered")) {
         errorMessage = "This email is already registered. Please sign in instead.";
       }
-      // Password requirements
       else if (error.message?.includes("Password")) {
-        errorMessage = "Password must be at least 6 characters long.";
+        errorMessage = "Your password must be at least 6 characters long.";
       }
-      // Page refresh needed
-      else if (error.message?.includes("body stream already read")) {
-        errorMessage = "Please refresh the page and try again.";
+      else if (error.message?.includes("body stream already read") || 
+               error.message?.includes("Failed to execute 'json'")) {
+        errorMessage = "Your session has expired. Please refresh the page to try again.";
+      }
+      else if (error.message?.includes("Invalid login credentials") || 
+               error.status === 400) {
+        errorMessage = "The email or password you entered is incorrect.";
       }
       
       console.log("[AuthForm] Setting error message:", errorMessage);
