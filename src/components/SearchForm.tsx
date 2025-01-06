@@ -60,7 +60,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* ZIP Code Input */}
       <div className="space-y-2">
-        <Label htmlFor="zipCode" className="text-white">ZIP Code</Label>
+        <Label htmlFor="zipCode" className="text-gray-600 text-sm">ZIP Code</Label>
         <div className="relative">
           <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
@@ -72,14 +72,14 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
             placeholder="Enter ZIP Code"
             value={zipCode}
             onChange={(e) => setZipCode(e.target.value.replace(/\D/g, ""))}
-            className="pl-9 bg-white/90 border-transparent focus:border-primary focus:ring-primary"
+            className="pl-9 bg-white border-gray-200 focus:border-[#4CAF50] focus:ring-[#4CAF50] rounded-lg"
           />
         </div>
       </div>
 
       {/* Monthly Usage Select */}
       <div className="space-y-2">
-        <Label htmlFor="usage" className="text-white">Monthly Usage</Label>
+        <Label htmlFor="usage" className="text-gray-600 text-sm">Monthly Usage</Label>
         <div className="relative">
           <Zap className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 z-10" />
           <Select
@@ -88,7 +88,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
           >
             <SelectTrigger 
               id="usage" 
-              className="w-full pl-9 bg-white/90 border-transparent focus:ring-primary"
+              className="w-full pl-9 bg-white border-gray-200 focus:ring-[#4CAF50] rounded-lg"
             >
               <SelectValue placeholder="Select usage" />
             </SelectTrigger>
@@ -105,7 +105,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
       <button 
         type="submit" 
         disabled={isLoading}
-        className="w-full bg-primary hover:bg-primary/90 text-white h-11 px-4 rounded-md flex items-center justify-center gap-2 transition-colors"
+        className="w-full bg-[#4CAF50] hover:bg-[#45a049] text-white h-11 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors"
       >
         <Search className="w-4 h-4" />
         {isLoading ? "Searching..." : "Search Rates"}

@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { SearchForm } from "@/components/SearchForm";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles } from "lucide-react";
+import { Search } from "lucide-react";
 
 export default function Index({ onSearch }: { onSearch: (zipCode: string, estimatedUse: string) => void }) {
   const navigate = useNavigate();
@@ -13,47 +13,64 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
   };
 
   return (
-    <div className="relative min-h-screen">
-      {/* Hero Background Image */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ 
-          backgroundImage: "url('/lovable-uploads/ec1624f2-53c7-4cc2-b436-6eee1782d81b.png')",
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
-        {/* Lighter gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/10" />
+    <div className="relative min-h-screen bg-[#E5F4F6]">
+      {/* Decorative Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        {/* Sun and Power Lines */}
+        <div className="absolute left-32 top-1/3 w-32 h-32 bg-[#FFB84C] rounded-full" />
+        <div className="absolute left-24 top-1/3 space-y-6">
+          <div className="w-1 h-16 bg-gray-400 transform rotate-12" />
+          <div className="w-1 h-16 bg-gray-400 transform rotate-12" />
+          <div className="w-1 h-16 bg-gray-400 transform rotate-12" />
+        </div>
+
+        {/* Clouds */}
+        <div className="absolute left-1/4 top-24 w-24 h-8 bg-[#FFB1C8] rounded-full" />
+        <div className="absolute right-1/4 top-32 w-32 h-10 bg-[#96DED1] rounded-full" />
+        <div className="absolute right-48 top-16 w-20 h-6 bg-[#FFB1C8] rounded-full" />
+
+        {/* Wind Turbine */}
+        <div className="absolute right-48 top-48">
+          <div className="w-4 h-48 bg-gray-200 rounded-t-full" />
+          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+            <div className="relative w-32 h-32">
+              <div className="absolute w-4 h-24 bg-gray-200 origin-bottom transform rotate-0 rounded-full" />
+              <div className="absolute w-4 h-24 bg-gray-200 origin-bottom transform rotate-120 rounded-full" />
+              <div className="absolute w-4 h-24 bg-gray-200 origin-bottom transform rotate-240 rounded-full" />
+            </div>
+          </div>
+        </div>
+
+        {/* Trees */}
+        <div className="absolute right-32 bottom-32">
+          <div className="w-8 h-16 bg-[#FFB1C8] rounded-full" />
+        </div>
+        <div className="absolute left-48 bottom-48">
+          <div className="w-12 h-20 bg-[#96DED1] rounded-full" />
+        </div>
       </div>
 
-      {/* Content Container */}
+      {/* Search Container */}
       <div className="relative z-10 container mx-auto px-4">
-        {/* Main Content */}
-        <div className="flex flex-col items-center justify-center min-h-screen text-center pt-24 pb-32">
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 max-w-3xl mx-auto leading-tight">
-            Find Your Perfect Energy Plan
-          </h1>
-          
-          <p className="text-lg md:text-xl text-white/90 mb-12 max-w-2xl mx-auto">
-            Compare electricity rates and plans from top providers in your area
-          </p>
-
-          {/* Search Form Container - Removed backdrop blur */}
-          <div className="w-full max-w-md mx-auto">
+        <div className="flex flex-col items-center justify-center min-h-screen max-w-md mx-auto">
+          {/* Search Form */}
+          <div className="w-full bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-lg">
+            <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
+              Find Your Perfect Energy Plan
+            </h2>
             <SearchForm onSearch={handleSearch} />
           </div>
 
-          {/* Feature Badges - Removed backdrop blur */}
-          <div className="flex flex-wrap justify-center gap-3 mt-8">
-            <Badge variant="secondary" className="text-white border-white/20 bg-transparent">
-              <Sparkles className="w-4 h-4 mr-2" />
+          {/* Feature Tags */}
+          <div className="flex flex-wrap justify-center gap-2 mt-6">
+            <Badge className="bg-[#4CAF50]/10 text-[#4CAF50] border-[#4CAF50]/20">
+              <Search className="w-4 h-4 mr-1" />
               No Signup Required
             </Badge>
-            <Badge variant="secondary" className="text-white border-white/20 bg-transparent">
+            <Badge className="bg-[#4CAF50]/10 text-[#4CAF50] border-[#4CAF50]/20">
               Real-Time Rates
             </Badge>
-            <Badge variant="secondary" className="text-white border-white/20 bg-transparent">
+            <Badge className="bg-[#4CAF50]/10 text-[#4CAF50] border-[#4CAF50]/20">
               Trusted Providers
             </Badge>
           </div>
