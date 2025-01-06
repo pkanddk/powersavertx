@@ -5,7 +5,6 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
-import { AuthError } from '@supabase/supabase-js';
 
 interface AuthFormProps {
   error: string | null;
@@ -16,50 +15,52 @@ export function AuthForm({ error }: AuthFormProps) {
   const [authError, setAuthError] = useState<string | null>(null);
 
   useEffect(() => {
-    const handleAuthStateChange = async (event: string, session: any) => {
+    const handleAuthStateChange = (event: string, session: any) => {
       console.log("Auth state change event:", event);
       
-      if (event === "SIGNED_IN") {
+      if (event === 'SIGNED_IN' && session) {
         console.log("User signed in successfully");
-      } else if (event === "SIGNED_OUT") {
+      } else if (event === 'SIGNED_OUT') {
         console.log("User signed out");
-      } else if (event === "USER_UPDATED") {
+      } else if (event === 'USER_UPDATED') {
         console.log("User updated");
-      } else if (event === "PASSWORD_RECOVERY") {
+      } else if (event === 'PASSWORD_RECOVERY') {
         console.log("Password recovery initiated");
       }
-
-      if (session?.error) {
-        const errorMessage = "Invalid email or password";
-        setAuthError(errorMessage);
-        toast({
-          title: "Authentication Error",
-          description: errorMessage,
-          variant: "destructive",
-        });
-      }
     };
-
-    const testConnection = async () => {
-      try {
-        const { data, error } = await supabase.auth.getSession();
-        if (error) {
-          console.error("Supabase connection error:", error);
-          setAuthError("Unable to connect to authentication service");
-          toast({
-            title: "Connection Error",
-            description: "Unable to connect to authentication service",
-            variant: "destructive",
-          });
-        }
-      } catch (err) {
-        console.error("Failed to test Supabase connection:", err);
-      }
-    };
-
-    testConnection();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(handleAuthStateChange);
+
+    // Set up error listener for auth UI
+    const authContainer = document.querySelector('.supabase-auth-ui_ui-container');
+    if (authContainer) {
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.type === 'childList') {
+            const errorElements = authContainer.querySelectorAll('[role="alert"]');
+            if (errorElements.length > 0) {
+              const errorMessage = "Invalid email or password";
+              setAuthError(errorMessage);
+              toast({
+                title: "Authentication Error",
+                description: errorMessage,
+                variant: "destructive",
+              });
+            }
+          }
+        });
+      });
+
+      observer.observe(authContainer, {
+        childList: true,
+        subtree: true
+      });
+
+      return () => {
+        observer.disconnect();
+        subscription.unsubscribe();
+      };
+    }
 
     return () => {
       subscription.unsubscribe();
