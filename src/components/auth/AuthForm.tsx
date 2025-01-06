@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface AuthFormProps {
   error: string | null;
@@ -12,13 +12,22 @@ interface AuthFormProps {
 
 export function AuthForm({ error }: AuthFormProps) {
   const { toast } = useToast();
+  const [authError, setAuthError] = useState<string | null>(null);
 
   useEffect(() => {
+    const handleAuthStateChange = async (event: any, session: any) => {
+      if (event === "SIGNED_IN") {
+        console.log("User signed in successfully");
+      } else if (event === "USER_UPDATED") {
+        console.log("User updated");
+      } else if (event === "SIGNED_OUT") {
+        console.log("User signed out");
+      }
+    };
+
     const handleAuthError = (event: any) => {
-      if (!event.detail?.error) return;
-      
-      const errorMessage = event.detail.error.message;
-      if (errorMessage?.includes("Invalid login credentials")) {
+      if (event?.detail?.error?.message?.includes("Invalid login credentials")) {
+        setAuthError("Invalid email or password");
         toast({
           title: "Authentication Error",
           description: "Invalid email or password",
@@ -27,18 +36,23 @@ export function AuthForm({ error }: AuthFormProps) {
       }
     };
 
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(handleAuthStateChange);
+
     window.addEventListener('supabase.auth.error', handleAuthError as EventListener);
 
     return () => {
+      subscription.unsubscribe();
       window.removeEventListener('supabase.auth.error', handleAuthError as EventListener);
     };
   }, [toast]);
 
   return (
     <>
-      {error && (
+      {(error || authError) && (
         <Alert variant="destructive" className="mb-4">
-          <AlertDescription>{error}</AlertDescription>
+          <AlertDescription>{error || authError}</AlertDescription>
         </Alert>
       )}
 
