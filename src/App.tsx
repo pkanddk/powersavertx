@@ -33,7 +33,7 @@ export default function App() {
 
   return (
     <Router>
-      <div className="min-h-screen flex flex-col">
+      <div className="flex min-h-screen flex-col">
         <div className="fixed top-4 right-4 z-50">
           <AuthMenu />
         </div>
