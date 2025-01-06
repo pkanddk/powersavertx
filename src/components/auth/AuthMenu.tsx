@@ -44,7 +44,7 @@ export function AuthMenu() {
 
   if (isLoading) {
     return (
-      <Button variant="outline" className="bg-white/20 text-white border-white/30" disabled>
+      <Button variant="outline" className="bg-primary/10 text-primary border-primary/30" disabled>
         <User className="h-4 w-4 animate-pulse" />
       </Button>
     );
@@ -56,7 +56,7 @@ export function AuthMenu() {
         <DropdownMenuTrigger asChild>
           <Button 
             variant="outline" 
-            className="bg-white/20 text-white border-white/30"
+            className="bg-primary/10 text-primary border-primary/30"
           >
             <User className="h-4 w-4 mr-2" />
             My Account
@@ -81,7 +81,7 @@ export function AuthMenu() {
       <DropdownMenuTrigger asChild>
         <Button 
           variant="outline" 
-          className="bg-white/20 text-white border-white/30"
+          className="bg-primary/10 text-primary border-primary/30"
         >
           <User className="h-4 w-4 mr-2" />
           Account

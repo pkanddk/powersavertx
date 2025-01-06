@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { useSearchParams } from "react-router-dom";
 import {
   Select,
   SelectContent,
@@ -16,9 +17,19 @@ interface SearchFormProps {
 }
 
 export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
+  const [searchParams] = useSearchParams();
   const [zipCode, setZipCode] = useState("");
   const [estimatedUse, setEstimatedUse] = useState("1000");
   const { toast } = useToast();
+
+  // Set initial ZIP code from URL parameters
+  useEffect(() => {
+    const zipFromUrl = searchParams.get("zip");
+    if (zipFromUrl) {
+      console.log("[SearchForm] Setting ZIP from URL:", zipFromUrl);
+      setZipCode(zipFromUrl);
+    }
+  }, [searchParams]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,7 +77,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
             console.log("[SearchForm] ZIP code changed:", value);
             setZipCode(value);
           }}
-          className="w-full md:w-[180px] h-12 md:h-10 text-lg md:text-base rounded-xl md:rounded-md shadow-sm border-gray-200 focus:ring-2 focus:ring-primary/20 bg-white/80 backdrop-blur-sm"
+          className="w-full md:w-[180px] h-12 md:h-10 text-lg md:text-base rounded-xl md:rounded-md shadow-sm border-gray-200 focus:ring-2 focus:ring-primary/20 bg-white/80"
           pattern="[0-9]{5}"
           maxLength={5}
           required
@@ -75,7 +86,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
           value={estimatedUse}
           onValueChange={handleEstimatedUseChange}
         >
-          <SelectTrigger className="w-full md:w-[140px] h-12 md:h-10 text-lg md:text-base rounded-xl md:rounded-md shadow-sm border-gray-200 bg-white/80 backdrop-blur-sm">
+          <SelectTrigger className="w-full md:w-[140px] h-12 md:h-10 text-lg md:text-base rounded-xl md:rounded-md shadow-sm border-gray-200 bg-white/80">
             <SelectValue placeholder="Select usage" />
           </SelectTrigger>
           <SelectContent className="rounded-xl md:rounded-md">
