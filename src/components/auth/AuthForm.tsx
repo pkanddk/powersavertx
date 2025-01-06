@@ -5,6 +5,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
+import { AuthError } from '@supabase/supabase-js';
 
 interface AuthFormProps {
   error: string | null;
@@ -15,55 +16,55 @@ export function AuthForm({ error }: AuthFormProps) {
   const [authError, setAuthError] = useState<string | null>(null);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state change event:", event);
       
-      switch (event) {
-        case 'SIGNED_IN':
-          if (session) {
-            console.log("User signed in successfully");
-            setAuthError(null);
-          }
-          break;
-        case 'USER_DELETED':
-        case 'SIGNED_OUT':
-          console.log("Auth event:", event);
-          break;
-        case 'PASSWORD_RECOVERY':
-          console.log("Password recovery initiated");
-          break;
+      if (event === 'SIGNED_IN') {
+        if (session) {
+          console.log("User signed in successfully");
+          setAuthError(null);
+        }
+      } else if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+        console.log("Auth event:", event);
+      } else if (event === 'PASSWORD_RECOVERY') {
+        console.log("Password recovery initiated");
       }
     });
 
-    // Set up error handling for auth events
-    const handleAuthError = (error: Error) => {
-      console.log("Auth error:", error);
-      let errorMessage = "An error occurred during authentication";
-      
-      if (error.message.includes('Invalid login credentials')) {
-        errorMessage = "Invalid email or password";
-      } else if (error.message.includes('Email not confirmed')) {
-        errorMessage = "Please confirm your email address";
-      } else if (error.message.includes('Password should be')) {
-        errorMessage = "Password should be at least 6 characters long";
-      } else if (error.message.includes('User already registered')) {
-        errorMessage = "This email is already registered";
+    // Handle auth state changes that might include errors
+    const handleAuthChange = async () => {
+      try {
+        const { error } = await supabase.auth.getSession();
+        if (error) {
+          console.error("Auth error:", error);
+          let errorMessage = "An error occurred during authentication";
+          
+          if (error.message.includes('Invalid login credentials')) {
+            errorMessage = "Invalid email or password";
+          } else if (error.message.includes('Email not confirmed')) {
+            errorMessage = "Please confirm your email address";
+          } else if (error.message.includes('Password should be')) {
+            errorMessage = "Password should be at least 6 characters long";
+          } else if (error.message.includes('User already registered')) {
+            errorMessage = "This email is already registered";
+          }
+          
+          setAuthError(errorMessage);
+          toast({
+            title: "Authentication Error",
+            description: errorMessage,
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        console.error("Error checking auth state:", error);
       }
-      
-      setAuthError(errorMessage);
-      toast({
-        title: "Authentication Error",
-        description: errorMessage,
-        variant: "destructive",
-      });
     };
 
-    // Subscribe to auth errors
-    const authErrorSubscription = supabase.auth.onError(handleAuthError);
+    handleAuthChange();
 
     return () => {
       subscription.unsubscribe();
-      authErrorSubscription.unsubscribe();
     };
   }, [toast]);
 
