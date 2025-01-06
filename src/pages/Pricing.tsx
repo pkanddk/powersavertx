@@ -64,17 +64,8 @@ export default function Pricing({ comparedPlans, onCompare, search, onSearch, es
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-50/50 via-white to-white">
       <div className="relative min-h-[calc(100vh-4rem)]">
-        {/* Hero Image Background */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center z-0"
-          style={{ 
-            backgroundImage: "url('/lovable-uploads/f5d9d82f-2512-4bcd-96fe-aeca04160865.png')",
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        >
-          <div className="absolute inset-0 bg-black/50" />
-        </div>
+        {/* Clean gradient background */}
+        <div className="absolute inset-0 bg-gradient-to-b from-sky-100 via-sky-50 to-white z-0" />
 
         {/* Content */}
         <div className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] text-center space-y-6 px-4">
