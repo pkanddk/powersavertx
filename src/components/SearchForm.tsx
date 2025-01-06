@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
 import { useSearchParams } from "react-router-dom";
+import { useToast } from "@/components/ui/use-toast";
+import { Search } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -10,7 +9,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search } from "lucide-react";
 
 interface SearchFormProps {
   onSearch: (zipCode: string, estimatedUse: string) => void;
@@ -57,34 +55,13 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <div className="flex flex-col md:flex-row gap-4">
-        <div className="flex-1">
-          <Input
-            type="text"
-            inputMode="numeric"
-            pattern="[0-9]*"
-            placeholder="Enter ZIP Code"
-            value={zipCode}
-            onChange={(e) => {
-              const value = e.target.value.replace(/\D/g, "").slice(0, 5);
-              console.log("[SearchForm] ZIP code changed:", value);
-              setZipCode(value);
-            }}
-            className="h-16 text-xl bg-white/10 backdrop-blur-md border-white/20 text-white placeholder:text-gray-300 focus:ring-2 focus:ring-purple-400"
-            maxLength={5}
-            required
-          />
-        </div>
-        
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="flex flex-col md:flex-row gap-3">
         <Select
           value={estimatedUse}
-          onValueChange={(value) => {
-            console.log("[SearchForm] Estimated use changed:", value);
-            setEstimatedUse(value);
-          }}
+          onValueChange={setEstimatedUse}
         >
-          <SelectTrigger className="h-16 min-w-[180px] bg-white/10 backdrop-blur-md border-white/20 text-white">
+          <SelectTrigger className="h-14 bg-white/10 backdrop-blur-sm border-0 text-white">
             <SelectValue placeholder="Select usage" />
           </SelectTrigger>
           <SelectContent>
@@ -95,14 +72,14 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
         </Select>
       </div>
 
-      <Button 
+      <button 
         type="submit" 
         disabled={isLoading}
-        className="h-16 text-lg bg-gradient-to-r from-purple-400 to-pink-400 hover:from-purple-500 hover:to-pink-500 text-white border-0"
+        className="w-full h-14 bg-gradient-to-r from-purple-400 to-pink-400 hover:from-purple-500 hover:to-pink-500 text-white rounded-lg flex items-center justify-center gap-2 transition-colors"
       >
-        <Search className="h-6 w-6 mr-2" />
+        <Search className="w-5 h-5" />
         {isLoading ? "Searching..." : "Search Rates"}
-      </Button>
+      </button>
     </form>
   );
 }
