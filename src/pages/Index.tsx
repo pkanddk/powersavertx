@@ -20,11 +20,8 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
         </div>
       </header>
 
-      <main className="flex-1 flex items-center justify-center bg-gradient-to-b from-teal-600 to-teal-700">
-        <div className="w-full px-6 py-12 text-center text-white">
-          <h1 className="text-4xl font-bold mb-4">Find Your Perfect Energy Plan</h1>
-          <p className="text-xl mb-8">Compare electricity rates and plans from top providers in your area</p>
-          
+      <main className="bg-gradient-to-b from-teal-600 to-teal-700">
+        <div className="w-full px-6 py-6 text-center text-white">
           <div className="max-w-3xl mx-auto">
             <SearchForm onSearch={handleSearch} />
             
