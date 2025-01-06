@@ -13,32 +13,25 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="w-full border-b">
-        <div className="container mx-auto px-4 py-4 flex justify-end">
+    <>
+      <nav className="border-b">
+        <div className="container px-4 py-3 flex justify-end">
           <AuthMenu />
         </div>
-      </header>
+      </nav>
 
-      <main className="container mx-auto px-4 py-12">
-        <div className="max-w-2xl mx-auto">
-          <h1 className="text-3xl font-bold text-foreground mb-4">
-            Find Your Perfect Energy Plan
-          </h1>
-          
-          <p className="text-lg text-muted-foreground mb-8">
-            Compare electricity rates and plans from top providers in your area
-          </p>
-
-          <SearchForm onSearch={handleSearch} />
-
-          <div className="flex flex-wrap gap-2 mt-6">
-            <Badge variant="secondary">No Signup Required</Badge>
-            <Badge variant="secondary">Real-Time Rates</Badge>
-            <Badge variant="secondary">Trusted Providers</Badge>
-          </div>
+      <div className="container px-4 py-6">
+        <h1 className="text-2xl font-semibold mb-2">Find Your Perfect Energy Plan</h1>
+        <p className="text-muted-foreground mb-6">Compare electricity rates and plans from top providers in your area</p>
+        
+        <SearchForm onSearch={handleSearch} />
+        
+        <div className="flex gap-2 mt-4">
+          <Badge variant="secondary">No Signup Required</Badge>
+          <Badge variant="secondary">Real-Time Rates</Badge>
+          <Badge variant="secondary">Trusted Providers</Badge>
         </div>
-      </main>
-    </div>
+      </div>
+    </>
   );
 }
