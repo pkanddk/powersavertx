@@ -24,56 +24,60 @@ export function AuthForm({ error }: AuthFormProps) {
           console.log("User signed in successfully");
           setAuthError(null);
         }
-      } else if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
-        console.log("Auth event:", event);
+      } else if (event === 'SIGNED_OUT') {
+        console.log("User signed out");
       } else if (event === 'PASSWORD_RECOVERY') {
         console.log("Password recovery initiated");
       }
     });
 
-    // Handle auth state changes that might include errors
-    const handleAuthChange = async () => {
-      try {
-        const { error } = await supabase.auth.getSession();
-        if (error) {
-          console.error("Auth error:", error);
-          let errorMessage = "An error occurred during authentication";
-          
-          if (error.message.includes('Invalid login credentials')) {
-            errorMessage = "Invalid email or password";
-          } else if (error.message.includes('Email not confirmed')) {
-            errorMessage = "Please confirm your email address";
-          } else if (error.message.includes('Password should be')) {
-            errorMessage = "Password should be at least 6 characters long";
-          } else if (error.message.includes('User already registered')) {
-            errorMessage = "This email is already registered";
-          }
-          
-          setAuthError(errorMessage);
-          toast({
-            title: "Authentication Error",
-            description: errorMessage,
-            variant: "destructive",
-          });
-        }
-      } catch (error) {
-        console.error("Error checking auth state:", error);
-      }
-    };
-
-    handleAuthChange();
-
     return () => {
       subscription.unsubscribe();
     };
-  }, [toast]);
+  }, []);
+
+  // Separate useEffect for error handling to avoid race conditions
+  useEffect(() => {
+    if (error) {
+      setAuthError(error);
+      toast({
+        title: "Authentication Error",
+        description: error,
+        variant: "destructive",
+      });
+    }
+  }, [error, toast]);
+
+  const supabaseAuthConfig = {
+    onError: (error: AuthError) => {
+      console.error("Supabase auth error:", error);
+      let errorMessage = "An error occurred during authentication";
+      
+      if (error.message.includes('Invalid login credentials')) {
+        errorMessage = "Invalid email or password";
+      } else if (error.message.includes('Email not confirmed')) {
+        errorMessage = "Please confirm your email address";
+      } else if (error.message.includes('Password should be')) {
+        errorMessage = "Password should be at least 6 characters long";
+      } else if (error.message.includes('User already registered')) {
+        errorMessage = "This email is already registered";
+      }
+      
+      setAuthError(errorMessage);
+      toast({
+        title: "Authentication Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <>
-      {(error || authError) && (
+      {authError && (
         <Alert variant="destructive" className="mb-4">
           <AlertDescription className="font-medium">
-            {error || authError}
+            {authError}
           </AlertDescription>
         </Alert>
       )}
@@ -87,6 +91,7 @@ export function AuthForm({ error }: AuthFormProps) {
 
       <Auth
         supabaseClient={supabase}
+        {...supabaseAuthConfig}
         appearance={{
           theme: ThemeSupa,
           variables: {
