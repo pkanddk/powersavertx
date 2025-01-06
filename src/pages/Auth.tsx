@@ -1,4 +1,4 @@
-import { Auth } from "@supabase/auth-ui-react";
+import { Auth as SupabaseAuth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
@@ -24,27 +24,42 @@ export default function AuthPage() {
 
     checkUser();
 
-    // Listen for auth changes and errors
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === "SIGNED_IN") {
         navigate("/");
+      } else if (event === "PASSWORD_RECOVERY") {
+        setError("Please check your email to reset your password.");
       } else if (event === "USER_UPDATED") {
-        setError(null);
-      }
-    });
-
-    // Listen for auth errors
-    const authListener = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_OUT") {
         setError(null);
       }
     });
 
     return () => {
       subscription.unsubscribe();
-      authListener.data.subscription.unsubscribe();
     };
   }, [navigate]);
+
+  // Handle authentication errors
+  const handleAuthError = (error: Error) => {
+    console.error("Auth error:", error);
+    let errorMessage = "An unexpected error occurred. Please try again.";
+
+    if (error.message.includes("Email not confirmed")) {
+      errorMessage = "Please check your email to confirm your account before signing in.";
+    } else if (error.message.includes("Invalid login credentials")) {
+      errorMessage = "Invalid email or password. Please try again.";
+    } else if (error.message.includes("weak_password")) {
+      errorMessage = "Password should be at least 6 characters long.";
+    }
+
+    setError(errorMessage);
+    toast({
+      variant: "destructive",
+      title: "Authentication Error",
+      description: errorMessage,
+    });
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -71,7 +86,7 @@ export default function AuthPage() {
           </AlertDescription>
         </Alert>
 
-        <Auth
+        <SupabaseAuth
           supabaseClient={supabase}
           appearance={{
             theme: ThemeSupa,
@@ -86,23 +101,7 @@ export default function AuthPage() {
           }}
           providers={[]}
           redirectTo={window.location.origin}
-          onError={(error) => {
-            console.error("Auth error:", error);
-            if (error.message.includes("Email not confirmed")) {
-              setError("Please check your email to confirm your account before signing in.");
-            } else if (error.message.includes("Invalid login credentials")) {
-              setError("Invalid email or password. Please try again.");
-            } else if (error.message.includes("weak_password")) {
-              setError("Password should be at least 6 characters long.");
-            } else {
-              setError(error.message);
-            }
-            toast({
-              variant: "destructive",
-              title: "Authentication Error",
-              description: error.message,
-            });
-          }}
+          onError={handleAuthError}
         />
       </Card>
     </div>
