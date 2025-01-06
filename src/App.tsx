@@ -33,11 +33,11 @@ export default function App() {
 
   return (
     <Router>
-      <div className="flex flex-col min-h-screen">
-        <div className="absolute top-4 right-4 z-50">
+      <div className="min-h-screen flex flex-col">
+        <div className="fixed top-4 right-4 z-50">
           <AuthMenu />
         </div>
-        <main className="flex-grow">
+        <main className="flex-1">
           <Routes>
             <Route 
               path="/" 

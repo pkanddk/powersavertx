@@ -1,13 +1,13 @@
 #root {
-  max-width: 1280px;
   margin: 0 auto;
   text-align: center;
   background: white !important;
   background-image: none !important;
+  width: 100%;
 }
 
 .card {
-  padding: 2em;
+  padding: 1em;
   background: white !important;
   background-image: none !important;
 }
