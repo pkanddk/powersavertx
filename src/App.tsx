@@ -12,6 +12,7 @@ import { useForm } from 'react-hook-form';
 import { ProfileFormData } from './components/auth/types';
 import { useState } from 'react';
 import { Plan } from './lib/api';
+import { Footer } from './components/Footer';
 
 const queryClient = new QueryClient();
 
@@ -34,7 +35,7 @@ export default function App() {
       <Router>
         <div className="min-h-screen flex flex-col">
           <header className="bg-gray-800 text-white p-4">
-            <h1 className="text-xl">My App</h1>
+            <h1 className="text-xl">Power Saver TX</h1>
           </header>
           
           <main className="flex-1">
@@ -73,9 +74,7 @@ export default function App() {
             </Routes>
           </main>
           
-          <footer className="bg-gray-800 text-white p-4">
-            <p>&copy; 2023 My App</p>
-          </footer>
+          <Footer />
         </div>
       </Router>
     </QueryClientProvider>
