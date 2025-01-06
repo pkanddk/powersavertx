@@ -20,21 +20,22 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
       </div>
 
       {/* Main Content */}
-      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)]">
+      <div className="flex flex-col items-center justify-start min-h-[calc(100vh-4rem)] pt-24">
         {/* Hero Image Background */}
         <div 
-          className="absolute inset-0 bg-cover bg-center z-0"
+          className="absolute inset-0 bg-cover bg-center z-0 h-[70vh]"
           style={{ 
             backgroundImage: "url('/lovable-uploads/f5d9d82f-2512-4bcd-96fe-aeca04160865.png')",
             backgroundSize: 'cover',
-            backgroundPosition: 'center',
+            backgroundPosition: 'center 30%',
+            clipPath: 'polygon(0 0, 100% 0, 100% 90%, 0 90%)'
           }}
         >
           <div className="absolute inset-0 bg-black/50" />
         </div>
 
         {/* Content */}
-        <div className="relative z-10 text-center space-y-6 px-4">
+        <div className="relative z-10 text-center space-y-6 px-4 mt-8">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white">
             Find Your Perfect Energy Plan
           </h1>
