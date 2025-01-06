@@ -13,7 +13,7 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center">
+    <div className="relative min-h-[80vh] flex items-start justify-center">
       {/* Auth Menu */}
       <div className="absolute top-4 right-4 z-50">
         <AuthMenu />
@@ -24,13 +24,14 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
         className="absolute inset-0 bg-cover bg-center"
         style={{ 
           backgroundImage: "url('/lovable-uploads/7edcecd9-8dd1-48a1-9600-0ba09103a4ba.png')",
+          height: "80vh" // Make hero more horizontal
         }}
       >
         <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px]" />
       </div>
 
-      {/* Content Container */}
-      <div className="relative w-full max-w-4xl mx-auto px-4 -translate-y-1/4">
+      {/* Content Container - Moved higher up */}
+      <div className="relative w-full max-w-4xl mx-auto px-4 pt-24">
         <div className="text-center space-y-6">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white">
             Find Your Perfect Energy Plan
