@@ -1,17 +1,34 @@
-import { QueryClient, QueryClientProvider } from 'react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ProtectedRoute } from '@/components/ProtectedRoute';
-import Alerts from '@/pages/Alerts';
-import ProfileFormContent from '@/components/auth/profile/ProfileFormContent';
-import ProfileFormProvider from '@/components/auth/profile/ProfileFormProvider';
-import Auth from '@/pages/Auth';
-import Index from '@/pages/Index';
-import Compare from '@/pages/Compare';
-import FAQ from '@/pages/FAQ';
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
+import Alerts from './pages/Alerts';
+import { ProfileFormContent } from './components/auth/profile/ProfileFormContent';
+import { ProfileFormProvider } from './components/auth/profile/ProfileFormProvider';
+import Auth from './pages/Auth';
+import Index from './pages/Index';
+import Compare from './pages/Compare';
+import FAQ from './pages/FAQ';
+import { useForm } from 'react-hook-form';
+import { ProfileFormData } from './components/auth/types';
+import { useState } from 'react';
+import { Plan } from './lib/api';
 
 const queryClient = new QueryClient();
 
 export default function App() {
+  const form = useForm<ProfileFormData>();
+  const [selectedPlans, setSelectedPlans] = useState<Plan[]>([]);
+  const [estimatedUse, setEstimatedUse] = useState('1000');
+
+  const handleSearch = (zipCode: string, usage: string) => {
+    setEstimatedUse(usage);
+    // Implement search logic here
+  };
+
+  const handleRemovePlan = (plan: Plan) => {
+    setSelectedPlans(prev => prev.filter(p => p.id !== plan.id));
+  };
+
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
@@ -22,7 +39,7 @@ export default function App() {
           
           <main className="flex-1">
             <Routes>
-              <Route path="/" element={<Index />} />
+              <Route path="/" element={<Index onSearch={handleSearch} />} />
               <Route path="/faq" element={<FAQ />} />
               <Route path="/auth" element={<Auth />} />
               <Route 
@@ -43,7 +60,16 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
-              <Route path="/compare" element={<Compare />} />
+              <Route 
+                path="/compare" 
+                element={
+                  <Compare 
+                    plans={selectedPlans}
+                    onRemove={handleRemovePlan}
+                    estimatedUse={estimatedUse}
+                  />
+                } 
+              />
             </Routes>
           </main>
           
