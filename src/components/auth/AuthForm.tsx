@@ -33,25 +33,25 @@ export function AuthForm({ error }: AuthFormProps) {
     const handleAuthError = (error: any) => {
       console.error("[AuthForm] Auth error:", error);
       
-      let userMessage = "An error occurred during sign in. Please try again.";
+      let userMessage = "We couldn't sign you in right now. Please try again.";
       
       // Check if the error is an AuthError
       if (error instanceof AuthError) {
         console.log("[AuthForm] Auth error details:", error.message);
         
         if (error.message.includes("Invalid login credentials")) {
-          userMessage = "The email or password you entered is incorrect.";
+          userMessage = "The email or password you entered is incorrect. Please check your credentials and try again.";
         } else if (error.message.includes("Email not confirmed")) {
-          userMessage = "Please verify your email address before signing in.";
+          userMessage = "Please check your email and click the verification link before signing in.";
         } else if (error.message.includes("rate limit")) {
-          userMessage = "Too many attempts. Please wait a moment and try again.";
+          userMessage = "Too many sign in attempts. Please wait a few moments before trying again.";
         } else if (error.message.includes("registered")) {
-          userMessage = "This email is already registered. Please sign in instead.";
+          userMessage = "This email is already registered. Please use the sign in option instead.";
         } else if (error.message.includes("Password")) {
-          userMessage = "Password must be at least 6 characters long.";
+          userMessage = "Your password must be at least 6 characters long.";
         }
       } else if (error.message?.includes("body stream already read")) {
-        userMessage = "There was a problem signing in. Please try again.";
+        userMessage = "Your session has expired. Please refresh the page and try signing in again.";
       }
       
       setAuthError(userMessage);
