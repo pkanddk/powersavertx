@@ -18,40 +18,61 @@ export function AlertCard({ alert, onDelete, onEdit }: AlertCardProps) {
     const fetchCurrentPrice = async () => {
       if (alert.alert_type === 'specific' && alert.plan_id) {
         console.log('Fetching current price for plan:', alert.plan_id);
-        const { data: plan, error } = await supabase
+        
+        // First get the plan details to get company and plan name
+        const { data: planDetails, error: planError } = await supabase
           .from('energy_plans')
-          .select('*')
+          .select('company_name, plan_name')
           .eq('id', alert.plan_id)
           .maybeSingle();
 
-        if (error) {
-          console.error('Error fetching current price:', error);
+        if (planError) {
+          console.error('Error fetching plan details:', planError);
           return;
         }
 
-        if (plan) {
-          console.log('Plan data:', plan);
+        if (!planDetails) {
+          console.log('No plan details found for id:', alert.plan_id);
+          return;
+        }
+
+        // Then get the current price from the plans table
+        const { data: currentPlan, error: priceError } = await supabase
+          .from('plans')
+          .select('*')
+          .eq('company_name', planDetails.company_name)
+          .eq('plan_name', planDetails.plan_name)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (priceError) {
+          console.error('Error fetching current price:', priceError);
+          return;
+        }
+
+        if (currentPlan) {
+          console.log('Current plan data:', currentPlan);
           // Map the usage to the correct price column
-          let priceColumn: string;
+          let price: number | null = null;
           switch (alert.kwh_usage) {
             case '500':
-              priceColumn = 'price_kwh500';
+              price = currentPlan.price_kwh500;
               break;
             case '1000':
-              priceColumn = 'price_kwh1000';
+              price = currentPlan.price_kwh1000;
               break;
             case '2000':
-              priceColumn = 'price_kwh2000';
+              price = currentPlan.price_kwh2000;
               break;
             default:
-              priceColumn = 'price_kwh1000'; // Default to 1000 kWh if usage is not standard
+              price = currentPlan.price_kwh1000; // Default to 1000 kWh if usage is not standard
           }
           
-          const price = plan[priceColumn];
-          console.log('Current price:', price, 'for usage:', alert.kwh_usage, 'using column:', priceColumn);
-          setCurrentPrice(typeof price === 'number' ? price : null);
+          console.log('Current price:', price, 'for usage:', alert.kwh_usage);
+          setCurrentPrice(price);
         } else {
-          console.log('No plan found for id:', alert.plan_id);
+          console.log('No current price found for plan:', planDetails.plan_name);
         }
       }
     };
