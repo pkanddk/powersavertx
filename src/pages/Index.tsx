@@ -13,30 +13,26 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
   };
 
   return (
-    <div className="relative min-h-[calc(100vh-4rem)]">
-      {/* Auth Menu - Now only on the right side */}
+    <div className="relative min-h-screen">
+      {/* Auth Menu */}
       <div className="absolute top-4 right-4 z-50">
         <AuthMenu />
       </div>
 
-      {/* Main Content */}
-      <div className="flex flex-col items-center min-h-[calc(100vh-4rem)]">
-        {/* Hero Image Background */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center z-0 h-[30vh]"
-          style={{ 
-            backgroundImage: "url('/lovable-uploads/f5d9d82f-2512-4bcd-96fe-aeca04160865.png')",
-            backgroundSize: 'cover',
-            backgroundPosition: 'center 30%',
-            clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 80%)'
-          }}
-        >
-          <div className="absolute inset-0 bg-black/50" />
-        </div>
+      {/* Hero Background */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ 
+          backgroundImage: "url('/lovable-uploads/f5d9d82f-2512-4bcd-96fe-aeca04160865.png')",
+        }}
+      >
+        <div className="absolute inset-0 bg-black/40" />
+      </div>
 
-        {/* Content - Moved up significantly */}
-        <div className="relative z-10 text-center space-y-3 px-4 -mt-16">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mt-4">
+      {/* Content Container */}
+      <div className="relative h-screen flex flex-col items-center justify-center max-w-4xl mx-auto px-4 -mt-20">
+        <div className="text-center space-y-6">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white">
             Find Your Perfect Energy Plan
           </h1>
           <p className="text-xl text-white/90 max-w-2xl mx-auto">
@@ -44,19 +40,19 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
           </p>
 
           {/* Search Form */}
-          <div className="max-w-md mx-auto w-full mt-2">
+          <div className="w-full max-w-2xl mx-auto">
             <SearchForm onSearch={handleSearch} />
           </div>
 
           {/* Features */}
-          <div className="flex flex-wrap justify-center gap-2 mt-1">
-            <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
+          <div className="flex flex-wrap justify-center gap-3 mt-6">
+            <Badge variant="secondary" className="bg-white/10 text-white border-white/20 py-1.5">
               No Signup Required
             </Badge>
-            <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
+            <Badge variant="secondary" className="bg-white/10 text-white border-white/20 py-1.5">
               Real-Time Rates
             </Badge>
-            <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
+            <Badge variant="secondary" className="bg-white/10 text-white border-white/20 py-1.5">
               Trusted Providers
             </Badge>
           </div>

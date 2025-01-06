@@ -22,7 +22,6 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
   const [estimatedUse, setEstimatedUse] = useState("1000");
   const { toast } = useToast();
 
-  // Set initial ZIP code from URL parameters
   useEffect(() => {
     const zipFromUrl = searchParams.get("zip");
     if (zipFromUrl) {
@@ -56,53 +55,45 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
     }
   };
 
-  const handleEstimatedUseChange = (value: string) => {
-    try {
-      console.log("[SearchForm] Estimated use changed:", value);
-      setEstimatedUse(value);
-    } catch (error) {
-      console.error("[SearchForm] Error in handleEstimatedUseChange:", error);
-    }
-  };
-
   return (
-    <div className="w-full max-w-2xl mx-auto py-2">
-      <form onSubmit={handleSubmit} className="flex flex-col md:flex-row items-center justify-center gap-4 md:space-x-4 px-4 md:px-0">
-        <Input
-          type="text"
-          placeholder="Enter ZIP Code"
-          value={zipCode}
-          onChange={(e) => {
-            const value = e.target.value.replace(/\D/g, "").slice(0, 5);
-            console.log("[SearchForm] ZIP code changed:", value);
-            setZipCode(value);
-          }}
-          className="w-full md:w-[180px] h-12 md:h-10 text-lg md:text-base rounded-xl md:rounded-md shadow-sm border-gray-200 focus:ring-2 focus:ring-primary/20 bg-white/80"
-          pattern="[0-9]{5}"
-          maxLength={5}
-          required
-        />
-        <Select
-          value={estimatedUse}
-          onValueChange={handleEstimatedUseChange}
-        >
-          <SelectTrigger className="w-full md:w-[140px] h-12 md:h-10 text-lg md:text-base rounded-xl md:rounded-md shadow-sm border-gray-200 bg-white/80">
-            <SelectValue placeholder="Select usage" />
-          </SelectTrigger>
-          <SelectContent className="rounded-xl md:rounded-md">
-            <SelectItem value="500">500 kWh</SelectItem>
-            <SelectItem value="1000">1000 kWh</SelectItem>
-            <SelectItem value="2000">2000 kWh</SelectItem>
-          </SelectContent>
-        </Select>
-        <Button 
-          type="submit" 
-          disabled={isLoading}
-          className="w-full md:w-[140px] h-12 md:h-10 text-lg md:text-base rounded-xl md:rounded-md bg-primary hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all duration-200"
-        >
-          {isLoading ? "Searching..." : "Search Plans"}
-        </Button>
-      </form>
-    </div>
+    <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-3">
+      <Input
+        type="text"
+        placeholder="Enter ZIP Code"
+        value={zipCode}
+        onChange={(e) => {
+          const value = e.target.value.replace(/\D/g, "").slice(0, 5);
+          console.log("[SearchForm] ZIP code changed:", value);
+          setZipCode(value);
+        }}
+        className="h-12 text-lg bg-white/90 border-0 rounded-lg shadow-lg"
+        pattern="[0-9]{5}"
+        maxLength={5}
+        required
+      />
+      <Select
+        value={estimatedUse}
+        onValueChange={(value) => {
+          console.log("[SearchForm] Estimated use changed:", value);
+          setEstimatedUse(value);
+        }}
+      >
+        <SelectTrigger className="h-12 text-lg bg-white/90 border-0 rounded-lg shadow-lg">
+          <SelectValue placeholder="Select usage" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="500">500 kWh</SelectItem>
+          <SelectItem value="1000">1000 kWh</SelectItem>
+          <SelectItem value="2000">2000 kWh</SelectItem>
+        </SelectContent>
+      </Select>
+      <Button 
+        type="submit" 
+        disabled={isLoading}
+        className="h-12 text-lg bg-primary hover:bg-primary/90 rounded-lg shadow-lg px-8"
+      >
+        {isLoading ? "Searching..." : "Search Plans"}
+      </Button>
+    </form>
   );
 }
