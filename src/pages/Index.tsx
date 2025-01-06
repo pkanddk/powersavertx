@@ -23,20 +23,20 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
       <div className="flex flex-col items-center min-h-[calc(100vh-4rem)]">
         {/* Hero Image Background */}
         <div 
-          className="absolute inset-0 bg-cover bg-center z-0 h-[40vh]"
+          className="absolute inset-0 bg-cover bg-center z-0 h-[30vh]"
           style={{ 
             backgroundImage: "url('/lovable-uploads/f5d9d82f-2512-4bcd-96fe-aeca04160865.png')",
             backgroundSize: 'cover',
             backgroundPosition: 'center 30%',
-            clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 85%)'
+            clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 80%)'
           }}
         >
           <div className="absolute inset-0 bg-black/50" />
         </div>
 
         {/* Content - Moved up significantly */}
-        <div className="relative z-10 text-center space-y-6 px-4 -mt-4">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mt-16">
+        <div className="relative z-10 text-center space-y-4 px-4 -mt-16">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mt-8">
             Find Your Perfect Energy Plan
           </h1>
           <p className="text-xl text-white/90 max-w-2xl mx-auto">
@@ -44,12 +44,12 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
           </p>
 
           {/* Search Form */}
-          <div className="max-w-md mx-auto w-full">
+          <div className="max-w-md mx-auto w-full mt-4">
             <SearchForm onSearch={handleSearch} />
           </div>
 
           {/* Features */}
-          <div className="flex flex-wrap justify-center gap-2 mt-6">
+          <div className="flex flex-wrap justify-center gap-2 mt-2">
             <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
               No Signup Required
             </Badge>
