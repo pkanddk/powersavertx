@@ -60,12 +60,8 @@ export function AuthForm({ error }: AuthFormProps) {
             } else if (errorBody.includes('Invalid email')) {
               errorMessage = "Please enter a valid email address.";
             } else if (errorBody.includes('failed to call url')) {
-              // Check if we have more specific error information
-              if (responseBody?.code) {
-                errorMessage = `Authentication failed: ${responseBody.message}`;
-              } else {
-                errorMessage = "Unable to connect to the authentication service. Please try again later.";
-              }
+              // Development environment specific message
+              errorMessage = "Authentication failed. Please ensure you've configured the Site URL and Redirect URLs in Supabase to match your development URL (e.g., http://localhost:5173 or your preview URL).";
             } else {
               errorMessage = responseBody?.message || session.error.message;
             }
@@ -91,7 +87,7 @@ export function AuthForm({ error }: AuthFormProps) {
         const { data, error } = await supabase.auth.getSession();
         if (error) {
           console.error("Supabase connection error:", error);
-          const errorMessage = "Unable to connect to authentication service. Please try again later.";
+          const errorMessage = "Unable to connect to authentication service. Please ensure your development environment is properly configured.";
           setAuthError(errorMessage);
           toast({
             title: "Connection Error",
@@ -135,7 +131,7 @@ export function AuthForm({ error }: AuthFormProps) {
       <Alert variant="default" className="mb-4 bg-blue-50 border-blue-200">
         <Info className="h-4 w-4 text-blue-600" />
         <AlertDescription className="text-sm text-blue-700 font-medium">
-          Password must be at least 6 characters long
+          For development: Make sure to set your Site URL and Redirect URLs in Supabase to match your development URL
         </AlertDescription>
       </Alert>
 
