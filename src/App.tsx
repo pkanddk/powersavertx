@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Plan } from "./lib/api";
 import { Toaster } from "./components/ui/toaster";
 import { Footer } from "./components/Footer";
@@ -14,105 +14,25 @@ import { Button } from "./components/ui/button";
 import { useToast } from "./hooks/use-toast";
 import { LogOut, Loader2 } from "lucide-react";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import { AuthError } from '@supabase/supabase-js';
+import { useAuthState } from "@/hooks/useAuthState";
 
 function App() {
   const [comparedPlans, setComparedPlans] = useState<Plan[]>([]);
   const [search, setSearch] = useState<{ zipCode: string; estimatedUse: string } | null>(null);
   const [estimatedUse, setEstimatedUse] = useState("500");
-  const [user, setUser] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { user, isLoading } = useAuthState();
   const { toast } = useToast();
-
-  useEffect(() => {
-    const checkUser = async () => {
-      try {
-        const { data: { user }, error } = await supabase.auth.getUser();
-        if (error) {
-          console.error('Error checking user:', error);
-          if (error instanceof AuthError) {
-            toast({
-              title: "Authentication Error",
-              description: error.message,
-              variant: "destructive",
-            });
-          }
-          return;
-        }
-        console.log("App - Current user:", user);
-        setUser(user);
-      } catch (error) {
-        console.error('Error checking user:', error);
-        if (error instanceof AuthError) {
-          toast({
-            title: "Authentication Error",
-            description: error.message,
-            variant: "destructive",
-          });
-        } else {
-          toast({
-            title: "System Error",
-            description: "Failed to check authentication status",
-            variant: "destructive",
-          });
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkUser();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("App - Auth state change:", event, session);
-      
-      if (event === 'SIGNED_IN') {
-        setUser(session?.user ?? null);
-        toast({
-          title: "Welcome!",
-          description: "You have successfully signed in.",
-        });
-      } else if (event === 'SIGNED_OUT') {
-        setUser(null);
-        toast({
-          title: "Signed out",
-          description: "You have been signed out successfully.",
-        });
-      } else if (event === 'USER_UPDATED') {
-        setUser(session?.user ?? null);
-      } else if (event === 'AUTH_ERROR') {
-        toast({
-          title: "Authentication Error",
-          description: "Please check your credentials and try again",
-          variant: "destructive",
-        });
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [toast]);
 
   const handleSignOut = async () => {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) {
         console.error('Error signing out:', error);
-        if (error instanceof AuthError) {
-          toast({
-            title: "Error",
-            description: error.message,
-            variant: "destructive",
-          });
-        } else {
-          toast({
-            title: "Error",
-            description: "Failed to sign out. Please try again.",
-            variant: "destructive",
-          });
-        }
-        return;
+        toast({
+          title: "Error",
+          description: error.message || "Failed to sign out. Please try again.",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error('Error signing out:', error);

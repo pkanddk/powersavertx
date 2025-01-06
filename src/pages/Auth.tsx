@@ -16,8 +16,9 @@ export default function AuthPage() {
     const checkUser = async () => {
       try {
         const { data: { user }, error } = await supabase.auth.getUser();
-        console.log("Current user:", user);
-        if (error) throw error;
+        if (error && error.message !== "Auth session missing!") {
+          throw error;
+        }
         
         if (user) {
           console.log("User already logged in, redirecting to home");
@@ -44,8 +45,6 @@ export default function AuthPage() {
       
       const passwordInput = form.querySelector('input[type="password"]') as HTMLInputElement;
       if (!passwordInput) return;
-
-      console.log("Form submit handler - Password length:", passwordInput.value.length);
 
       if (passwordInput.value.length < 6) {
         event.preventDefault();
@@ -76,17 +75,6 @@ export default function AuthPage() {
       if (event === 'SIGNED_IN') {
         console.log("User signed in, redirecting to home");
         navigate("/");
-      } else if (event === 'PASSWORD_RECOVERY') {
-        setError("Please check your email to reset your password.");
-      } else if (event === 'USER_UPDATED' || event === 'SIGNED_OUT') {
-        setError(null);
-      } else if (event === 'USER_DELETED') {
-        setError("This account has been deleted.");
-      } else if (event === 'INITIAL_SESSION') {
-        // Handle initial session check
-        if (session) {
-          navigate("/");
-        }
       }
     });
 
@@ -109,11 +97,11 @@ export default function AuthPage() {
           description: "An account with this email already exists",
           variant: "destructive",
         });
-      } else {
-        setError(error?.message || "An unexpected error occurred");
+      } else if (error?.message) {
+        setError(error.message);
         toast({
           title: "Authentication Error",
-          description: error?.message || "An unexpected error occurred",
+          description: error.message,
           variant: "destructive",
         });
       }
