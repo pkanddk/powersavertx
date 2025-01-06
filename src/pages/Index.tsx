@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { SearchForm } from "@/components/SearchForm";
 import { Badge } from "@/components/ui/badge";
-import { AuthMenu } from "@/components/auth/AuthMenu";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Lightbulb, Zap, Shield } from "lucide-react";
 
@@ -15,9 +14,9 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gradient-to-b from-violet-50 to-white">
-      <div className="container mx-auto px-4">
-        <Card className="max-w-2xl mx-auto shadow-lg">
+    <div className="absolute inset-0 bg-gray-500 flex items-center justify-center">
+      <div className="w-full max-w-2xl mx-auto px-4">
+        <Card className="shadow-lg bg-white">
           <CardHeader className="text-center space-y-4">
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
               Find Your Perfect Energy Plan
