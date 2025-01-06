@@ -34,39 +34,6 @@ export function AuthForm({ error }: AuthFormProps) {
     };
   }, []);
 
-  const handleAuthError = (error: AuthError) => {
-    console.error("Auth error:", error);
-    let errorMessage = "An error occurred during authentication";
-    
-    // Parse the error message from the response body if available
-    try {
-      if (error.message.includes('body')) {
-        const bodyError = JSON.parse(error.message);
-        if (bodyError.message) {
-          errorMessage = bodyError.message;
-        }
-      }
-    } catch (e) {
-      // If parsing fails, use the standard error mapping
-      if (error.message.includes('Invalid login credentials')) {
-        errorMessage = "Invalid email or password";
-      } else if (error.message.includes('Email not confirmed')) {
-        errorMessage = "Please confirm your email address";
-      } else if (error.message.includes('Password should be')) {
-        errorMessage = "Password should be at least 6 characters long";
-      } else if (error.message.includes('User already registered')) {
-        errorMessage = "This email is already registered";
-      }
-    }
-    
-    setAuthError(errorMessage);
-    toast({
-      title: "Authentication Error",
-      description: errorMessage,
-      variant: "destructive",
-    });
-  };
-
   return (
     <>
       {authError && (
@@ -86,7 +53,6 @@ export function AuthForm({ error }: AuthFormProps) {
 
       <Auth
         supabaseClient={supabase}
-        onError={handleAuthError}
         appearance={{
           theme: ThemeSupa,
           variables: {
