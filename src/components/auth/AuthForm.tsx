@@ -17,8 +17,6 @@ export function AuthForm({ error }: AuthFormProps) {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state change event:", event);
-      
       if (event === 'SIGNED_IN') {
         if (session) {
           console.log("User signed in successfully");
@@ -36,23 +34,20 @@ export function AuthForm({ error }: AuthFormProps) {
     };
   }, []);
 
-  // Separate useEffect for error handling to avoid race conditions
-  useEffect(() => {
-    if (error) {
-      setAuthError(error);
-      toast({
-        title: "Authentication Error",
-        description: error,
-        variant: "destructive",
-      });
-    }
-  }, [error, toast]);
-
-  const supabaseAuthConfig = {
-    onError: (error: AuthError) => {
-      console.error("Supabase auth error:", error);
-      let errorMessage = "An error occurred during authentication";
-      
+  const handleAuthError = (error: AuthError) => {
+    console.error("Auth error:", error);
+    let errorMessage = "An error occurred during authentication";
+    
+    // Parse the error message from the response body if available
+    try {
+      if (error.message.includes('body')) {
+        const bodyError = JSON.parse(error.message);
+        if (bodyError.message) {
+          errorMessage = bodyError.message;
+        }
+      }
+    } catch (e) {
+      // If parsing fails, use the standard error mapping
       if (error.message.includes('Invalid login credentials')) {
         errorMessage = "Invalid email or password";
       } else if (error.message.includes('Email not confirmed')) {
@@ -62,14 +57,14 @@ export function AuthForm({ error }: AuthFormProps) {
       } else if (error.message.includes('User already registered')) {
         errorMessage = "This email is already registered";
       }
-      
-      setAuthError(errorMessage);
-      toast({
-        title: "Authentication Error",
-        description: errorMessage,
-        variant: "destructive",
-      });
     }
+    
+    setAuthError(errorMessage);
+    toast({
+      title: "Authentication Error",
+      description: errorMessage,
+      variant: "destructive",
+    });
   };
 
   return (
@@ -91,7 +86,7 @@ export function AuthForm({ error }: AuthFormProps) {
 
       <Auth
         supabaseClient={supabase}
-        {...supabaseAuthConfig}
+        onError={handleAuthError}
         appearance={{
           theme: ThemeSupa,
           variables: {
