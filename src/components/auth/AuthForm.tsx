@@ -17,7 +17,8 @@ export function AuthForm({ error }: AuthFormProps) {
 
   useEffect(() => {
     const handleAuthStateChange = async (event: string, session: any) => {
-      console.log("Auth state change event:", event, session);
+      console.log("Auth state change event:", event);
+      console.log("Session state:", session);
       
       if (event === "SIGNED_IN") {
         console.log("User signed in successfully");
@@ -31,22 +32,33 @@ export function AuthForm({ error }: AuthFormProps) {
 
       // Handle authentication errors
       if (session?.error) {
-        console.error("Auth error:", session.error);
+        console.error("Detailed auth error:", {
+          message: session.error.message,
+          status: session.error.status,
+          name: session.error.name,
+          stack: session.error.stack
+        });
         
         let errorMessage = "An unexpected error occurred";
         
         if (session.error instanceof AuthError) {
-          if (session.error.message.includes('Invalid login credentials')) {
-            errorMessage = "Incorrect email or password";
-          } else if (session.error.message.includes('Password should be at least 6 characters')) {
+          const errorBody = session.error.message;
+          console.log("Error body:", errorBody);
+          
+          if (errorBody.includes('Invalid login credentials')) {
+            errorMessage = "Incorrect email or password. Please try again.";
+          } else if (errorBody.includes('Password should be at least 6 characters')) {
             errorMessage = "Password must be at least 6 characters long";
-          } else if (session.error.message.includes('Email not confirmed')) {
+          } else if (errorBody.includes('Email not confirmed')) {
             errorMessage = "Please verify your email address";
+          } else if (errorBody.includes('Invalid email')) {
+            errorMessage = "Please enter a valid email address";
           } else {
             errorMessage = session.error.message;
           }
         }
         
+        console.log("Setting error message:", errorMessage);
         setAuthError(errorMessage);
         toast({
           title: "Authentication Error",
@@ -56,9 +68,23 @@ export function AuthForm({ error }: AuthFormProps) {
       }
     };
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      handleAuthStateChange(event, session);
-    });
+    // Test Supabase connection
+    const testConnection = async () => {
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error("Supabase connection error:", error);
+        } else {
+          console.log("Supabase connection successful:", data);
+        }
+      } catch (err) {
+        console.error("Failed to test Supabase connection:", err);
+      }
+    };
+
+    testConnection();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(handleAuthStateChange);
 
     return () => {
       subscription.unsubscribe();
