@@ -24,6 +24,26 @@ export default function AuthPage() {
 
     checkUser();
 
+    // Add event listener for form submission
+    const handleFormSubmit = (event: Event) => {
+      const form = event.target as HTMLFormElement;
+      if (!form || !form.matches('form')) return;
+      
+      const passwordInput = form.querySelector('input[type="password"]') as HTMLInputElement;
+      if (!passwordInput) return;
+
+      if (passwordInput.value.length < 6) {
+        event.preventDefault();
+        event.stopPropagation();
+        setError("Password must be at least 6 characters long");
+        return false;
+      }
+      
+      setError(null);
+    };
+
+    document.addEventListener('submit', handleFormSubmit, true);
+
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN") {
@@ -39,6 +59,7 @@ export default function AuthPage() {
 
     return () => {
       subscription.unsubscribe();
+      document.removeEventListener('submit', handleFormSubmit, true);
     };
   }, [navigate, toast]);
 
