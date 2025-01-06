@@ -26,7 +26,7 @@ export function ProfileFormProvider({
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [priceAlerts, setPriceAlerts] = useState<PriceAlert[]>([]);
 
-  // Load user profile on mount
+  // Load user profile and alerts on mount
   useEffect(() => {
     loadProfile();
   }, []);
@@ -60,44 +60,44 @@ export function ProfileFormProvider({
           universal_kwh_usage: profile.universal_kwh_usage || "",
           universal_price_threshold: profile.universal_price_threshold?.toString() || "",
         });
-      }
 
-      // Load price alerts
-      const { data: alerts, error: alertsError } = await supabase
-        .from("user_plan_tracking")
-        .select(`
-          id,
-          plan_id,
-          kwh_usage,
-          price_threshold,
-          energy_plans (
-            plan_name,
-            company_name,
-            go_to_plan,
-            renewable_percentage
-          )
-        `)
-        .eq("user_id", profile.id)
-        .eq("active", true);
+        // Load price alerts
+        const { data: alerts, error: alertsError } = await supabase
+          .from("user_plan_tracking")
+          .select(`
+            id,
+            plan_id,
+            kwh_usage,
+            price_threshold,
+            energy_plans (
+              plan_name,
+              company_name,
+              go_to_plan,
+              renewable_percentage
+            )
+          `)
+          .eq("user_id", profile.id)
+          .eq("active", true);
 
-      if (alertsError) {
-        console.error("[ProfileForm] Error loading alerts:", alertsError);
-        throw alertsError;
-      }
+        if (alertsError) {
+          console.error("[ProfileForm] Error loading alerts:", alertsError);
+          throw alertsError;
+        }
 
-      if (alerts) {
-        console.log("[ProfileForm] Alerts loaded:", alerts);
-        setPriceAlerts(alerts.map(alert => ({
-          id: alert.id,
-          plan_id: alert.plan_id,
-          plan_name: alert.energy_plans.plan_name,
-          company_name: alert.energy_plans.company_name,
-          kwh_usage: alert.kwh_usage,
-          price_threshold: alert.price_threshold,
-          go_to_plan: alert.energy_plans.go_to_plan,
-          renewable_percentage: alert.energy_plans.renewable_percentage,
-          alert_type: 'specific'
-        })));
+        if (alerts) {
+          console.log("[ProfileForm] Alerts loaded:", alerts);
+          setPriceAlerts(alerts.map(alert => ({
+            id: alert.id,
+            plan_id: alert.plan_id,
+            plan_name: alert.energy_plans.plan_name,
+            company_name: alert.energy_plans.company_name,
+            kwh_usage: alert.kwh_usage,
+            price_threshold: alert.price_threshold,
+            go_to_plan: alert.energy_plans.go_to_plan,
+            renewable_percentage: alert.energy_plans.renewable_percentage,
+            alert_type: 'specific'
+          })));
+        }
       }
     } catch (error: any) {
       console.error("[ProfileForm] Error in loadProfile:", error);

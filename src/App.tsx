@@ -1,166 +1,57 @@
-import { BrowserRouter as Router, Routes, Route, Navigate, Link } from "react-router-dom";
-import { useState } from "react";
-import { Plan } from "./lib/api";
-import { Toaster } from "./components/ui/toaster";
-import { Footer } from "./components/Footer";
-import { supabase } from "@/integrations/supabase/client";
-import Index from "./pages/Index";
-import Compare from "./pages/Compare";
-import Alerts from "./pages/Alerts";
-import FAQ from "./pages/FAQ";
-import Pricing from "./pages/Pricing";
-import Auth from "./pages/Auth";
-import { Button } from "./components/ui/button";
-import { useToast } from "./hooks/use-toast";
-import { LogOut, Loader2 } from "lucide-react";
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import { useAuthState } from "@/hooks/useAuthState";
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
+import Alerts from '@/pages/Alerts';
+import ProfileFormContent from '@/components/auth/profile/ProfileFormContent';
+import ProfileFormProvider from '@/components/auth/profile/ProfileFormProvider';
+import Auth from '@/pages/Auth';
+import Index from '@/pages/Index';
+import Compare from '@/pages/Compare';
+import FAQ from '@/pages/FAQ';
 
-function App() {
-  const [comparedPlans, setComparedPlans] = useState<Plan[]>([]);
-  const [search, setSearch] = useState<{ zipCode: string; estimatedUse: string } | null>(null);
-  const [estimatedUse, setEstimatedUse] = useState("500");
-  const { user, isLoading } = useAuthState();
-  const { toast } = useToast();
+const queryClient = new QueryClient();
 
-  const handleSignOut = async () => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error('Error signing out:', error);
-        toast({
-          title: "Error",
-          description: error.message || "Failed to sign out. Please try again.",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      console.error('Error signing out:', error);
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred while signing out.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleCompare = (plan: Plan) => {
-    setComparedPlans((prev) => {
-      const exists = prev.some((p) => p.plan_name === plan.plan_name && p.company_name === plan.company_name);
-      if (exists) {
-        return prev.filter((p) => p.plan_name !== plan.plan_name || p.company_name !== plan.company_name);
-      }
-      if (prev.length >= 3) {
-        return [...prev.slice(1), plan];
-      }
-      return [...prev, plan];
-    });
-  };
-
-  const handleSearch = (zipCode: string, estimatedUse: string) => {
-    try {
-      console.log("[App] Handling search:", { zipCode, estimatedUse });
-      setSearch({ zipCode, estimatedUse });
-      setEstimatedUse(estimatedUse);
-    } catch (error) {
-      console.error("[App] Error in handleSearch:", error);
-    }
-  };
-
+export default function App() {
   return (
-    <Router>
-      <div className="min-h-screen flex flex-col">
-        <header className="border-b">
-          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-            <nav className="flex items-center space-x-4">
-              <Link to="/">
-                <Button variant="link">Home</Button>
-              </Link>
-              <Link to="/faq">
-                <Button variant="link">FAQ</Button>
-              </Link>
-              {user && (
-                <Link to="/alerts">
-                  <Button variant="link">Alerts</Button>
-                </Link>
-              )}
-            </nav>
-            <div className="flex items-center space-x-4">
-              {isLoading ? (
-                <Loader2 className="h-5 w-5 animate-spin" />
-              ) : user ? (
-                <div className="flex items-center space-x-4">
-                  <span className="text-sm text-muted-foreground">
-                    {user.email}
-                  </span>
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    onClick={handleSignOut}
-                  >
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Sign out
-                  </Button>
-                </div>
-              ) : (
-                <Link to="/auth">
-                  <Button variant="default" size="sm">
-                    Sign in
-                  </Button>
-                </Link>
-              )}
-            </div>
-          </div>
-        </header>
-
-        <div className="flex-grow">
-          <Routes>
-            <Route path="/" element={<Index onSearch={handleSearch} />} />
-            <Route path="/auth" element={
-              user ? <Navigate to="/" replace /> : <Auth />
-            } />
-            <Route
-              path="/pricing"
-              element={
-                search ? (
-                  <Pricing
-                    comparedPlans={comparedPlans}
-                    onCompare={handleCompare}
-                    search={search}
-                    onSearch={handleSearch}
-                    estimatedUse={estimatedUse}
-                  />
-                ) : (
-                  <Navigate to="/" replace />
-                )
-              }
-            />
-            <Route
-              path="/compare"
-              element={
-                <Compare
-                  plans={comparedPlans}
-                  onRemove={handleCompare}
-                  estimatedUse={estimatedUse}
-                />
-              }
-            />
-            <Route
-              path="/alerts"
-              element={
-                <ProtectedRoute>
-                  <Alerts />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/faq" element={<FAQ />} />
-          </Routes>
+    <QueryClientProvider client={queryClient}>
+      <Router>
+        <div className="min-h-screen flex flex-col">
+          <header className="bg-gray-800 text-white p-4">
+            <h1 className="text-xl">My App</h1>
+          </header>
+          
+          <main className="flex-1">
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/faq" element={<FAQ />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route 
+                path="/alerts" 
+                element={
+                  <ProtectedRoute>
+                    <Alerts />
+                  </ProtectedRoute>
+                }
+              />
+              <Route 
+                path="/profile" 
+                element={
+                  <ProtectedRoute>
+                    <ProfileFormProvider form={form}>
+                      <ProfileFormContent form={form} />
+                    </ProfileFormProvider>
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/compare" element={<Compare />} />
+            </Routes>
+          </main>
+          
+          <footer className="bg-gray-800 text-white p-4">
+            <p>&copy; 2023 My App</p>
+          </footer>
         </div>
-        <Footer />
-        <Toaster />
-      </div>
-    </Router>
+      </Router>
+    </QueryClientProvider>
   );
 }
-
-export default App;
