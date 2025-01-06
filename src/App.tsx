@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import { useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Plan } from "@/lib/api";
-import Index from "@/pages/Index";
 import Pricing from "@/pages/Pricing";
 import Compare from "@/pages/Compare";
 import Auth from "@/pages/Auth";
@@ -40,9 +39,8 @@ export default function App() {
         </div>
         <main className="flex-grow">
           <Routes>
-            <Route index element={<Index onSearch={handleSearch} />} />
             <Route 
-              path="/pricing" 
+              path="/" 
               element={
                 <Pricing 
                   onSearch={handleSearch}
@@ -51,6 +49,12 @@ export default function App() {
                   search={searchParams}
                   estimatedUse={searchParams?.estimatedUse || "1000"}
                 />
+              } 
+            />
+            <Route 
+              path="/pricing" 
+              element={
+                <Navigate to="/" replace />
               }
             />
             <Route 
