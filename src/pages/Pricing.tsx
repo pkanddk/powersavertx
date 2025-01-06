@@ -21,16 +21,6 @@ export default function Pricing({ onSearch, onCompare, comparedPlans, search, es
   const isMobile = useIsMobile();
   const [isLoading, setIsLoading] = useState(false);
   const [plans, setPlans] = useState<Plan[]>([]);
-  
-  // State for filters
-  const [currentSort, setCurrentSort] = useState("price-asc");
-  const [currentContractLength, setCurrentContractLength] = useState("all");
-  const [currentPlanType, setCurrentPlanType] = useState("all");
-  const [currentPrepaid, setCurrentPrepaid] = useState("all");
-  const [currentTimeOfUse, setCurrentTimeOfUse] = useState("all");
-  const [currentCompany, setCurrentCompany] = useState("all");
-  const [currentRenewable, setCurrentRenewable] = useState("all");
-  const [currentCancellationFee, setCurrentCancellationFee] = useState<[number, number]>([0, 99999]);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   useEffect(() => {
@@ -66,8 +56,8 @@ export default function Pricing({ onSearch, onCompare, comparedPlans, search, es
             className="absolute inset-0"
             style={{ 
               backgroundImage: "url('/lovable-uploads/5e950f3a-e331-4c06-aa8f-d883b1d7795f.png')",
-              backgroundSize: 'contain',
-              backgroundPosition: 'center',
+              backgroundSize: '100% auto',
+              backgroundPosition: 'center top',
               backgroundRepeat: 'no-repeat'
             }}
           >
@@ -85,8 +75,8 @@ export default function Pricing({ onSearch, onCompare, comparedPlans, search, es
           </p>
 
           {/* Search Form */}
-          <div className="max-w-md mx-auto w-full glass-effect rounded-lg p-4">
-            <SearchForm onSearch={onSearch} />
+          <div className="w-full max-w-2xl mx-auto glass-effect rounded-xl p-6">
+            <SearchForm onSearch={onSearch} isLoading={isLoading} />
           </div>
         </div>
 
@@ -122,6 +112,8 @@ export default function Pricing({ onSearch, onCompare, comparedPlans, search, es
 
                 {/* Mobile Filters Dialog */}
                 <MobileFiltersDialog
+                  isOpen={showMobileFilters}
+                  onClose={() => setShowMobileFilters(false)}
                   onSortChange={setCurrentSort}
                   onContractLengthChange={setCurrentContractLength}
                   onPlanTypeChange={setCurrentPlanType}
@@ -162,6 +154,7 @@ export default function Pricing({ onSearch, onCompare, comparedPlans, search, es
         <ComparisonBar
           plans={comparedPlans}
           onRemove={onCompare}
+          estimatedUse={estimatedUse}
         />
       )}
     </div>
