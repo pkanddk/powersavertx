@@ -3,7 +3,6 @@ import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Info } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
 
 interface AuthFormProps {
@@ -11,13 +10,12 @@ interface AuthFormProps {
 }
 
 export function AuthForm({ error }: AuthFormProps) {
-  const { toast } = useToast();
   const [authError, setAuthError] = useState<string | null>(error);
 
   useEffect(() => {
     console.log("[AuthForm] Initializing with error:", error);
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("[AuthForm] Auth state change:", event, session);
       
       if (event === 'SIGNED_IN' && session) {
@@ -29,7 +27,7 @@ export function AuthForm({ error }: AuthFormProps) {
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [error]);
 
   return (
     <>
