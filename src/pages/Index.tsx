@@ -11,14 +11,14 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-700 via-teal-600 to-emerald-500 flex items-center justify-center p-6">
-      <div className="w-full max-w-3xl space-y-8 text-center">
+    <div className="bg-gradient-to-br from-teal-700 via-teal-600 to-emerald-500 p-6">
+      <div className="w-full max-w-3xl mx-auto space-y-6">
         {/* Header */}
-        <div className="space-y-4">
-          <h1 className="text-4xl md:text-6xl font-bold text-white">
+        <div className="space-y-3">
+          <h1 className="text-3xl md:text-5xl font-bold text-white">
             Find Your Perfect Energy Plan
           </h1>
-          <p className="text-xl text-white/90">
+          <p className="text-lg text-white/90">
             Compare electricity rates and plans from top providers in your area
           </p>
         </div>
