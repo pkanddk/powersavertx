@@ -95,7 +95,14 @@ export default function ManageAlerts() {
         );
       }
 
-      setAlerts(formattedAlerts);
+      // Sort alerts to ensure universal alert is always first
+      const sortedAlerts = formattedAlerts.sort((a, b) => {
+        if (a.alert_type === 'universal') return -1;
+        if (b.alert_type === 'universal') return 1;
+        return 0;
+      });
+
+      setAlerts(sortedAlerts);
     } catch (error: any) {
       console.error('Error loading alerts:', error);
       toast({
