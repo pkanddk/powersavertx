@@ -33,14 +33,23 @@ export function AuthForm({ error }: AuthFormProps) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       handleAuthStateChange(event, session);
       
-      if (session?.error) {
-        console.error("Auth error:", session.error);
+      if (event === 'AUTH_ERROR' || event === 'USER_ERROR') {
+        const errorData = (session as any)?.error;
+        console.error("Auth error:", errorData);
         
-        const errorMessage = session.error instanceof AuthError 
-          ? session.error.message.includes('Invalid login credentials')
-            ? "Incorrect email or password"
-            : session.error.message
-          : "An unexpected error occurred";
+        let errorMessage = "An unexpected error occurred";
+        
+        if (errorData instanceof AuthError) {
+          if (errorData.message.includes('Invalid login credentials')) {
+            errorMessage = "Incorrect email or password";
+          } else if (errorData.message.includes('Password should be at least 6 characters')) {
+            errorMessage = "Password must be at least 6 characters long";
+          } else if (errorData.message.includes('Email not confirmed')) {
+            errorMessage = "Please verify your email address";
+          } else {
+            errorMessage = errorData.message;
+          }
+        }
         
         setAuthError(errorMessage);
         toast({
