@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { SearchForm } from "@/components/SearchForm";
 import { Badge } from "@/components/ui/badge";
-import { AuthMenu } from "@/components/auth/AuthMenu";
 
 export default function Index({ onSearch }: { onSearch: (zipCode: string, estimatedUse: string) => void }) {
   const navigate = useNavigate();
@@ -21,11 +20,6 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
 
   return (
     <div className="relative min-h-[calc(100vh-4rem)]">
-      {/* Auth Navigation - Now positioned on the left */}
-      <div className="absolute top-4 left-4 z-20">
-        <AuthMenu />
-      </div>
-
       {/* Main Content */}
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)]">
         {/* Hero Image Background */}

@@ -63,7 +63,7 @@ export function AuthMenu() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
-          <DropdownMenuItem onClick={() => handleAuth("/alerts")}>
+          <DropdownMenuItem onClick={() => handleAuth("/profile")}>
             <User className="h-4 w-4 mr-2" />
             Manage Alerts
           </DropdownMenuItem>
