@@ -60,7 +60,7 @@ export default function AuthPage() {
     document.addEventListener('submit', handleFormSubmit, true);
 
     // Auth state change listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state change event:", event);
       
       if (event === 'SIGNED_IN') {
@@ -77,8 +77,48 @@ export default function AuthPage() {
       }
     });
 
+    // Handle auth errors through a separate listener
+    const handleAuthError = async (error: AuthError) => {
+      console.error("Auth error:", error);
+      
+      if (error.message.includes("already registered")) {
+        const message = "This email is already registered. Please sign in instead.";
+        setError(message);
+        toast({
+          title: "Account Exists",
+          description: message,
+          variant: "destructive",
+        });
+      } else if (error.message.includes("Invalid login credentials")) {
+        const message = "Invalid email or password. Please try again.";
+        setError(message);
+        toast({
+          title: "Login Failed",
+          description: message,
+          variant: "destructive",
+        });
+      } else {
+        setError(error.message);
+        toast({
+          title: "Authentication Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
+    };
+
+    // Subscribe to auth errors
+    const {
+      data: { subscription: errorSubscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'USER_DELETED' || event === 'SIGNED_OUT') {
+        setError(null);
+      }
+    });
+
     return () => {
       subscription.unsubscribe();
+      errorSubscription.unsubscribe();
       document.removeEventListener('submit', handleFormSubmit, true);
     };
   }, [navigate, toast]);
