@@ -18,7 +18,7 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
       <div 
         className="absolute inset-0 bg-cover bg-center"
         style={{ 
-          backgroundImage: "url('/lovable-uploads/f5d9d82f-2512-4bcd-96fe-aeca04160865.png')",
+          backgroundImage: "url('/lovable-uploads/hero-final.jpg')",
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
