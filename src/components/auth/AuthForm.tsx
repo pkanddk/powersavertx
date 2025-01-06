@@ -28,26 +28,22 @@ export function AuthForm({ error }: AuthFormProps) {
       } else if (event === "PASSWORD_RECOVERY") {
         console.log("Password recovery initiated");
       }
-    };
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      handleAuthStateChange(event, session);
-      
-      if (event === 'AUTH_ERROR' || event === 'USER_ERROR') {
-        const errorData = (session as any)?.error;
-        console.error("Auth error:", errorData);
+      // Handle authentication errors
+      if (session?.error) {
+        console.error("Auth error:", session.error);
         
         let errorMessage = "An unexpected error occurred";
         
-        if (errorData instanceof AuthError) {
-          if (errorData.message.includes('Invalid login credentials')) {
+        if (session.error instanceof AuthError) {
+          if (session.error.message.includes('Invalid login credentials')) {
             errorMessage = "Incorrect email or password";
-          } else if (errorData.message.includes('Password should be at least 6 characters')) {
+          } else if (session.error.message.includes('Password should be at least 6 characters')) {
             errorMessage = "Password must be at least 6 characters long";
-          } else if (errorData.message.includes('Email not confirmed')) {
+          } else if (session.error.message.includes('Email not confirmed')) {
             errorMessage = "Please verify your email address";
           } else {
-            errorMessage = errorData.message;
+            errorMessage = session.error.message;
           }
         }
         
@@ -58,6 +54,10 @@ export function AuthForm({ error }: AuthFormProps) {
           variant: "destructive",
         });
       }
+    };
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      handleAuthStateChange(event, session);
     });
 
     return () => {
