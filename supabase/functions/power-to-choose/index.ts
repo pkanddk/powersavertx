@@ -5,29 +5,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Helper functions
-const parseRenewablePercentage = (plan: any): number | null => {
-  if (plan.renewable_percentage !== undefined && plan.renewable_percentage !== null) {
-    return Number(plan.renewable_percentage);
-  }
-
-  if (plan.renewable_energy_id) {
-    const percentage = Number(plan.renewable_energy_id);
-    if (!isNaN(percentage)) {
-      return percentage;
-    }
-  }
-
-  if (plan.renewable_energy_description) {
-    const match = plan.renewable_energy_description.match(/(\d+)%/);
-    if (match) {
-      return Number(match[1]);
-    }
-  }
-
-  return null;
-};
-
 const makeRequest = async (url: string, method: string, headers: Record<string, string>) => {
   try {
     console.log("[Edge Function] Making request to:", url);
@@ -107,7 +84,7 @@ const makeRequest = async (url: string, method: string, headers: Record<string, 
       contract_length: plan.term_value ? Number(plan.term_value) : null,
       prepaid: Boolean(plan.prepaid || false),
       timeofuse: Boolean(plan.timeofuse || false),
-      renewable_percentage: parseRenewablePercentage(plan),
+      renewable_percentage: plan.renewable_percentage !== undefined ? Number(plan.renewable_percentage) : null,
       pricing_details: plan.pricing_details || null,
       promotions: plan.promotions || null,
       enroll_phone: plan.enroll_phone || null,
