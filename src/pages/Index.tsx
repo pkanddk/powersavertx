@@ -13,41 +13,32 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
   };
 
   return (
-    <main className="container mx-auto px-4 py-8">
-      {/* Auth Menu */}
-      <div className="absolute top-4 right-4 z-50">
-        <AuthMenu />
-      </div>
+    <div className="min-h-screen bg-background">
+      <header className="w-full border-b">
+        <div className="container mx-auto px-4 py-4 flex justify-end">
+          <AuthMenu />
+        </div>
+      </header>
 
-      {/* Main Content */}
-      <div className="max-w-4xl mx-auto mt-12">
-        <div className="text-center space-y-6">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground">
+      <main className="container mx-auto px-4 py-12">
+        <div className="max-w-2xl mx-auto">
+          <h1 className="text-3xl font-bold text-foreground mb-4">
             Find Your Perfect Energy Plan
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          
+          <p className="text-lg text-muted-foreground mb-8">
             Compare electricity rates and plans from top providers in your area
           </p>
 
-          {/* Search Form */}
-          <div className="w-full max-w-2xl mx-auto mt-8">
-            <SearchForm onSearch={handleSearch} />
-          </div>
+          <SearchForm onSearch={handleSearch} />
 
-          {/* Features */}
-          <div className="flex flex-wrap justify-center gap-3 mt-6">
-            <Badge variant="secondary" className="py-1.5 px-4">
-              No Signup Required
-            </Badge>
-            <Badge variant="secondary" className="py-1.5 px-4">
-              Real-Time Rates
-            </Badge>
-            <Badge variant="secondary" className="py-1.5 px-4">
-              Trusted Providers
-            </Badge>
+          <div className="flex flex-wrap gap-2 mt-6">
+            <Badge variant="secondary">No Signup Required</Badge>
+            <Badge variant="secondary">Real-Time Rates</Badge>
+            <Badge variant="secondary">Trusted Providers</Badge>
           </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }
