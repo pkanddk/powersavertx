@@ -15,7 +15,7 @@ export function AuthForm({ error }: AuthFormProps) {
   const [authError, setAuthError] = useState<string | null>(null);
 
   useEffect(() => {
-    const handleAuthStateChange = async (event: string, session: any) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("Auth state change event:", event);
       
       switch (event) {
@@ -32,37 +32,38 @@ export function AuthForm({ error }: AuthFormProps) {
         case 'PASSWORD_RECOVERY':
           console.log("Password recovery initiated");
           break;
-        default:
-          // Check if it's an error event
-          if (event.includes('ERROR')) {
-            console.log("Auth error event:", event);
-            let errorMessage = "An error occurred during authentication";
-            
-            // Map specific error events to user-friendly messages
-            if (event.includes('INVALID_LOGIN_CREDENTIALS')) {
-              errorMessage = "Invalid email or password";
-            } else if (event.includes('INVALID_EMAIL')) {
-              errorMessage = "Please enter a valid email address";
-            } else if (event.includes('WEAK_PASSWORD')) {
-              errorMessage = "Password should be at least 6 characters long";
-            } else if (event.includes('EMAIL_TAKEN')) {
-              errorMessage = "This email is already registered";
-            }
-            
-            setAuthError(errorMessage);
-            toast({
-              title: "Authentication Error",
-              description: errorMessage,
-              variant: "destructive",
-            });
-          }
       }
+    });
+
+    // Set up error handling for auth events
+    const handleAuthError = (error: Error) => {
+      console.log("Auth error:", error);
+      let errorMessage = "An error occurred during authentication";
+      
+      if (error.message.includes('Invalid login credentials')) {
+        errorMessage = "Invalid email or password";
+      } else if (error.message.includes('Email not confirmed')) {
+        errorMessage = "Please confirm your email address";
+      } else if (error.message.includes('Password should be')) {
+        errorMessage = "Password should be at least 6 characters long";
+      } else if (error.message.includes('User already registered')) {
+        errorMessage = "This email is already registered";
+      }
+      
+      setAuthError(errorMessage);
+      toast({
+        title: "Authentication Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
     };
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(handleAuthStateChange);
+    // Subscribe to auth errors
+    const authErrorSubscription = supabase.auth.onError(handleAuthError);
 
     return () => {
       subscription.unsubscribe();
+      authErrorSubscription.unsubscribe();
     };
   }, [toast]);
 
