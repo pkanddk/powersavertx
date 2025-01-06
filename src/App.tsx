@@ -8,8 +8,8 @@ import Compare from "@/pages/Compare";
 import Auth from "@/pages/Auth";
 import FAQ from "@/pages/FAQ";
 import Alerts from "@/pages/Alerts";
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
-import Footer from "@/components/Footer";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { Footer } from "@/components/Footer";
 
 export default function App() {
   const [selectedPlans, setSelectedPlans] = useState<Plan[]>([]);
@@ -40,10 +40,10 @@ export default function App() {
               path="/pricing" 
               element={
                 <Pricing 
-                  search={searchParams}
                   onSearch={handleSearch}
-                  comparedPlans={selectedPlans}
                   onCompare={handleAddPlan}
+                  comparedPlans={selectedPlans}
+                  search={searchParams}
                   estimatedUse={searchParams?.estimatedUse || "1000"}
                 />
               } 
