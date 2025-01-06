@@ -30,19 +30,16 @@ export function AuthForm({ error }: AuthFormProps) {
       }
     };
 
-    // Handle both auth state changes and errors through the same listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       handleAuthStateChange(event, session);
       
-      // Check for error events
-      if (event === 'USER_ERROR') {
-        const error = session?.error;
-        console.error("Auth error:", error);
+      if (session?.error) {
+        console.error("Auth error:", session.error);
         
-        const errorMessage = error instanceof AuthError 
-          ? error.message.includes('Invalid login credentials')
+        const errorMessage = session.error instanceof AuthError 
+          ? session.error.message.includes('Invalid login credentials')
             ? "Incorrect email or password"
-            : error.message
+            : session.error.message
           : "An unexpected error occurred";
         
         setAuthError(errorMessage);
