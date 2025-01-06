@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -55,8 +56,18 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="flex flex-col md:flex-row gap-3">
+    <form onSubmit={handleSubmit} className="space-y-4 w-full max-w-md mx-auto">
+      <div className="flex flex-col gap-3">
+        <Input
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          maxLength={5}
+          placeholder="Enter ZIP Code"
+          value={zipCode}
+          onChange={(e) => setZipCode(e.target.value.replace(/\D/g, ""))}
+          className="h-14 bg-white/10 backdrop-blur-sm border-0 text-white placeholder:text-white/70"
+        />
         <Select
           value={estimatedUse}
           onValueChange={setEstimatedUse}
