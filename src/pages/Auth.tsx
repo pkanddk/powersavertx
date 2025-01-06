@@ -7,7 +7,6 @@ import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { AuthError } from "@supabase/supabase-js";
 
 export default function AuthPage() {
   const navigate = useNavigate();
@@ -33,34 +32,26 @@ export default function AuthPage() {
         setError("Please check your email to reset your password.");
       } else if (event === "USER_UPDATED") {
         setError(null);
+      } else if (event === "SIGNED_OUT") {
+        setError(null);
+      }
+    });
+
+    // Set up auth error listener
+    const authListener = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_UP") {
+        toast({
+          title: "Account created",
+          description: "Please check your email to confirm your account.",
+        });
       }
     });
 
     return () => {
       subscription.unsubscribe();
+      authListener.data.subscription.unsubscribe();
     };
-  }, [navigate]);
-
-  // Handle authentication errors
-  const handleAuthError = (error: AuthError) => {
-    console.error("Auth error:", error);
-    let errorMessage = "An unexpected error occurred. Please try again.";
-
-    if (error.message.includes("Email not confirmed")) {
-      errorMessage = "Please check your email to confirm your account before signing in.";
-    } else if (error.message.includes("Invalid login credentials")) {
-      errorMessage = "Invalid email or password. Please try again.";
-    } else if (error.message.includes("weak_password")) {
-      errorMessage = "Password should be at least 6 characters long.";
-    }
-
-    setError(errorMessage);
-    toast({
-      variant: "destructive",
-      title: "Authentication Error",
-      description: errorMessage,
-    });
-  };
+  }, [navigate, toast]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -98,11 +89,20 @@ export default function AuthPage() {
                   brandAccent: '#6D28D9',
                 }
               }
+            },
+            style: {
+              input: {
+                borderRadius: '0.375rem',
+              },
+              message: {
+                color: 'rgb(239 68 68)',
+                fontSize: '0.875rem',
+                marginTop: '0.5rem'
+              }
             }
           }}
           providers={[]}
           redirectTo={window.location.origin}
-          onError={handleAuthError}
         />
       </Card>
     </div>
