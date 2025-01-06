@@ -13,7 +13,7 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
   };
 
   return (
-    <div className="bg-gradient-to-b from-primary/5 to-background">
+    <div>
       <div className="container mx-auto px-4 py-12 md:py-24">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Column - Content */}
