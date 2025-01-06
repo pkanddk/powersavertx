@@ -25,33 +25,37 @@ export function AuthForm({ error }: AuthFormProps) {
         console.log("User signed out");
       } else if (event === "USER_UPDATED") {
         console.log("User updated");
+      } else if (event === "PASSWORD_RECOVERY") {
+        console.log("Password recovery initiated");
       }
     };
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(handleAuthStateChange);
-
-    // Set up error listener
-    const {
-      data: { subscription: errorSubscription },
-    } = supabase.auth.onError((error) => {
-      console.error("Auth error from listener:", error);
-      const errorMessage = error instanceof AuthError 
-        ? error.message.includes('Invalid login credentials')
-          ? "Incorrect email or password"
-          : error.message
-        : "An unexpected error occurred";
+    // Handle both auth state changes and errors through the same listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      handleAuthStateChange(event, session);
       
-      setAuthError(errorMessage);
-      toast({
-        title: "Authentication Error",
-        description: errorMessage,
-        variant: "destructive",
-      });
+      // Check for error events
+      if (event === 'USER_ERROR') {
+        const error = session?.error;
+        console.error("Auth error:", error);
+        
+        const errorMessage = error instanceof AuthError 
+          ? error.message.includes('Invalid login credentials')
+            ? "Incorrect email or password"
+            : error.message
+          : "An unexpected error occurred";
+        
+        setAuthError(errorMessage);
+        toast({
+          title: "Authentication Error",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      }
     });
 
     return () => {
       subscription.unsubscribe();
-      errorSubscription.unsubscribe();
     };
   }, [toast]);
 
