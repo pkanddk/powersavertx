@@ -49,13 +49,13 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
 
           {/* Features */}
           <div className="flex flex-wrap justify-center gap-2 mt-6">
-            <Badge variant="secondary" className="bg-white/20 backdrop-blur-sm text-white border-white/30">
+            <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
               No Signup Required
             </Badge>
-            <Badge variant="secondary" className="bg-white/20 backdrop-blur-sm text-white border-white/30">
+            <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
               Real-Time Rates
             </Badge>
-            <Badge variant="secondary" className="bg-white/20 backdrop-blur-sm text-white border-white/30">
+            <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
               Trusted Providers
             </Badge>
           </div>

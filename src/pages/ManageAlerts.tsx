@@ -246,7 +246,7 @@ export default function ManageAlerts() {
 
       <div className="space-y-8">
         {/* Universal Alert Form - Always at the top */}
-        <div className="w-full max-w-md mx-auto">
+        <div className="w-full">
           <UniversalAlertForm onSubmit={handleUniversalAlert} />
         </div>
 

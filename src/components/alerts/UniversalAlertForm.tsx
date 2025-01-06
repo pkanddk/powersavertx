@@ -20,7 +20,7 @@ export function UniversalAlertForm({ onSubmit }: UniversalAlertFormProps) {
   };
 
   return (
-    <Card>
+    <Card className="w-full">
       <CardHeader>
         <CardTitle>Set Universal Price Alert</CardTitle>
       </CardHeader>
