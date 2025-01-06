@@ -41,48 +41,51 @@ export const searchPlans = async (zipCode: string, estimatedUse?: string) => {
     
     // Call the Edge Function
     console.log('[API] Calling Edge Function with params:', { zipCode, estimatedUse });
-    const { data: responseData, error: functionError } = await supabase.functions.invoke('power-to-choose', {
+    const { data, error } = await supabase.functions.invoke('power-to-choose', {
       body: { zipCode, estimatedUse },
     });
 
-    console.log('[API] Edge Function raw response:', responseData);
+    console.log('[API] Edge Function response:', data);
 
-    if (functionError) {
-      console.error('[API] Error calling Edge Function:', functionError);
-      throw functionError;
+    if (error) {
+      console.error('[API] Error from Edge Function:', error);
+      throw new Error(error.message || 'Unable to fetch energy plans. Please try again later.');
     }
 
-    if (!responseData) {
+    if (!data) {
       console.error('[API] No data received from Edge Function');
-      throw new Error('No data received from Edge Function');
+      throw new Error('No energy plans found. Please try a different ZIP code.');
     }
 
-    // If responseData is an error object, throw it
-    if ('error' in responseData) {
-      console.error('[API] Error from Edge Function:', responseData.error);
-      throw new Error(responseData.error);
+    // If the response contains an error message, throw it
+    if ('error' in data && typeof data.message === 'string') {
+      console.error('[API] Error message in response:', data.message);
+      throw new Error(data.message);
     }
 
     // Ensure we have an array to work with
-    const plansArray = Array.isArray(responseData) ? responseData : [responseData];
+    const plansArray = Array.isArray(data) ? data : [data];
     console.log('[API] Plans array before validation:', plansArray);
 
-    // Parse and validate each plan individually to identify specific validation issues
+    // Parse and validate each plan individually
     const validatedPlans = plansArray.map((plan, index) => {
       try {
         return PlanSchema.parse(plan);
       } catch (error) {
         console.error(`[API] Validation error for plan ${index}:`, error);
         console.error(`[API] Problem plan data:`, plan);
-        throw error;
+        throw new Error('We encountered an issue processing the energy plans. Please try again.');
       }
     });
 
     console.log('[API] Validated plans:', validatedPlans);
-    
     return validatedPlans;
   } catch (error) {
     console.error("[API] Error fetching plans:", error);
-    throw error;
+    // Ensure we always return a user-friendly error message
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
+    throw new Error('Unable to fetch energy plans. Please try again later.');
   }
 };
