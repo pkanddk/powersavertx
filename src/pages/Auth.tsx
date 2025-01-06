@@ -97,14 +97,28 @@ export default function AuthPage() {
           redirectTo={window.location.origin}
           localization={{
             variables: {
-              sign_up: {
-                password_too_short: "Password should be at least 6 characters long",
-                password_validation_failed: "Password must be at least 6 characters long"
-              },
               sign_in: {
-                password_validation_failed: "Password must be at least 6 characters long"
-              }
-            }
+                email_label: 'Email',
+                password_label: 'Password',
+                email_input_placeholder: 'Your email address',
+                password_input_placeholder: 'Your password',
+                button_label: 'Sign in',
+                loading_button_label: 'Signing in ...',
+                social_provider_text: 'Sign in with {{provider}}',
+                link_text: 'Already have an account? Sign in',
+              },
+              sign_up: {
+                email_label: 'Email',
+                password_label: 'Password',
+                email_input_placeholder: 'Your email address',
+                password_input_placeholder: 'Your password (min 6 characters)',
+                button_label: 'Sign up',
+                loading_button_label: 'Signing up ...',
+                social_provider_text: 'Sign up with {{provider}}',
+                link_text: "Don't have an account? Sign up",
+                confirmation_text: 'Check your email for the confirmation link',
+              },
+            },
           }}
         />
       </Card>
