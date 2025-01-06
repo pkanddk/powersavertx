@@ -5,7 +5,6 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
-import { AuthError } from '@supabase/supabase-js';
 
 interface AuthFormProps {
   error: string | null;
@@ -17,55 +16,48 @@ export function AuthForm({ error }: AuthFormProps) {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("[AuthForm] Auth state change event:", event);
-      
-      if (event === 'SIGNED_IN') {
-        if (session) {
-          console.log("[AuthForm] User signed in successfully");
-          setAuthError(null);
-        }
-      } else if (event === 'USER_UPDATED') {
-        console.log("[AuthForm] User updated");
+      if (event === 'SIGNED_IN' && session) {
+        console.log("[AuthForm] User signed in successfully");
+        setAuthError(null);
       }
     });
 
-    // Handle auth errors before they propagate
     const handleAuthError = (error: any) => {
-      console.error("[AuthForm] Auth error:", error);
+      console.log("[AuthForm] Handling auth error:", error);
       
-      let errorMessage = "Unable to sign in. Please check your email and password.";
+      let errorMessage = "Please check your email and password.";
       
       if (error.message?.includes("Email not confirmed")) {
-        errorMessage = "Please verify your email address before signing in.";
+        errorMessage = "Please check your email and click the verification link to sign in.";
       }
       else if (error.message?.includes("rate limit")) {
-        errorMessage = "Too many sign in attempts. Please try again in a few minutes.";
+        errorMessage = "Please wait a few minutes before trying again.";
       }
       else if (error.message?.includes("already registered")) {
         errorMessage = "This email is already registered. Please sign in instead.";
       }
       else if (error.message?.includes("Password")) {
-        errorMessage = "Your password must be at least 6 characters long.";
+        errorMessage = "Password must be at least 6 characters.";
       }
-      else if (error.message?.includes("body stream already read") || 
-               error.message?.includes("Failed to execute 'json'")) {
-        errorMessage = "Your session has expired. Please refresh the page to try again.";
+      else if (error.message?.includes("body stream") || 
+               error.message?.includes("json")) {
+        errorMessage = "Please refresh the page and try again.";
       }
       else if (error.message?.includes("Invalid login credentials") || 
                error.status === 400) {
-        errorMessage = "The email or password you entered is incorrect.";
+        errorMessage = "Incorrect email or password.";
       }
       
-      console.log("[AuthForm] Setting error message:", errorMessage);
+      console.log("[AuthForm] Setting user-friendly error:", errorMessage);
       setAuthError(errorMessage);
+      
       toast({
         variant: "destructive",
-        title: "Sign In Error",
+        title: "Unable to sign in",
         description: errorMessage,
       });
     };
 
-    // Listen for auth errors
     window.addEventListener('supabase.auth.error', (event: any) => {
       if (event.detail?.error) {
         handleAuthError(event.detail.error);
