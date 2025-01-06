@@ -44,19 +44,6 @@ export default function App() {
             <Route 
               path="/pricing" 
               element={
-                searchParams ? (
-                  <Navigate 
-                    to={`/pricing?zip=${searchParams.zipCode}&usage=${searchParams.estimatedUse}`} 
-                    replace 
-                  />
-                ) : (
-                  <Navigate to="/" replace />
-                )
-              } 
-            />
-            <Route
-              path="/pricing"
-              element={
                 <Pricing 
                   onSearch={handleSearch}
                   onCompare={handleAddPlan}
