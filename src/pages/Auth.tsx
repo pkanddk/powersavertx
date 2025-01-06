@@ -21,11 +21,9 @@ export default function AuthPage({ mode }: AuthPageProps) {
     const checkUser = async () => {
       try {
         const { data: { user }, error } = await supabase.auth.getUser();
-        if (error && error.message !== "Auth session missing!") {
-          throw error;
-        }
         
-        if (user) {
+        // Only redirect if we have a valid user object
+        if (user && user.id) {
           console.log("[Auth] User already logged in, redirecting to home");
           navigate("/");
         }
@@ -46,7 +44,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("[Auth] Auth state change event:", event);
       
-      if (event === 'SIGNED_IN') {
+      if (event === 'SIGNED_IN' && session?.user) {
         console.log("[Auth] User signed in, redirecting to home");
         navigate("/");
       }
