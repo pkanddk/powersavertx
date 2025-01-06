@@ -48,9 +48,10 @@ const makeRequest = async (url: string, method: string, headers: Record<string, 
     if (!response.ok) {
       const errorText = await response.text();
       console.error("[Edge Function] Error Response:", errorText);
-      throw new Error(`HTTP Error ${response.status}: ${errorText}`);
+      throw new Error(`Unable to fetch energy plans. Please try again later.`);
     }
 
+    // Read the response text once
     const responseText = await response.text();
     console.log("[Edge Function] Raw response:", responseText);
 
@@ -72,12 +73,12 @@ const makeRequest = async (url: string, method: string, headers: Record<string, 
       
     } catch (parseError) {
       console.error("[Edge Function] JSON parse error:", parseError);
-      throw new Error("Failed to parse API response as JSON");
+      throw new Error("We're having trouble processing the energy plans data. Please try again later.");
     }
 
     if (data.error || (data.success === false)) {
       console.error("[Edge Function] API returned error:", data);
-      throw new Error(data.message || "API returned an error");
+      throw new Error(data.message || "Unable to retrieve energy plans at this time. Please try again later.");
     }
 
     let plans = [];
@@ -91,10 +92,14 @@ const makeRequest = async (url: string, method: string, headers: Record<string, 
       plans = data.Results;
     } else {
       console.error("[Edge Function] Unexpected response structure:", data);
-      throw new Error("Unexpected response structure from API");
+      throw new Error("We encountered an issue with the energy plans data format. Please try again later.");
     }
 
     console.log(`[Edge Function] Found ${plans.length} plans`);
+    
+    if (plans.length === 0) {
+      throw new Error("No energy plans found for your area. Please try a different ZIP code.");
+    }
     
     // Transform the plans to match our schema
     const transformedPlans = plans.map(plan => ({
@@ -148,7 +153,7 @@ serve(async (req) => {
     console.log(`[Edge Function] Received request with ZIP: ${zipCode}, Usage: ${estimatedUse}`);
 
     if (!zipCode) {
-      throw new Error("ZIP code is required");
+      throw new Error("Please enter a ZIP code to search for energy plans.");
     }
 
     const apiUrl = `http://api.powertochoose.org/api/PowerToChoose/plans?zip_code=${zipCode}${estimatedUse && estimatedUse !== "any" ? `&kWh=${estimatedUse}` : ''}`;
@@ -170,8 +175,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         error: true,
-        message: error.message || "An unexpected error occurred",
-        details: error.stack
+        message: error.message || "An unexpected error occurred while fetching energy plans. Please try again later."
       }),
       {
         status: 500,
