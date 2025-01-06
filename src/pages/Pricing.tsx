@@ -5,7 +5,7 @@ import { PlanGrid } from "@/components/PlanGrid";
 import { Plan } from "@/lib/api";
 import { PlanFilters } from "@/components/PlanFilters";
 import { ComparisonBar } from "@/components/plan/ComparisonBar";
-import { useMediaQuery } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { MobileFiltersDialog } from "@/components/filters/MobileFiltersDialog";
 
 interface PricingProps {
@@ -18,19 +18,19 @@ interface PricingProps {
 
 export default function Pricing({ onSearch, onCompare, comparedPlans, search, estimatedUse }: PricingProps) {
   const navigate = useNavigate();
-  const isMobile = useMediaQuery("(max-width: 768px)");
+  const isMobile = useIsMobile();
   const [isLoading, setIsLoading] = useState(false);
   const [plans, setPlans] = useState<Plan[]>([]);
-  const [filters, setFilters] = useState({
-    sortBy: "price_kwh",
-    companies: [] as string[],
-    contractLength: [0, 60],
-    baseCharge: [0, 100],
-    cancellationFee: [0, 500],
-    renewable: false,
-    prepaid: false,
-    timeOfUse: false,
-  });
+  
+  // State for filters
+  const [currentSort, setCurrentSort] = useState("price-asc");
+  const [currentContractLength, setCurrentContractLength] = useState("all");
+  const [currentPlanType, setCurrentPlanType] = useState("all");
+  const [currentPrepaid, setCurrentPrepaid] = useState("all");
+  const [currentTimeOfUse, setCurrentTimeOfUse] = useState("all");
+  const [currentCompany, setCurrentCompany] = useState("all");
+  const [currentRenewable, setCurrentRenewable] = useState("all");
+  const [currentCancellationFee, setCurrentCancellationFee] = useState<[number, number]>([0, 99999]);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   useEffect(() => {
@@ -94,31 +94,55 @@ export default function Pricing({ onSearch, onCompare, comparedPlans, search, es
                 {!isMobile && (
                   <aside className="w-full md:w-64 space-y-6">
                     <PlanFilters 
-                      filters={filters}
-                      onChange={setFilters}
+                      onSortChange={setCurrentSort}
+                      onContractLengthChange={setCurrentContractLength}
+                      onPlanTypeChange={setCurrentPlanType}
+                      onPrepaidChange={setCurrentPrepaid}
+                      onTimeOfUseChange={setCurrentTimeOfUse}
+                      onCompanyChange={setCurrentCompany}
+                      onRenewableChange={setCurrentRenewable}
+                      onCancellationFeeChange={setCurrentCancellationFee}
+                      currentSort={currentSort}
+                      currentContractLength={currentContractLength}
+                      currentPlanType={currentPlanType}
+                      currentPrepaid={currentPrepaid}
+                      currentTimeOfUse={currentTimeOfUse}
+                      currentCompany={currentCompany}
+                      currentRenewable={currentRenewable}
+                      currentCancellationFee={currentCancellationFee}
+                      plans={plans}
                     />
                   </aside>
                 )}
 
                 {/* Mobile Filters Dialog */}
                 <MobileFiltersDialog
-                  open={showMobileFilters}
-                  onOpenChange={setShowMobileFilters}
-                  filters={filters}
-                  onChange={setFilters}
+                  onSortChange={setCurrentSort}
+                  onContractLengthChange={setCurrentContractLength}
+                  onPlanTypeChange={setCurrentPlanType}
+                  onPrepaidChange={setCurrentPrepaid}
+                  onTimeOfUseChange={setCurrentTimeOfUse}
+                  onCompanyChange={setCurrentCompany}
+                  onRenewableChange={setCurrentRenewable}
+                  onCancellationFeeChange={setCurrentCancellationFee}
+                  currentSort={currentSort}
+                  currentContractLength={currentContractLength}
+                  currentPlanType={currentPlanType}
+                  currentPrepaid={currentPrepaid}
+                  currentTimeOfUse={currentTimeOfUse}
+                  currentCompany={currentCompany}
+                  currentRenewable={currentRenewable}
+                  currentCancellationFee={currentCancellationFee}
+                  plans={plans}
                 />
 
                 {/* Plans Grid */}
                 <main className="flex-1">
                   <PlanGrid
                     plans={plans}
-                    isLoading={isLoading}
                     onCompare={onCompare}
                     comparedPlans={comparedPlans}
                     estimatedUse={estimatedUse}
-                    showMobileFilters={() => setShowMobileFilters(true)}
-                    isMobile={isMobile}
-                    filters={filters}
                   />
                 </main>
               </div>
@@ -131,7 +155,7 @@ export default function Pricing({ onSearch, onCompare, comparedPlans, search, es
       {comparedPlans.length > 0 && (
         <ComparisonBar
           plans={comparedPlans}
-          onViewComparison={() => navigate('/compare')}
+          onRemove={onCompare}
           estimatedUse={estimatedUse}
         />
       )}
