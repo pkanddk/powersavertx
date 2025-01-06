@@ -33,7 +33,7 @@ export function AuthForm({ error }: AuthFormProps) {
     const handleAuthError = (error: any) => {
       console.error("[AuthForm] Auth error:", error);
       
-      let userMessage = "We couldn't sign you in right now. Please try again.";
+      let userMessage = "There was a problem with the authentication process. Please try again and if the issue persists, contact support.";
       
       // Check if the error is an AuthError
       if (error instanceof AuthError) {
@@ -51,13 +51,13 @@ export function AuthForm({ error }: AuthFormProps) {
           userMessage = "Your password must be at least 6 characters long.";
         }
       } else if (error.message?.includes("body stream already read")) {
-        userMessage = "Your session has expired. Please refresh the page and try signing in again.";
+        userMessage = "The authentication process was interrupted. This usually happens when the page has been open for too long. Please refresh the page and try signing in again. If this keeps happening, try clearing your browser cache.";
       }
       
       setAuthError(userMessage);
       toast({
         variant: "destructive",
-        title: "Sign In Error",
+        title: "Authentication Error",
         description: userMessage,
       });
     };
