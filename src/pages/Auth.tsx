@@ -39,7 +39,7 @@ export default function AuthPage() {
     checkUser();
 
     // Form submission handler for password validation
-    const handleFormSubmit = (event: Event) => {
+    const handleFormSubmit = async (event: Event) => {
       const form = event.target as HTMLFormElement;
       if (!form || !form.matches('form')) return;
       
@@ -81,6 +81,8 @@ export default function AuthPage() {
     // Listen for Supabase auth errors
     const handleAuthError = (event: CustomEvent) => {
       const error = event.detail?.error;
+      if (!error) return;
+      
       console.error("Auth error:", error);
       
       if (error?.message?.includes("Invalid login credentials")) {

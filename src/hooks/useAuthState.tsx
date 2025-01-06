@@ -13,16 +13,14 @@ export function useAuthState() {
       try {
         const { data: { user }, error } = await supabase.auth.getUser();
         if (error) {
-          console.error('Error checking user:', error);
-          if (error instanceof AuthError) {
-            // Only show error toast if it's not the initial "Auth session missing" error
-            if (error.message !== "Auth session missing!") {
-              toast({
-                title: "Authentication Error",
-                description: error.message,
-                variant: "destructive",
-              });
-            }
+          // Only show error toast if it's not the initial "Auth session missing" error
+          if (error instanceof AuthError && error.message !== "Auth session missing!") {
+            console.error('Error checking user:', error);
+            toast({
+              title: "Authentication Error",
+              description: error.message,
+              variant: "destructive",
+            });
           }
           return;
         }
