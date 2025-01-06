@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
 import {
   Select,
   SelectContent,
@@ -16,15 +17,31 @@ interface SearchFormProps {
 
 export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
   const [zipCode, setZipCode] = useState("");
-  const [estimatedUse, setEstimatedUse] = useState("500");
+  const [estimatedUse, setEstimatedUse] = useState("1000");
+  const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     try {
       console.log("[SearchForm] Submitting search:", { zipCode, estimatedUse });
+      
+      if (!zipCode || zipCode.length !== 5) {
+        toast({
+          variant: "destructive",
+          title: "Invalid ZIP Code",
+          description: "Please enter a valid 5-digit ZIP code",
+        });
+        return;
+      }
+
       onSearch(zipCode, estimatedUse);
     } catch (error) {
       console.error("[SearchForm] Error in handleSubmit:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "An error occurred while searching. Please try again.",
+      });
     }
   };
 

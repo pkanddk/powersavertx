@@ -9,6 +9,9 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
   const handleSearch = (zipCode: string, estimatedUse: string) => {
     try {
       console.log("[Index] Handling search:", { zipCode, estimatedUse });
+      if (!zipCode || zipCode.length !== 5) {
+        throw new Error("Please enter a valid 5-digit ZIP code");
+      }
       onSearch(zipCode, estimatedUse);
       navigate("/pricing");
     } catch (error) {

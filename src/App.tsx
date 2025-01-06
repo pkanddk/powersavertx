@@ -19,6 +19,7 @@ export default function App() {
   } | null>(null);
 
   const handleSearch = (zipCode: string, estimatedUse: string) => {
+    console.log("[App] Handling search with:", { zipCode, estimatedUse });
     setSearchParams({ zipCode, estimatedUse });
   };
 
@@ -35,17 +36,21 @@ export default function App() {
       <div className="flex flex-col min-h-screen">
         <main className="flex-grow">
           <Routes>
-            <Route path="/" element={<Index onSearch={handleSearch} />} />
+            <Route index element={<Index onSearch={handleSearch} />} />
             <Route 
               path="/pricing" 
               element={
-                <Pricing 
-                  onSearch={handleSearch}
-                  onCompare={handleAddPlan}
-                  comparedPlans={selectedPlans}
-                  search={searchParams}
-                  estimatedUse={searchParams?.estimatedUse || "1000"}
-                />
+                searchParams ? (
+                  <Pricing 
+                    onSearch={handleSearch}
+                    onCompare={handleAddPlan}
+                    comparedPlans={selectedPlans}
+                    search={searchParams}
+                    estimatedUse={searchParams.estimatedUse}
+                  />
+                ) : (
+                  <Navigate to="/" replace />
+                )
               } 
             />
             <Route 
