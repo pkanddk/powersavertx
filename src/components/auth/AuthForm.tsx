@@ -15,80 +15,52 @@ export function AuthForm({ error }: AuthFormProps) {
   const [authError, setAuthError] = useState<string | null>(error);
 
   useEffect(() => {
+    console.log("[AuthForm] Initializing with error:", error);
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("[AuthForm] Auth state change:", event, session);
+      
       if (event === 'SIGNED_IN' && session) {
         console.log("[AuthForm] User signed in successfully");
         setAuthError(null);
       }
     });
 
-    const handleAuthError = (error: any) => {
-      console.log("[AuthForm] Handling auth error:", error);
-      
-      let errorMessage = "Please check your email and password.";
-      
-      // Convert technical errors to user-friendly messages
-      if (error.message?.includes("Email not confirmed")) {
-        errorMessage = "Please check your email and click the verification link to sign in.";
-      }
-      else if (error.message?.includes("rate limit")) {
-        errorMessage = "Please wait a few minutes before trying again.";
-      }
-      else if (error.message?.includes("already registered")) {
-        errorMessage = "This email is already registered. Please sign in instead.";
-      }
-      else if (error.message?.includes("Password")) {
-        errorMessage = "Password must be at least 6 characters.";
-      }
-      else if (error.message?.includes("body stream") || 
-               error.message?.includes("json") ||
-               error.message?.includes("Failed to execute")) {
-        errorMessage = "Please refresh the page and try again.";
-      }
-      else if (error.message?.includes("Invalid login credentials") || 
-               error.status === 400) {
-        errorMessage = "Incorrect email or password.";
-      }
-      
-      console.log("[AuthForm] Setting user-friendly error:", errorMessage);
-      setAuthError(errorMessage);
-      
-      toast({
-        variant: "destructive",
-        title: "Unable to sign in",
-        description: errorMessage,
-      });
-    };
-
-    // Listen for auth errors from Supabase events
-    window.addEventListener('supabase.auth.error', (event: any) => {
-      if (event.detail?.error) {
-        handleAuthError(event.detail.error);
-      }
-    });
-
-    // Also catch any JSON parsing or response errors
-    const originalFetch = window.fetch;
-    window.fetch = async function(...args) {
-      try {
-        const response = await originalFetch.apply(this, args);
-        return response;
-      } catch (error: any) {
-        if (error.message?.includes('body stream') || 
-            error.message?.includes('json') ||
-            error.message?.includes('Failed to execute')) {
-          handleAuthError(error);
-        }
-        throw error;
-      }
-    };
-
     return () => {
       subscription.unsubscribe();
-      window.removeEventListener('supabase.auth.error', handleAuthError);
-      window.fetch = originalFetch;
     };
   }, [toast]);
+
+  // Create a wrapper around supabase auth to catch errors
+  const supabaseAuthClient = {
+    ...supabase.auth,
+    signInWithPassword: async (credentials: { email: string; password: string }) => {
+      try {
+        console.log("[AuthForm] Attempting sign in");
+        const response = await supabase.auth.signInWithPassword(credentials);
+        console.log("[AuthForm] Sign in response:", response);
+        return response;
+      } catch (error: any) {
+        console.error("[AuthForm] Sign in error:", error);
+        let message = "Unable to sign in. Please try again.";
+        
+        if (error.message?.includes("body stream") || 
+            error.message?.includes("json") ||
+            error.message?.includes("Failed to execute")) {
+          message = "Please refresh the page and try again.";
+        }
+        
+        setAuthError(message);
+        toast({
+          variant: "destructive",
+          title: "Sign in failed",
+          description: message
+        });
+        
+        throw error;
+      }
+    }
+  };
 
   return (
     <>
@@ -108,7 +80,7 @@ export function AuthForm({ error }: AuthFormProps) {
       </Alert>
 
       <Auth
-        supabaseClient={supabase}
+        supabaseClient={supabaseAuthClient}
         appearance={{
           theme: ThemeSupa,
           variables: {
