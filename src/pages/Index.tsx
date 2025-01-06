@@ -14,11 +14,11 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
 
   return (
     <div 
-      className="relative min-h-screen flex items-center justify-center bg-cover bg-center"
+      className="relative min-h-[70vh] flex items-start justify-center bg-cover bg-center pt-24"
       style={{ 
         backgroundImage: 'url("/lovable-uploads/4401e154-998f-4a3f-99d5-7bcf11361699.png")',
         backgroundColor: 'rgba(45, 55, 72, 0.5)',
-        backgroundBlend: 'overlay'
+        backgroundBlendMode: 'overlay'
       }}
     >
       {/* Auth Menu - Glass effect in top right */}
