@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { SearchForm } from "@/components/SearchForm";
+import { Badge } from "@/components/ui/badge";
 
 export default function Index({ onSearch }: { onSearch: (zipCode: string, estimatedUse: string) => void }) {
   const navigate = useNavigate();
@@ -11,32 +12,44 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
   };
 
   return (
-    <div className="bg-gradient-to-br from-teal-700 via-teal-600 to-emerald-500 py-8">
-      <div className="w-full max-w-xl mx-auto px-4">
-        {/* Header */}
-        <div className="mb-4">
-          <h1 className="text-3xl md:text-5xl font-bold text-white text-center">
-            Find Your Perfect Energy Plan
-          </h1>
-          <p className="text-lg text-white/90 text-center mt-2">
-            Compare electricity rates and plans from top providers in your area
-          </p>
-        </div>
+    <div className="relative min-h-[calc(100vh-4rem)]">
+      {/* Hero Image Background */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center z-0"
+        style={{ 
+          backgroundImage: "url('/lovable-uploads/f5d9d82f-2512-4bcd-96fe-aeca04160865.png')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        <div className="absolute inset-0 bg-black/50" />
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] text-center space-y-6 px-4">
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white">
+          Find Your Perfect Energy Plan
+        </h1>
+        <p className="text-xl text-white/90 max-w-2xl mx-auto">
+          Compare electricity rates and plans from top providers in your area
+        </p>
 
         {/* Search Form */}
-        <SearchForm onSearch={handleSearch} />
+        <div className="max-w-md mx-auto w-full">
+          <SearchForm onSearch={handleSearch} />
+        </div>
 
         {/* Features */}
-        <div className="flex flex-wrap justify-center gap-2 mt-3">
-          <div className="px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-sm">
-            <p className="text-sm text-white">No Signup Required</p>
-          </div>
-          <div className="px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-sm">
-            <p className="text-sm text-white">Real-Time Rates</p>
-          </div>
-          <div className="px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-sm">
-            <p className="text-sm text-white">Trusted Providers</p>
-          </div>
+        <div className="flex flex-wrap justify-center gap-2 mt-6">
+          <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
+            No Signup Required
+          </Badge>
+          <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
+            Real-Time Rates
+          </Badge>
+          <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
+            Trusted Providers
+          </Badge>
         </div>
       </div>
     </div>
