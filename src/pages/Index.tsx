@@ -13,27 +13,29 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
   };
 
   return (
-    <div className="w-full">
-      <nav className="w-full border-b bg-white">
-        <div className="w-full px-4 py-3 flex justify-end">
+    <div className="min-h-screen flex flex-col">
+      <header className="border-b bg-white">
+        <div className="flex justify-end px-4 py-2">
           <AuthMenu />
         </div>
-      </nav>
+      </header>
 
-      <div className="w-full px-4 py-6">
-        <div className="w-full max-w-4xl">
-          <h1 className="text-2xl font-semibold mb-2">Find Your Perfect Energy Plan</h1>
-          <p className="text-muted-foreground mb-6">Compare electricity rates and plans from top providers in your area</p>
+      <main className="flex-1 flex items-center justify-center bg-gradient-to-b from-teal-600 to-teal-700">
+        <div className="w-full px-6 py-12 text-center text-white">
+          <h1 className="text-4xl font-bold mb-4">Find Your Perfect Energy Plan</h1>
+          <p className="text-xl mb-8">Compare electricity rates and plans from top providers in your area</p>
           
-          <SearchForm onSearch={handleSearch} />
-          
-          <div className="flex gap-2 mt-4">
-            <Badge variant="secondary">No Signup Required</Badge>
-            <Badge variant="secondary">Real-Time Rates</Badge>
-            <Badge variant="secondary">Trusted Providers</Badge>
+          <div className="max-w-3xl mx-auto">
+            <SearchForm onSearch={handleSearch} />
+            
+            <div className="flex justify-center gap-2 mt-4">
+              <Badge variant="secondary" className="bg-white/10">No Signup Required</Badge>
+              <Badge variant="secondary" className="bg-white/10">Real-Time Rates</Badge>
+              <Badge variant="secondary" className="bg-white/10">Trusted Providers</Badge>
+            </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

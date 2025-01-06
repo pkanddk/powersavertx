@@ -56,7 +56,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full flex flex-col md:flex-row gap-3">
+    <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-3">
       <Input
         type="text"
         placeholder="Enter ZIP Code"
@@ -66,7 +66,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
           console.log("[SearchForm] ZIP code changed:", value);
           setZipCode(value);
         }}
-        className="h-12 text-base bg-white border rounded-lg shadow-sm flex-1"
+        className="h-12 text-base bg-white/90 backdrop-blur-sm border-0 rounded-lg shadow-md flex-1"
         pattern="[0-9]{5}"
         maxLength={5}
         required
@@ -78,7 +78,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
           setEstimatedUse(value);
         }}
       >
-        <SelectTrigger className="h-12 text-base bg-white border rounded-lg shadow-sm w-full md:w-48">
+        <SelectTrigger className="h-12 text-base bg-white/90 backdrop-blur-sm border-0 rounded-lg shadow-md w-full md:w-48">
           <SelectValue placeholder="Select usage" />
         </SelectTrigger>
         <SelectContent>
@@ -90,7 +90,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
       <Button 
         type="submit" 
         disabled={isLoading}
-        className="h-12 text-base bg-primary hover:bg-primary/90 rounded-lg shadow-sm px-8 min-w-[140px]"
+        className="h-12 text-base bg-white text-teal-700 hover:bg-white/90 rounded-lg shadow-md px-8 min-w-[140px]"
       >
         {isLoading ? "Searching..." : "Search Plans"}
       </Button>
