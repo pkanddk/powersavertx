@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { AuthError, AuthResponse, User, AuthChangeEvent, Session } from '@supabase/supabase-js';
 
 export default function AuthPage() {
   const navigate = useNavigate();
@@ -59,7 +60,7 @@ export default function AuthPage() {
     document.addEventListener('submit', handleFormSubmit, true);
 
     // Auth state change listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session: Session | null) => {
       console.log("Auth state change event:", event);
       
       if (event === 'SIGNED_IN') {
@@ -68,19 +69,29 @@ export default function AuthPage() {
         setError("Please check your email to reset your password.");
       } else if (event === 'USER_UPDATED' || event === 'SIGNED_OUT') {
         setError(null);
-      } else if (event === 'USER_DELETED') {
-        setError(null);
       }
 
       // Handle authentication errors
       if (event === 'SIGNED_UP' && !session) {
-        const message = "This email is already registered. Please sign in instead.";
-        setError(message);
-        toast({
-          title: "Account Exists",
-          description: message,
-          variant: "destructive",
-        });
+        try {
+          const { error } = await supabase.auth.signUp({
+            email: (document.querySelector('input[type="email"]') as HTMLInputElement)?.value || '',
+            password: (document.querySelector('input[type="password"]') as HTMLInputElement)?.value || ''
+          });
+
+          if (error?.message?.includes("already registered")) {
+            const message = "This email is already registered. Please sign in instead.";
+            setError(message);
+            toast({
+              title: "Account Exists",
+              description: message,
+              variant: "destructive",
+            });
+          }
+        } catch (err) {
+          console.error("Signup error:", err);
+          setError("An error occurred during signup. Please try again.");
+        }
       }
     });
 
