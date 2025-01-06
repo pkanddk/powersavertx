@@ -22,9 +22,6 @@ export function AuthForm({ error }: AuthFormProps) {
           console.log("User signed in successfully");
           setAuthError(null);
         }
-      } else if (event === 'USER_DELETED') {
-        console.log("Auth error: Invalid login credentials");
-        setAuthError("Invalid login credentials");
       }
     });
 
