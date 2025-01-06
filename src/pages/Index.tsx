@@ -13,14 +13,14 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
   };
 
   return (
-    <div className="relative min-h-[50vh] flex items-center justify-center">
+    <main className="container mx-auto px-4 py-8">
       {/* Auth Menu */}
       <div className="absolute top-4 right-4 z-50">
         <AuthMenu />
       </div>
 
-      {/* Content Container */}
-      <div className="relative w-full max-w-4xl mx-auto px-4">
+      {/* Main Content */}
+      <div className="max-w-4xl mx-auto mt-12">
         <div className="text-center space-y-6">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground">
             Find Your Perfect Energy Plan
@@ -48,6 +48,6 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
