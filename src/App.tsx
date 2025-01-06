@@ -40,10 +40,11 @@ export default function App() {
               path="/pricing" 
               element={
                 <Pricing 
-                  searchParams={searchParams} 
-                  selectedPlans={selectedPlans}
-                  onAddPlan={handleAddPlan}
-                  onRemovePlan={handleRemovePlan}
+                  search={searchParams}
+                  onSearch={handleSearch}
+                  comparedPlans={selectedPlans}
+                  onCompare={handleAddPlan}
+                  estimatedUse={searchParams?.estimatedUse || "1000"}
                 />
               } 
             />
@@ -51,8 +52,9 @@ export default function App() {
               path="/compare" 
               element={
                 <Compare 
-                  selectedPlans={selectedPlans} 
-                  onRemovePlan={handleRemovePlan}
+                  plans={selectedPlans}
+                  onRemove={handleRemovePlan}
+                  estimatedUse={searchParams?.estimatedUse || "1000"}
                 />
               } 
             />

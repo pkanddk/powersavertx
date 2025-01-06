@@ -62,8 +62,10 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
       title: "Authentication required",
       description: "Please sign in to access this feature.",
     });
-    return <Navigate to="/auth" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   return <>{children}</>;
 };
+
+export default ProtectedRoute;
