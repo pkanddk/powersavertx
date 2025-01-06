@@ -29,33 +29,7 @@ export function AuthForm({ error }: AuthFormProps) {
     return () => {
       subscription.unsubscribe();
     };
-  }, [toast]);
-
-  // Intercept auth operations to handle errors
-  const handleAuth = async (operation: () => Promise<any>) => {
-    try {
-      console.log("[AuthForm] Attempting auth operation");
-      return await operation();
-    } catch (error: any) {
-      console.error("[AuthForm] Auth error:", error);
-      let message = "Unable to sign in. Please try again.";
-      
-      if (error.message?.includes("body stream") || 
-          error.message?.includes("json") ||
-          error.message?.includes("Failed to execute")) {
-        message = "Please refresh the page and try again.";
-      }
-      
-      setAuthError(message);
-      toast({
-        variant: "destructive",
-        title: "Sign in failed",
-        description: message
-      });
-      
-      throw error;
-    }
-  };
+  }, []);
 
   return (
     <>
@@ -75,14 +49,7 @@ export function AuthForm({ error }: AuthFormProps) {
       </Alert>
 
       <Auth
-        supabaseClient={{
-          ...supabase,
-          auth: {
-            ...supabase.auth,
-            signInWithPassword: async (credentials) => 
-              handleAuth(() => supabase.auth.signInWithPassword(credentials))
-          }
-        }}
+        supabaseClient={supabase}
         appearance={{
           theme: ThemeSupa,
           variables: {
