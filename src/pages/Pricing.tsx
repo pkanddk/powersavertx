@@ -1,185 +1,139 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { SearchForm } from "@/components/SearchForm";
 import { PlanGrid } from "@/components/PlanGrid";
 import { Plan } from "@/lib/api";
-import { useToast } from "@/hooks/use-toast";
-import { filterPlans } from "@/lib/utils/filterPlans";
 import { PlanFilters } from "@/components/PlanFilters";
 import { ComparisonBar } from "@/components/plan/ComparisonBar";
-import { WelcomeDialog } from "@/components/WelcomeDialog";
-import { BugReportDialog } from "@/components/BugReportDialog";
-import { DevMessageDialog } from "@/components/DevMessageDialog";
-import { searchPlans } from "@/lib/api";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { Badge } from "@/components/ui/badge";
+import { useMediaQuery } from "@/hooks/use-mobile";
+import { MobileFiltersDialog } from "@/components/filters/MobileFiltersDialog";
 
 interface PricingProps {
-  comparedPlans: Plan[];
-  onCompare: (plan: Plan) => void;
-  search: { zipCode: string; estimatedUse: string } | null;
   onSearch: (zipCode: string, estimatedUse: string) => void;
+  onCompare: (plan: Plan) => void;
+  comparedPlans: Plan[];
+  search: { zipCode: string; estimatedUse: string; } | null;
   estimatedUse: string;
 }
 
-export default function Pricing({ comparedPlans, onCompare, search, onSearch, estimatedUse }: PricingProps) {
-  const [sortOrder, setSortOrder] = useState("price-asc");
-  const [contractLength, setContractLength] = useState("all");
-  const [planType, setPlanType] = useState("all");
-  const [prepaidFilter, setPrepaidFilter] = useState("all");
-  const [timeOfUseFilter, setTimeOfUseFilter] = useState("all");
-  const [companyFilter, setCompanyFilter] = useState("all");
-  const [renewableFilter, setRenewableFilter] = useState("all");
-  const [cancellationFeeRange, setCancellationFeeRange] = useState<[number, number]>([0, 1000]);
-  const { toast } = useToast();
-  const isMobile = useIsMobile();
-
-  const { data: plans, isLoading } = useQuery({
-    queryKey: ["plans", search?.zipCode, search?.estimatedUse],
-    queryFn: () => searchPlans(search!.zipCode, search!.estimatedUse),
-    enabled: !!search,
-    meta: {
-      onError: () => {
-        toast({
-          title: "Error",
-          description: "Failed to fetch energy plans. Please try again.",
-          variant: "destructive",
-        });
-      },
-    },
+export default function Pricing({ onSearch, onCompare, comparedPlans, search, estimatedUse }: PricingProps) {
+  const navigate = useNavigate();
+  const isMobile = useMediaQuery("(max-width: 768px)");
+  const [isLoading, setIsLoading] = useState(false);
+  const [plans, setPlans] = useState<Plan[]>([]);
+  const [filters, setFilters] = useState({
+    sortBy: "price_kwh",
+    companies: [] as string[],
+    contractLength: [0, 60],
+    baseCharge: [0, 100],
+    cancellationFee: [0, 500],
+    renewable: false,
+    prepaid: false,
+    timeOfUse: false,
   });
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
-  const filteredPlans = plans ? filterPlans(plans, {
-    planType,
-    contractLength,
-    prepaidFilter,
-    timeOfUseFilter,
-    companyFilter,
-    sortOrder,
-    renewableFilter,
-    cancellationFeeRange,
-    estimatedUse,
-  }) : [];
+  useEffect(() => {
+    const fetchPlans = async () => {
+      if (!search?.zipCode) return;
+      
+      setIsLoading(true);
+      try {
+        const response = await fetch(`/api/plans?zip=${search.zipCode}`);
+        if (!response.ok) throw new Error('Failed to fetch plans');
+        const data = await response.json();
+        setPlans(data);
+      } catch (error) {
+        console.error('Error fetching plans:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPlans();
+  }, [search?.zipCode]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-50/50 via-white to-white">
       <div className="relative min-h-[calc(100vh-4rem)]">
-        {/* Clean gradient background */}
-        <div className="absolute inset-0 bg-gradient-to-b from-sky-100 via-sky-50 to-white z-0" />
+        {/* Hero Image Background */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center z-0"
+          style={{ 
+            backgroundImage: "url('/lovable-uploads/5e950f3a-e331-4c06-aa8f-d883b1d7795f.png')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+          aria-label="Decorative hero image showing a pink house with wind turbine, representing clean energy and home power"
+          role="img"
+        >
+          <div className="absolute inset-0 bg-black/30" />
+        </div>
 
         {/* Content */}
         <div className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] text-center space-y-6 px-4">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white">
-            Find Your Perfect Energy Plan
+            Compare Energy Plans
           </h1>
           <p className="text-xl text-white/90 max-w-2xl mx-auto">
-            Compare electricity rates and plans from top providers in your area
+            Find the best electricity rates and plans from top providers in your area
           </p>
 
           {/* Search Form */}
-          <div className="max-w-md mx-auto w-full">
-            <SearchForm onSearch={onSearch} isLoading={isLoading} />
-          </div>
-
-          {/* Features */}
-          <div className="flex flex-wrap justify-center gap-2 mt-6">
-            <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
-              No Signup Required
-            </Badge>
-            <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
-              Real-Time Rates
-            </Badge>
-            <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
-              Trusted Providers
-            </Badge>
+          <div className="max-w-md mx-auto w-full glass-effect rounded-lg p-4">
+            <SearchForm onSearch={onSearch} />
           </div>
         </div>
+
+        {/* Plans Section */}
+        {search && (
+          <div className="relative z-10 bg-white py-8">
+            <div className="container mx-auto px-4">
+              <div className="flex flex-col md:flex-row gap-6">
+                {/* Filters */}
+                {!isMobile && (
+                  <aside className="w-full md:w-64 space-y-6">
+                    <PlanFilters 
+                      filters={filters}
+                      onChange={setFilters}
+                    />
+                  </aside>
+                )}
+
+                {/* Mobile Filters Dialog */}
+                <MobileFiltersDialog
+                  open={showMobileFilters}
+                  onOpenChange={setShowMobileFilters}
+                  filters={filters}
+                  onChange={setFilters}
+                />
+
+                {/* Plans Grid */}
+                <main className="flex-1">
+                  <PlanGrid
+                    plans={plans}
+                    isLoading={isLoading}
+                    onCompare={onCompare}
+                    comparedPlans={comparedPlans}
+                    estimatedUse={estimatedUse}
+                    showMobileFilters={() => setShowMobileFilters(true)}
+                    isMobile={isMobile}
+                    filters={filters}
+                  />
+                </main>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Plans Section - Only shown after search */}
-      {plans && (
-        <div className="container mx-auto px-4 py-8">
-          {isMobile && (
-            <div className="flex items-center justify-center gap-2 md:gap-3 mt-2 mb-4 md:mb-6">
-              <DevMessageDialog />
-              <BugReportDialog />
-            </div>
-          )}
-
-          <div className="space-y-6 md:space-y-8">
-            <div className="md:hidden">
-              <PlanFilters
-                onSortChange={setSortOrder}
-                onContractLengthChange={setContractLength}
-                onPlanTypeChange={setPlanType}
-                onPrepaidChange={setPrepaidFilter}
-                onTimeOfUseChange={setTimeOfUseFilter}
-                onCompanyChange={setCompanyFilter}
-                onRenewableChange={setRenewableFilter}
-                onCancellationFeeChange={setCancellationFeeRange}
-                currentSort={sortOrder}
-                currentContractLength={contractLength}
-                currentPlanType={planType}
-                currentPrepaid={prepaidFilter}
-                currentTimeOfUse={timeOfUseFilter}
-                currentCompany={companyFilter}
-                currentRenewable={renewableFilter}
-                currentCancellationFee={cancellationFeeRange}
-                plans={plans}
-              />
-            </div>
-
-            <div className="hidden md:block">
-              <div className="flex flex-col gap-4">
-                <div className="flex justify-between items-start">
-                  <PlanFilters
-                    onSortChange={setSortOrder}
-                    onContractLengthChange={setContractLength}
-                    onPlanTypeChange={setPlanType}
-                    onPrepaidChange={setPrepaidFilter}
-                    onTimeOfUseChange={setTimeOfUseFilter}
-                    onCompanyChange={setCompanyFilter}
-                    onRenewableChange={setRenewableFilter}
-                    onCancellationFeeChange={setCancellationFeeRange}
-                    currentSort={sortOrder}
-                    currentContractLength={contractLength}
-                    currentPlanType={planType}
-                    currentPrepaid={prepaidFilter}
-                    currentTimeOfUse={timeOfUseFilter}
-                    currentCompany={companyFilter}
-                    currentRenewable={renewableFilter}
-                    currentCancellationFee={cancellationFeeRange}
-                    plans={plans}
-                  />
-                  <div className="flex gap-3 mt-8">
-                    <DevMessageDialog />
-                    <BugReportDialog />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {isLoading ? (
-              <div className="text-center py-12 md:py-16">
-                <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-primary border-r-transparent" />
-              </div>
-            ) : (
-              <div className="animate-fade-in">
-                <PlanGrid
-                  plans={filteredPlans}
-                  onCompare={onCompare}
-                  comparedPlans={comparedPlans}
-                  estimatedUse={estimatedUse}
-                />
-              </div>
-            )}
-          </div>
-
-          <ComparisonBar
-            plans={comparedPlans}
-            onRemove={onCompare}
-          />
-        </div>
+      {/* Comparison Bar */}
+      {comparedPlans.length > 0 && (
+        <ComparisonBar
+          plans={comparedPlans}
+          onViewComparison={() => navigate('/compare')}
+          estimatedUse={estimatedUse}
+        />
       )}
     </div>
   );
