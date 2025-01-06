@@ -22,10 +22,6 @@ export function AuthForm({ error }: AuthFormProps) {
           console.log("User signed in successfully");
           setAuthError(null);
         }
-      } else if (event === 'SIGNED_OUT') {
-        console.log("User signed out");
-      } else if (event === 'PASSWORD_RECOVERY') {
-        console.log("Password recovery initiated");
       }
     });
 
