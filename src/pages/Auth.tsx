@@ -38,38 +38,7 @@ export default function AuthPage() {
 
     checkUser();
 
-    // Form submission handler for password validation
-    const handleFormSubmit = async (event: Event) => {
-      const form = event.target as HTMLFormElement;
-      if (!form || !form.matches('form')) return;
-      
-      const passwordInput = form.querySelector('input[type="password"]') as HTMLInputElement;
-      if (!passwordInput) return;
-
-      if (passwordInput.value.length < 6) {
-        event.preventDefault();
-        event.stopPropagation();
-        
-        passwordInput.value = '';
-        passwordInput.focus();
-        
-        const message = "Password must be at least 6 characters long";
-        setError(message);
-        toast({
-          title: "Invalid Password",
-          description: message,
-          variant: "destructive",
-        });
-        
-        return false;
-      }
-      
-      setError(null);
-    };
-
-    document.addEventListener('submit', handleFormSubmit, true);
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("Auth state change event:", event);
       
       if (event === 'SIGNED_IN') {
@@ -78,45 +47,10 @@ export default function AuthPage() {
       }
     });
 
-    // Listen for Supabase auth errors
-    const handleAuthError = (event: CustomEvent) => {
-      const error = event.detail?.error;
-      if (!error) return;
-      
-      console.error("Auth error:", error);
-      
-      if (error?.message?.includes("Invalid login credentials")) {
-        setError("Invalid email or password");
-        toast({
-          title: "Authentication Error",
-          description: "Invalid email or password",
-          variant: "destructive",
-        });
-      } else if (error?.message?.includes("User already registered")) {
-        setError("An account with this email already exists");
-        toast({
-          title: "Authentication Error",
-          description: "An account with this email already exists",
-          variant: "destructive",
-        });
-      } else if (error?.message) {
-        setError(error.message);
-        toast({
-          title: "Authentication Error",
-          description: error.message,
-          variant: "destructive",
-        });
-      }
-    };
-
-    window.addEventListener('supabase.auth.error', handleAuthError as EventListener);
-
     return () => {
       subscription.unsubscribe();
-      document.removeEventListener('submit', handleFormSubmit, true);
-      window.removeEventListener('supabase.auth.error', handleAuthError as EventListener);
     };
-  }, [navigate, toast]);
+  }, [navigate]);
 
   if (isLoading) {
     return (

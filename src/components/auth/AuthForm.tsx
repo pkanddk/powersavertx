@@ -3,12 +3,37 @@ import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Info } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { useEffect } from "react";
 
 interface AuthFormProps {
   error: string | null;
 }
 
 export function AuthForm({ error }: AuthFormProps) {
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const handleAuthError = (event: any) => {
+      if (!event.detail?.error) return;
+      
+      const errorMessage = event.detail.error.message;
+      if (errorMessage?.includes("Invalid login credentials")) {
+        toast({
+          title: "Authentication Error",
+          description: "Invalid email or password",
+          variant: "destructive",
+        });
+      }
+    };
+
+    window.addEventListener('supabase.auth.error', handleAuthError as EventListener);
+
+    return () => {
+      window.removeEventListener('supabase.auth.error', handleAuthError as EventListener);
+    };
+  }, [toast]);
+
   return (
     <>
       {error && (
