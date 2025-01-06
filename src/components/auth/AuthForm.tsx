@@ -9,14 +9,15 @@ import { Loader2 } from "lucide-react";
 
 interface AuthFormProps {
   error: string | null;
+  mode: "sign_in" | "sign_up";
 }
 
-export function AuthForm({ error: initialError }: AuthFormProps) {
+export function AuthForm({ error: initialError, mode: initialMode }: AuthFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(initialError);
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [mode, setMode] = useState<"signin" | "signup">(initialMode === "sign_in" ? "signin" : "signup");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,7 +31,6 @@ export function AuthForm({ error: initialError }: AuthFormProps) {
           password,
         });
         if (signInError) {
-          // Parse the error message from the response
           if (signInError.message === "Invalid login credentials") {
             throw new Error("Invalid email or password. Please try again.");
           }
