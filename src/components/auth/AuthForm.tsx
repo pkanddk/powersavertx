@@ -77,12 +77,22 @@ export function AuthForm({ error }: AuthFormProps) {
         if (error) {
           console.error("Supabase connection error:", error);
           setAuthError("Unable to connect to authentication service. Please try again later.");
+          toast({
+            title: "Connection Error",
+            description: "Unable to connect to authentication service. Please try again later.",
+            variant: "destructive",
+          });
         } else {
           console.log("Supabase connection successful:", data);
         }
       } catch (err) {
         console.error("Failed to test Supabase connection:", err);
         setAuthError("Unable to establish connection with authentication service.");
+        toast({
+          title: "Connection Error",
+          description: "Unable to establish connection with authentication service.",
+          variant: "destructive",
+        });
       }
     };
 
@@ -99,13 +109,15 @@ export function AuthForm({ error }: AuthFormProps) {
     <>
       {(error || authError) && (
         <Alert variant="destructive" className="mb-4">
-          <AlertDescription>{error || authError}</AlertDescription>
+          <AlertDescription className="font-medium">
+            {error || authError}
+          </AlertDescription>
         </Alert>
       )}
 
       <Alert variant="default" className="mb-4 bg-blue-50 border-blue-200">
         <Info className="h-4 w-4 text-blue-600" />
-        <AlertDescription className="text-sm text-blue-700">
+        <AlertDescription className="text-sm text-blue-700 font-medium">
           Password must be at least 6 characters long
         </AlertDescription>
       </Alert>
@@ -128,7 +140,8 @@ export function AuthForm({ error }: AuthFormProps) {
             message: {
               color: 'rgb(239 68 68)',
               fontSize: '0.875rem',
-              marginTop: '0.5rem'
+              marginTop: '0.5rem',
+              fontWeight: '500'
             }
           }
         }}
