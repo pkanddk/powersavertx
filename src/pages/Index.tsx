@@ -13,31 +13,19 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
   };
 
   return (
-    <div className="relative min-h-[50vh] flex items-start justify-center pt-32">
+    <div className="relative min-h-[50vh] flex items-center justify-center">
       {/* Auth Menu */}
       <div className="absolute top-4 right-4 z-50">
         <AuthMenu />
       </div>
 
-      {/* Hero Background */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ 
-          backgroundImage: "url('/lovable-uploads/7edcecd9-8dd1-48a1-9600-0ba09103a4ba.png')",
-          height: "50vh",
-          backgroundPosition: "center 25%"
-        }}
-      >
-        <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px]" />
-      </div>
-
       {/* Content Container */}
       <div className="relative w-full max-w-4xl mx-auto px-4">
         <div className="text-center space-y-6">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground">
             Find Your Perfect Energy Plan
           </h1>
-          <p className="text-xl text-white/90 max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Compare electricity rates and plans from top providers in your area
           </p>
 
@@ -48,13 +36,13 @@ export default function Index({ onSearch }: { onSearch: (zipCode: string, estima
 
           {/* Features */}
           <div className="flex flex-wrap justify-center gap-3 mt-6">
-            <Badge variant="secondary" className="bg-white/20 text-white border-white/20 py-1.5 px-4">
+            <Badge variant="secondary" className="py-1.5 px-4">
               No Signup Required
             </Badge>
-            <Badge variant="secondary" className="bg-white/20 text-white border-white/20 py-1.5 px-4">
+            <Badge variant="secondary" className="py-1.5 px-4">
               Real-Time Rates
             </Badge>
-            <Badge variant="secondary" className="bg-white/20 text-white border-white/20 py-1.5 px-4">
+            <Badge variant="secondary" className="py-1.5 px-4">
               Trusted Providers
             </Badge>
           </div>
