@@ -22,15 +22,23 @@ export function AuthForm({ error }: AuthFormProps) {
           console.log("User signed in successfully");
           setAuthError(null);
         }
+      } else if (event === 'USER_DELETED') {
+        console.log("Auth error: Invalid login credentials");
+        setAuthError("Invalid login credentials");
       }
     });
 
-    // Listen for auth errors
+    // Listen for auth errors through custom events
     const handleAuthError = (event: CustomEvent) => {
       const error = event.detail?.error;
       if (error?.message) {
         console.log("Auth error:", error.message);
         setAuthError(error.message);
+        toast({
+          variant: "destructive",
+          title: "Authentication Error",
+          description: error.message
+        });
       }
     };
 
@@ -40,7 +48,7 @@ export function AuthForm({ error }: AuthFormProps) {
       subscription.unsubscribe();
       window.removeEventListener('supabase.auth.error', handleAuthError as EventListener);
     };
-  }, []);
+  }, [toast]);
 
   return (
     <>
@@ -84,16 +92,6 @@ export function AuthForm({ error }: AuthFormProps) {
         }}
         providers={[]}
         redirectTo={window.location.origin}
-        onError={(error) => {
-          console.log("Auth error in onError:", error);
-          if (error instanceof AuthError) {
-            setAuthError(error.message);
-          } else if (error instanceof Error) {
-            setAuthError(error.message);
-          } else {
-            setAuthError("An unexpected error occurred");
-          }
-        }}
         localization={{
           variables: {
             sign_in: {
